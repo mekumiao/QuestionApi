@@ -1,19 +1,20 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuestionApi;
 
-public class QuestionDbContext : DbContext {
+public class QuestionDbContext : IdentityDbContext {
     public DbSet<Question> Questions { get; set; }
-    public DbSet<User> Users { get; set; }
     public string DbPath { get; }
 
     public QuestionDbContext() {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);
-        DbPath = System.IO.Path.Join(path, "question.db");
+        DbPath = Path.Join(path, "question.db");
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -21,24 +22,33 @@ public class QuestionDbContext : DbContext {
 }
 
 /// <summary>
-/// 题库表
+/// 题目表
 /// </summary>
 public class Question {
     public int QuestionId { get; set; }
-    public string Remark { get; set; } = string.Empty;
-    public QuestionType Type { get; set; }
+    public string QuestionText { get; set; } = string.Empty;
+    public QuestionType QuestionType { get; set; }
+    public string CorrectAnswer { get; set; } = string.Empty;
+    public ICollection<Option> Options { get; set; } = [];
 }
 
 /// <summary>
 /// 题型枚举
 /// </summary>
 public enum QuestionType {
-    single,
-    multiple,
-    panduan,
-    tiankong
+    SingleChoice,
+    MultipleChoice,
+    TrueFalse,
+    FillInTheBlank
 }
 
-public class User {
-    public int UserId { get; set; }
+/// <summary>
+/// 选项表
+/// </summary>
+public class Option {
+    public int OptionId { get; set; }
+    public int QuestionId { get; set; }
+    public Question Question { get; set; } = null!;
+    public string OptionText { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
 }

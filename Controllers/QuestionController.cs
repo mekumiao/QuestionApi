@@ -1,6 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
+using Mapster;
+
+using MapsterMapper;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,21 +13,19 @@ using QuestionApi.Modules;
 
 namespace QuestionApi.Controllers;
 
+[Authorize(Roles = "admin,user")]
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class QuestionController(ILogger<QuestionController> logger, QuestionDbContext dbContext) : ControllerBase {
+public class QuestionController(ILogger<QuestionController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
     private readonly ILogger<QuestionController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
+    private readonly IMapper _mapper = mapper;
 
     [HttpGet]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetListAsync([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
-        var result = await _dbContext.Questions.AsNoTracking().Select(v => new QuestionDto {
-            QuestionId = v.QuestionId,
-            Remark = v.Remark,
-            Type = v.Type,
-        }).Skip(offset).Take(limit).ToListAsync();
+        var result = await _dbContext.Questions.AsNoTracking().ProjectToType<QuestionDto>().Skip(offset).Take(limit).ToListAsync();
         return Ok(result);
     }
 
@@ -33,27 +36,16 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
         var item = await _dbContext.Questions.FindAsync(questionId);
         return item is null
             ? NotFound()
-            : Ok(new QuestionDto {
-                QuestionId = item.QuestionId,
-                Remark = item.Remark,
-                Type = item.Type,
-            });
+            : Ok(_mapper.Map<QuestionDto>(item));
     }
 
     [HttpPost]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateAsync([FromBody, FromForm] QuestionCreateDto dto) {
-        var item = new Question {
-            Remark = dto.Remark,
-            Type = dto.Type,
-        };
+        var item = _mapper.Map<Question>(dto);
         _dbContext.Questions.Add(item);
         await _dbContext.SaveChangesAsync();
-        var result = new QuestionDto {
-            QuestionId = item.QuestionId,
-            Remark = item.Remark,
-            Type = item.Type,
-        };
+        var result = _mapper.Map<QuestionDto>(item);
         return CreatedAtRoute("GetQuestionById", new { questionId = item.QuestionId }, result);
     }
 
@@ -65,18 +57,13 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
         if (item is null) {
             return NotFound();
         }
-        item.Remark = dto.Remark;
-        item.Type = dto.Type;
+        _mapper.From(dto).AdaptTo(item);
         await _dbContext.SaveChangesAsync();
         item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
             return NotFound();
         }
-        var result = new QuestionDto {
-            QuestionId = questionId,
-            Remark = item.Remark,
-            Type = item.Type,
-        };
+        var result = _mapper.Map<QuestionDto>(item);
         return Ok(result);
     }
 }
