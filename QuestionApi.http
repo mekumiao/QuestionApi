@@ -1,0 +1,6 @@
+@QuestionApi_HostAddress = http://localhost:5137
+
+GET {{QuestionApi_HostAddress}}/Question/
+Accept: application/json
+
+###
