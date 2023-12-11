@@ -1,6 +1,9 @@
-@QuestionApi_HostAddress = http://localhost:5137
+@HostAddress = https://localhost:7224/api
 
-GET {{QuestionApi_HostAddress}}/Question/
+GET {{HostAddress}}/Question/
 Accept: application/json
 
 ###
+
+GET {{HostAddress}}/Question/1
+Accept: application/json
