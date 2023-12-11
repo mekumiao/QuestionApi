@@ -31,11 +31,7 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     public async Task<IActionResult> GetQuestionById([FromRoute] int questionId) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
-            var errorResponse = new {
-                Message = "Resource not found",
-                ErrorDetail = "The requested resource could not be found."
-            };
-            return NotFound(errorResponse);
+            return NotFound();
         }
         return Ok(new QuestionDto {
             QuestionId = item.QuestionId,
@@ -67,22 +63,14 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     public async Task<IActionResult> UpdateAsync([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdateDto dto) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
-            var errorResponse = new {
-                Message = "Resource not found",
-                ErrorDetail = "The requested resource could not be found."
-            };
-            return NotFound(errorResponse);
+            return NotFound();
         }
         item.Remark = dto.Remark;
         item.Type = dto.Type;
         await _dbContext.SaveChangesAsync();
         item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
-            var errorResponse = new {
-                Message = "Resource not found",
-                ErrorDetail = "The requested resource could not be found."
-            };
-            return NotFound(errorResponse);
+            return NotFound();
         }
         var result = new QuestionDto {
             QuestionId = questionId,
