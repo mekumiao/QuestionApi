@@ -1,6 +1,6 @@
 @HostAddress = https://localhost:7224/api
 
-GET {{HostAddress}}/Question/
+GET {{HostAddress}}/Question/?offset=10&limit=10
 Accept: application/json
 
 ###

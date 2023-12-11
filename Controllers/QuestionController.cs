@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,12 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
 
     [HttpGet]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetListAsync() {
+    public async Task<IActionResult> GetListAsync([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
         var result = await _dbContext.Questions.AsNoTracking().Select(v => new QuestionDto {
             QuestionId = v.QuestionId,
             Remark = v.Remark,
             Type = v.Type,
-        }).ToListAsync();
+        }).Skip(offset).Take(limit).ToListAsync();
         return Ok(result);
     }
 
@@ -30,14 +31,13 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetQuestionById([FromRoute] int questionId) {
         var item = await _dbContext.Questions.FindAsync(questionId);
-        if (item is null) {
-            return NotFound();
-        }
-        return Ok(new QuestionDto {
-            QuestionId = item.QuestionId,
-            Remark = item.Remark,
-            Type = item.Type,
-        });
+        return item is null
+            ? NotFound()
+            : Ok(new QuestionDto {
+                QuestionId = item.QuestionId,
+                Remark = item.Remark,
+                Type = item.Type,
+            });
     }
 
     [HttpPost]
