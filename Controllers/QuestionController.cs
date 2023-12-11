@@ -15,6 +15,7 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     private readonly QuestionDbContext _dbContext = dbContext;
 
     [HttpGet]
+    [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetListAsync() {
         var result = await _dbContext.Questions.AsNoTracking().Select(v => new QuestionDto {
             QuestionId = v.QuestionId,
@@ -25,6 +26,8 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     }
 
     [HttpGet("{questionId:int}", Name = "GetQuestionById")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetQuestionById([FromRoute] int questionId) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
@@ -42,6 +45,7 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateAsync([FromBody, FromForm] QuestionCreateDto dto) {
         var item = new Question {
             Remark = dto.Remark,
@@ -49,10 +53,17 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
         };
         _dbContext.Questions.Add(item);
         await _dbContext.SaveChangesAsync();
-        return CreatedAtRoute("GetQuestionById", new { questionId = item.QuestionId }, item);
+        var result = new QuestionDto {
+            QuestionId = item.QuestionId,
+            Remark = item.Remark,
+            Type = item.Type,
+        };
+        return CreatedAtRoute("GetQuestionById", new { questionId = item.QuestionId }, result);
     }
 
     [HttpPut("{questionId:int}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateAsync([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdateDto dto) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
@@ -65,7 +76,19 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
         item.Remark = dto.Remark;
         item.Type = dto.Type;
         await _dbContext.SaveChangesAsync();
-        var result = await _dbContext.Questions.FindAsync(questionId);
+        item = await _dbContext.Questions.FindAsync(questionId);
+        if (item is null) {
+            var errorResponse = new {
+                Message = "Resource not found",
+                ErrorDetail = "The requested resource could not be found."
+            };
+            return NotFound(errorResponse);
+        }
+        var result = new QuestionDto {
+            QuestionId = questionId,
+            Remark = item.Remark,
+            Type = item.Type,
+        };
         return Ok(result);
     }
 }
