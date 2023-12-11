@@ -7,3 +7,26 @@ Accept: application/json
 
 GET {{HostAddress}}/Question/1
 Accept: application/json
+
+
+###
+
+POST  {{HostAddress}}/Question/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Remark": "测试题目？",
+  "Type": 1
+}
+
+###
+
+PUT   {{HostAddress}}/Question/11
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Remark": "测试题目？xxxxx22222x",
+  "Type": 3
+}

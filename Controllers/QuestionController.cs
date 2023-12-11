@@ -15,7 +15,7 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     private readonly QuestionDbContext _dbContext = dbContext;
 
     [HttpGet]
-    public async Task<IActionResult> GetAsync() {
+    public async Task<IActionResult> GetListAsync() {
         var result = await _dbContext.Questions.AsNoTracking().Select(v => new QuestionDto {
             QuestionId = v.QuestionId,
             Remark = v.Remark,
@@ -24,8 +24,8 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
         return Ok(result);
     }
 
-    [HttpGet("{questionId:int}")]
-    public async Task<IActionResult> GetAsync([FromRoute] int questionId) {
+    [HttpGet("{questionId:int}", Name = "GetQuestionById")]
+    public async Task<IActionResult> GetQuestionById([FromRoute] int questionId) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
             var errorResponse = new {
@@ -41,5 +41,31 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
         });
     }
 
-    // public async Task<IActionResult> 
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync([FromBody, FromForm] QuestionCreateDto dto) {
+        var item = new Question {
+            Remark = dto.Remark,
+            Type = dto.Type,
+        };
+        _dbContext.Questions.Add(item);
+        await _dbContext.SaveChangesAsync();
+        return CreatedAtRoute("GetQuestionById", new { questionId = item.QuestionId }, item);
+    }
+
+    [HttpPut("{questionId:int}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdateDto dto) {
+        var item = await _dbContext.Questions.FindAsync(questionId);
+        if (item is null) {
+            var errorResponse = new {
+                Message = "Resource not found",
+                ErrorDetail = "The requested resource could not be found."
+            };
+            return NotFound(errorResponse);
+        }
+        item.Remark = dto.Remark;
+        item.Type = dto.Type;
+        await _dbContext.SaveChangesAsync();
+        var result = await _dbContext.Questions.FindAsync(questionId);
+        return Ok(result);
+    }
 }
