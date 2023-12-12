@@ -13,6 +13,12 @@ using QuestionApi.Modules;
 
 namespace QuestionApi.Controllers;
 
+/// <summary>
+/// 题目
+/// </summary>
+/// <param name="logger"></param>
+/// <param name="dbContext"></param>
+/// <param name="mapper"></param>
 [Authorize(Roles = "admin")]
 [ApiController]
 [Route("[controller]")]
