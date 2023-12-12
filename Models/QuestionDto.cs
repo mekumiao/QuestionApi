@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace QuestionApi.Modules;
+using QuestionApi.Database;
+
+namespace QuestionApi.Models;
 
 public class QuestionDto {
     public int QuestionId { get; set; }

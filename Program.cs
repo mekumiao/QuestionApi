@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 
-using QuestionApi;
+using QuestionApi.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 

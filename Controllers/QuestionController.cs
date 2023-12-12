@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using QuestionApi.Modules;
+using QuestionApi.Database;
+using QuestionApi.Models;
 
 namespace QuestionApi.Controllers;
 
