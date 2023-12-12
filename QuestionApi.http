@@ -1,5 +1,5 @@
 @HostAddress = https://qbank.yuxiaoyu.top
-# @HostAddress = https://mini.dev:7224
+# @HostAddress = https://localhost:7224
 @email = admin@qq.com
 @badPassword = password
 @password = Az.123123!
@@ -29,7 +29,7 @@ Content-Type: application/json
 ###
 
 # these come from the previous response
-@accessToken = CfDJ8D5AZxaCIK9Pp0gjouj9HChVCGq4G5xR5sCj5LNfroCuonQvZdAhi0hNSh622IxyKgWXy4czBKBnisqe8WdmbZ6tyeOEBX4AVtTcZhthVWjlEY40QSCGlp3Jd7mmpZdidu-Mqn_Ld5kJ4lNeXojuPJ6_k0xN6IlstnPdpOXwrDk8_krAwPngupH9pgv7yuGoU4FUod9WfCwkW-JaOcnJHyCcmjQsZDrXO2ouoHg6E5UIAVmGTGwAhGMfvALLBe3Gn7YOMK73Y4X3oX6sJ2QGIrHJ78U3qBVNHiWGdQ5zY2xTNAtONO3y5Mt4zuJP_Nv5FHBAuw0X1wsylKcS2FLSJlS8Zhqmdir6TJI1jkQUauM-6ySDqZch8n0VtdL2qYAPYc7seU0ng_ju0XoXTLn2HCzDJ8Db6clX4jGAs_YyGnkL7cTkxPHlJNy3IV2D5TFr1AgItoeE9aJ2TMsNi4QzUGKZV__6ZN00R6G3GV_ZLPA1F_umrd2ugMEoD_QMyr-X05m9-hCW2pn_BHOesdMmGRquOa3q0GscX55q8IwkOvdr-j9T7yVJFMlgN0cJtqSl8SUshTJ_40MFSlZVBgTR2oSz0Gf_4UBcKTI7rrjDZhNaCGiCcxktFa9eyiyGnpF13ViecvpS8nMX9F7ymd4ceFhJEuOiO5ENuL43xMlVSMTvLCwq-Ckbf4VYYBbMUvLNyrr9IUHHpMKpGmC_UECAvrg
+@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlDM8mnbPuU9BLowt6M3o7rv8NLCp2y803JRKcpAy2QdLkr8cX1GIFEMdfkZN8SzfRYvyWXi7CCkxPPNFUpJpxtfutk5Nw5YFXKA8JYV8yLGtJR658xoJXjdAXuHhlpK0I_hrWpeU-cEbTa10sLhrV4k4848-0BRtNUW74_B-ypizzvJKXqZ5RSZUaiAtN0FQJNKTCa1LwqzuIjXbGH_UGhPD-dEXcy6AKaHAKA_TE9YdsuE0S-Erf5ygxSaLEems1xb0KOTwYfEeizHlP-qCXXD_b01IRh2p-3CnJsZdCmMxreRY4xM8dychStxPsRzaKaBDZodWWe8N_F_t27viAp8hTr9LBEK6k_81YgU_YnPxvOP7aCioihywC_6sWRqH4Z157Kk2VrWPFTQXwIeO3cbOxyWgF9hwE-Nf4m9zXYMgSXM2QYVfvrg9LOrRqo4bq-ifmU4GG_U3gEQtbxm2Trcl9w5wTNIKkwqizAQdttmXW3ng928f5Aa-X7hdqqRIbbphxN-uKO3KDM9-bgtmg1VVIqt6BQsplYL2hmc275tqhJMAXzo9ZRN9g4eXb3Jo9g_JDwHm_UGc55uy0X5Ivk6K8TKEaPA7dKrwMW87K26Qusis3Nq9P9AO23HxWuZFdVhvvkfisf5oHEOzj_FwdPPl7yxFbttlQQlDcWYByBKi1jRXUCGyFHuEw_L_c8DPms
 @refreshToken = CfDJ8D5AZxaCIK9Pp0gjouj9HCg0hHxSiO55LR_H_Ii6ObT1WlSvvnokLQ1_7ALll4tOg6F8nTuelXo5YSrW6rEXxykcyIhkGKfboq4Db0CXAJCukHb48a-XtngCSaAvC0EFgmPgHhaTPa2X6zvDvsKftsttskcII5j-oi09fUWm7f7BPuND1NQimRnG45EqzYWLYwEY7EJv2VhUHjvQEXpSNS1-kKMyu9ndlqnC8fAQD18b6nG5WZTw_hWSizahd0dZuSGy9_oapc3vX_dfdpKc7uTROSU2DazTFt7Ktto2UvnJUzV2wYQ5gZ7KHm8EsYm4AaDMjgu1Beo0BL9XVyoEuC40krSiby313K-rk1fHeuVx21AaFcwiaWEWjGS0PxlpkRDs-LNIXhGc7XeXJrmcNBchQ4pZumMFQP0tL_6y682XZ9lQf_SCn9p1hFc0OB3n8p09VD1wrgbWs1pNnJ_ILzbU_cYfScZQQ1rLGPdVfS6dLjOWlotZN96n8evqo_I4ibQ8yPoprQ9uvmdIOSk7Ze_nzFsxu899twkpTGhipv3ibekM5W3AmDzizLG8mczGihwicBGwPJVqCYOPxHAZctgpUpwy3tNSg_0q9mrEYb_TJKXx5W7PpBioPn4aol6b13WiMfxcbiNr4hIV7NrfgKY_UCyTOeuc3zAHlJxgWlEs3waCjxqv7P4JDhwGBBHX1Mzv95Jss5nlClF1aQRLrKFJWgJddMS1_XWqas8rDCPI
 
 ###
@@ -44,20 +44,20 @@ Content-Type: application/json
 
 ###
 
-GET {{HostAddress}}/Question/?offset=0&limit=10
+GET {{HostAddress}}/api/Question/?offset=0&limit=10
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
-GET {{HostAddress}}/Question/1
+GET {{HostAddress}}/api/Question/1
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 
 ###
 
-POST {{HostAddress}}/Question/
+POST {{HostAddress}}/api/Question/
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
@@ -68,7 +68,7 @@ Content-Type: application/json
 
 ###
 
-PUT {{HostAddress}}/Question/1
+PUT {{HostAddress}}/api/Question/1
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
