@@ -35,17 +35,17 @@ public class QuestionDbContext : IdentityDbContext {
                 l => l.HasOne(v => v.Question).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.QuestionId).IsRequired(),
                 r => r.HasOne(v => v.Exam).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.ExamId).IsRequired());
 
+        builder.Entity<Student>()
+            .HasOne(v => v.User)
+            .WithOne()
+            .HasForeignKey<Student>(v => v.UserId)
+            .IsRequired(false);
+
         // builder.Entity<Student>()
         //     .HasMany(v => v.StudentAnswers)
         //     .WithOne(v => v.Student)
         //     .HasForeignKey(v => v.StudentId)
         //     .IsRequired();
-
-        // builder.Entity<Student>()
-        //     .HasOne(v => v.User)
-        //     .WithOne()
-        //     .HasForeignKey<Student>(v => v.UserId)
-        //     .IsRequired(false);
 
         // builder.Entity<StudentAnswer>()
         //     .HasOne(v => v.Question)
@@ -130,18 +130,18 @@ public class ExamQuestion {
     public Question Question { get; set; } = null!;
 }
 
-// /// <summary>
-// /// 学生表
-// /// </summary>
-// public class Student {
-//     public int StudentId { get; set; }
-//     [MaxLength(500)]
-//     public string Name { get; set; } = string.Empty;
-//     public string? UserId { get; set; }
-//     public IdentityUser? User { get; set; }
-//     public List<StudentAnswer> StudentAnswers { get; } = [];
-//     public List<AnswerHistory> AnswerHistories { get; } = [];
-// }
+/// <summary>
+/// 学生表
+/// </summary>
+public class Student {
+    public int StudentId { get; set; }
+    [MaxLength(500)]
+    public string Name { get; set; } = string.Empty;
+    public string? UserId { get; set; }
+    public IdentityUser? User { get; set; }
+    // public List<StudentAnswer> StudentAnswers { get; } = [];
+    // public List<AnswerHistory> AnswerHistories { get; } = [];
+}
 
 // /// <summary>
 // /// 学生答题表
