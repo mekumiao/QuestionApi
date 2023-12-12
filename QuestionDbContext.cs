@@ -32,44 +32,44 @@ public class QuestionDbContext : IdentityDbContext {
             .HasMany(e => e.Questions)
             .WithMany(e => e.Exams)
             .UsingEntity<ExamQuestion>(
-                l => l.HasOne<Question>().WithMany().HasForeignKey(e => e.QuestionId).IsRequired(),
-                r => r.HasOne<Exam>().WithMany().HasForeignKey(e => e.ExamId).IsRequired());
+                l => l.HasOne(v => v.Question).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.QuestionId).IsRequired(),
+                r => r.HasOne(v => v.Exam).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.ExamId).IsRequired());
 
-        builder.Entity<Student>()
-            .HasMany(v => v.StudentAnswers)
-            .WithOne(v => v.Student)
-            .HasForeignKey(v => v.StudentId)
-            .IsRequired();
+        // builder.Entity<Student>()
+        //     .HasMany(v => v.StudentAnswers)
+        //     .WithOne(v => v.Student)
+        //     .HasForeignKey(v => v.StudentId)
+        //     .IsRequired();
 
-        builder.Entity<Student>()
-            .HasOne(v => v.User)
-            .WithOne()
-            .HasForeignKey<Student>(v => v.UserId)
-            .IsRequired(false);
+        // builder.Entity<Student>()
+        //     .HasOne(v => v.User)
+        //     .WithOne()
+        //     .HasForeignKey<Student>(v => v.UserId)
+        //     .IsRequired(false);
 
-        builder.Entity<StudentAnswer>()
-            .HasOne(v => v.Question)
-            .WithMany(v => v.StudentAnswers)
-            .HasForeignKey(v => v.QuestionId)
-            .IsRequired();
+        // builder.Entity<StudentAnswer>()
+        //     .HasOne(v => v.Question)
+        //     .WithMany(v => v.StudentAnswers)
+        //     .HasForeignKey(v => v.QuestionId)
+        //     .IsRequired();
 
-        builder.Entity<AnswerHistory>()
-            .HasMany(v => v.StudentAnswers)
-            .WithOne(v => v.AnswerHistory)
-            .HasForeignKey(v => v.AnswerHistoryId)
-            .IsRequired();
+        // builder.Entity<AnswerHistory>()
+        //     .HasMany(v => v.StudentAnswers)
+        //     .WithOne(v => v.AnswerHistory)
+        //     .HasForeignKey(v => v.AnswerHistoryId)
+        //     .IsRequired();
 
-        builder.Entity<AnswerHistory>()
-            .HasOne(v => v.Student)
-            .WithMany(v => v.AnswerHistories)
-            .HasForeignKey(v => v.StudentId)
-            .IsRequired();
+        // builder.Entity<AnswerHistory>()
+        //     .HasOne(v => v.Student)
+        //     .WithMany(v => v.AnswerHistories)
+        //     .HasForeignKey(v => v.StudentId)
+        //     .IsRequired();
 
-        builder.Entity<AnswerHistory>()
-            .HasOne(v => v.Exam)
-            .WithMany(v => v.AnswerHistories)
-            .HasForeignKey(v => v.ExamId)
-            .IsRequired();
+        // builder.Entity<AnswerHistory>()
+        //     .HasOne(v => v.Exam)
+        //     .WithMany(v => v.AnswerHistories)
+        //     .HasForeignKey(v => v.ExamId)
+        //     .IsRequired();
     }
 }
 
@@ -83,7 +83,8 @@ public class Question {
     public string CorrectAnswer { get; set; } = string.Empty;
     public List<Option> Options { get; } = [];
     public List<Exam> Exams { get; } = [];
-    public List<StudentAnswer> StudentAnswers { get; } = [];
+    public List<ExamQuestion> ExamQuestions { get; } = [];
+    // public List<StudentAnswer> StudentAnswers { get; } = [];
 }
 
 /// <summary>
@@ -115,7 +116,8 @@ public class Exam {
     [MaxLength(500)]
     public string ExamName { get; set; } = string.Empty;
     public List<Question> Questions { get; } = [];
-    public List<AnswerHistory> AnswerHistories { get; } = [];
+    public List<ExamQuestion> ExamQuestions { get; } = [];
+    // public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
 /// <summary>
@@ -128,53 +130,53 @@ public class ExamQuestion {
     public Question Question { get; set; } = null!;
 }
 
-/// <summary>
-/// 学生表
-/// </summary>
-public class Student {
-    public int StudentId { get; set; }
-    [MaxLength(500)]
-    public string Name { get; set; } = string.Empty;
-    public string? UserId { get; set; }
-    public IdentityUser? User { get; set; }
-    public List<StudentAnswer> StudentAnswers { get; } = [];
-    public List<AnswerHistory> AnswerHistories { get; } = [];
-}
+// /// <summary>
+// /// 学生表
+// /// </summary>
+// public class Student {
+//     public int StudentId { get; set; }
+//     [MaxLength(500)]
+//     public string Name { get; set; } = string.Empty;
+//     public string? UserId { get; set; }
+//     public IdentityUser? User { get; set; }
+//     public List<StudentAnswer> StudentAnswers { get; } = [];
+//     public List<AnswerHistory> AnswerHistories { get; } = [];
+// }
 
-/// <summary>
-/// 学生答题表
-/// </summary>
-public class StudentAnswer {
-    [Key]
-    public int AnswerId { get; set; }
-    public int StudentId { get; set; }
-    public Student Student { get; set; } = null!;
-    public int QuestionId { get; set; }
-    public Question Question { get; set; } = null!;
-    public int AnswerHistoryId { get; set; }
-    public AnswerHistory AnswerHistory { get; set; } = null!;
-    /// <summary>
-    /// 答案选项（单选题和多选题。用英文逗号","隔开）
-    /// </summary>
-    public string ChosenOptions { get; set; } = string.Empty;
-    /// <summary>
-    /// 答案文本（填空题）
-    /// </summary>
-    public string AnswerText { get; set; } = string.Empty;
-}
+// /// <summary>
+// /// 学生答题表
+// /// </summary>
+// public class StudentAnswer {
+//     [Key]
+//     public int AnswerId { get; set; }
+//     public int StudentId { get; set; }
+//     public Student Student { get; set; } = null!;
+//     public int QuestionId { get; set; }
+//     public Question Question { get; set; } = null!;
+//     public int AnswerHistoryId { get; set; }
+//     public AnswerHistory AnswerHistory { get; set; } = null!;
+//     /// <summary>
+//     /// 答案选项（单选题和多选题。用英文逗号","隔开）
+//     /// </summary>
+//     public string ChosenOptions { get; set; } = string.Empty;
+//     /// <summary>
+//     /// 答案文本（填空题）
+//     /// </summary>
+//     public string AnswerText { get; set; } = string.Empty;
+// }
 
-/// <summary>
-/// 答题历史表
-/// </summary>
-public class AnswerHistory {
-    public int AnswerHistoryId { get; set; }
-    public int StudentId { get; set; }
-    public Student Student { get; set; } = null!;
-    public int ExamId { get; set; }
-    public Exam Exam { get; set; } = null!;
-    /// <summary>
-    /// 交卷时间
-    /// </summary>
-    public DateTime SubmissionTime { get; set; }
-    public List<StudentAnswer> StudentAnswers { get; } = [];
-}
+// /// <summary>
+// /// 答题历史表
+// /// </summary>
+// public class AnswerHistory {
+//     public int AnswerHistoryId { get; set; }
+//     public int StudentId { get; set; }
+//     public Student Student { get; set; } = null!;
+//     public int ExamId { get; set; }
+//     public Exam Exam { get; set; } = null!;
+//     /// <summary>
+//     /// 交卷时间
+//     /// </summary>
+//     public DateTime SubmissionTime { get; set; }
+//     public List<StudentAnswer> StudentAnswers { get; } = [];
+// }
