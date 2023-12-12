@@ -41,17 +41,17 @@ public class QuestionDbContext : IdentityDbContext {
             .HasForeignKey<Student>(v => v.UserId)
             .IsRequired(false);
 
-        // builder.Entity<Student>()
-        //     .HasMany(v => v.StudentAnswers)
-        //     .WithOne(v => v.Student)
-        //     .HasForeignKey(v => v.StudentId)
-        //     .IsRequired();
+        builder.Entity<StudentAnswer>()
+            .HasOne(v => v.Student)
+            .WithMany(v => v.StudentAnswers)
+            .HasForeignKey(v => v.StudentId)
+            .IsRequired();
 
-        // builder.Entity<StudentAnswer>()
-        //     .HasOne(v => v.Question)
-        //     .WithMany(v => v.StudentAnswers)
-        //     .HasForeignKey(v => v.QuestionId)
-        //     .IsRequired();
+        builder.Entity<StudentAnswer>()
+            .HasOne(v => v.Question)
+            .WithMany(v => v.StudentAnswers)
+            .HasForeignKey(v => v.QuestionId)
+            .IsRequired();
 
         // builder.Entity<AnswerHistory>()
         //     .HasMany(v => v.StudentAnswers)
@@ -84,7 +84,7 @@ public class Question {
     public List<Option> Options { get; } = [];
     public List<Exam> Exams { get; } = [];
     public List<ExamQuestion> ExamQuestions { get; } = [];
-    // public List<StudentAnswer> StudentAnswers { get; } = [];
+    public List<StudentAnswer> StudentAnswers { get; } = [];
 }
 
 /// <summary>
@@ -139,31 +139,31 @@ public class Student {
     public string Name { get; set; } = string.Empty;
     public string? UserId { get; set; }
     public IdentityUser? User { get; set; }
-    // public List<StudentAnswer> StudentAnswers { get; } = [];
+    public List<StudentAnswer> StudentAnswers { get; } = [];
     // public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
-// /// <summary>
-// /// 学生答题表
-// /// </summary>
-// public class StudentAnswer {
-//     [Key]
-//     public int AnswerId { get; set; }
-//     public int StudentId { get; set; }
-//     public Student Student { get; set; } = null!;
-//     public int QuestionId { get; set; }
-//     public Question Question { get; set; } = null!;
-//     public int AnswerHistoryId { get; set; }
-//     public AnswerHistory AnswerHistory { get; set; } = null!;
-//     /// <summary>
-//     /// 答案选项（单选题和多选题。用英文逗号","隔开）
-//     /// </summary>
-//     public string ChosenOptions { get; set; } = string.Empty;
-//     /// <summary>
-//     /// 答案文本（填空题）
-//     /// </summary>
-//     public string AnswerText { get; set; } = string.Empty;
-// }
+/// <summary>
+/// 学生答题表
+/// </summary>
+public class StudentAnswer {
+    [Key]
+    public int AnswerId { get; set; }
+    public int StudentId { get; set; }
+    public Student Student { get; set; } = null!;
+    public int QuestionId { get; set; }
+    public Question Question { get; set; } = null!;
+    public int AnswerHistoryId { get; set; }
+    // public AnswerHistory AnswerHistory { get; set; } = null!;
+    /// <summary>
+    /// 答案选项（单选题和多选题。用英文逗号","隔开）
+    /// </summary>
+    public string ChosenOptions { get; set; } = string.Empty;
+    /// <summary>
+    /// 答案文本（填空题）
+    /// </summary>
+    public string AnswerText { get; set; } = string.Empty;
+}
 
 // /// <summary>
 // /// 答题历史表
