@@ -1,10 +1,11 @@
 using Mapster;
 
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.BearerToken;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
+using QuestionApi;
 using QuestionApi.Database;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<QuestionDbContext>();
+builder.Services.AddDbContext<QuestionDbContext>(options =>
+    options.UseNpgsql("Host=mini.dev;Username=postgres;Database=questiondb")
+);
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => {
@@ -23,13 +26,22 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => {
     .AddEntityFrameworkStores<QuestionDbContext>();
 
 builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, (options) => {
-    options.BearerTokenExpiration = TimeSpan.FromSeconds(30);
-    options.RefreshTokenExpiration = TimeSpan.FromSeconds(10);
+    options.BearerTokenExpiration = TimeSpan.FromHours(1);
+    options.RefreshTokenExpiration = TimeSpan.FromDays(14);
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition(IdentityConstants.BearerScheme, new OpenApiSecurityScheme() {
+        In = ParameterLocation.Header,
+        Description = "Please enter Token with Bearer into field",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+
+    });
+    options.OperationFilter<AuthorizeCheckOperationFilter>();
+});
 
 var app = builder.Build();
 

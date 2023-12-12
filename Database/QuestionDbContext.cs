@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuestionApi.Database;
 
-public class QuestionDbContext : IdentityDbContext {
-    public string DbPath { get; }
+public class QuestionDbContext(DbContextOptions options) : IdentityDbContext(options) {
     public DbSet<Question> Questions { get; set; }
     public DbSet<Option> Options { get; set; }
     public DbSet<Exam> Exams { get; set; }
@@ -12,15 +11,6 @@ public class QuestionDbContext : IdentityDbContext {
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<AnswerHistory> AnswerHistories { get; set; }
-
-    public QuestionDbContext() {
-        var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
-        DbPath = Path.Join(path, "question.db");
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
