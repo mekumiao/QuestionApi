@@ -13,7 +13,7 @@ using QuestionApi.Modules;
 
 namespace QuestionApi.Controllers;
 
-[Authorize(Roles = "admin,user")]
+[Authorize(Roles = "admin")]
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
