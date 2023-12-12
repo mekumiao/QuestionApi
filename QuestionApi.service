@@ -1,0 +1,11 @@
+[Unit]
+Description="QuestionApi Service"
+
+[Service]
+Type=simple
+WorkingDirectory=/data/publish/QuestionApi/
+ExecStart=/data/publish/QuestionApi/QuestionApi --urls=https://localhost:7224
+Restart=on-failure
+RestartPreventExitStatus=23
+[Install]
+WantedBy=multi-user.target

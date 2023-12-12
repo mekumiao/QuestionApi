@@ -45,17 +45,6 @@ builder.Services.AddSwaggerGen(options => {
 
 var app = builder.Build();
 
-// using var scope = app.Services.CreateScope();
-// var manager = scope.ServiceProvider.GetRequiredService<SignInManager<IdentityUser>>();
-// var ss = scope.ServiceProvider.GetRequiredService<IAuthenticationService>();
-// var schemes = scope.ServiceProvider.GetRequiredService<IAuthenticationSchemeProvider>();
-// var scheme = await schemes.GetSchemeAsync(manager.AuthenticationScheme);
-// var scheme = await schemes.GetSchemeAsync(IdentityConstants.ApplicationScheme);
-// var scheme = await schemes.GetSchemeAsync(JwtBearerDefaults.AuthenticationScheme);
-// var handler = scope.ServiceProvider.GetRequiredService(scheme!.HandlerType);
-// var signInHandler = handler as IAuthenticationSignInHandler;
-// await signInHandler!.SignInAsync();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
