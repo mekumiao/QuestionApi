@@ -3,9 +3,15 @@ Description="QuestionApi Service"
 
 [Service]
 Type=simple
-WorkingDirectory=/data/publish/QuestionApi/
-ExecStart=/data/publish/QuestionApi/QuestionApi --urls=https://localhost:7224
-Restart=on-failure
-RestartPreventExitStatus=23
+WorkingDirectory=/var/www//QuestionApi/
+ExecStart=/usr/local/bin/dotnet /var/www/QuestionApi/QuestionApi.dll --urls=http://localhost:5137
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-questionapi
+User=root
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
 [Install]
 WantedBy=multi-user.target
