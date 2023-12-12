@@ -53,23 +53,23 @@ public class QuestionDbContext : IdentityDbContext {
             .HasForeignKey(v => v.QuestionId)
             .IsRequired();
 
-        // builder.Entity<AnswerHistory>()
-        //     .HasMany(v => v.StudentAnswers)
-        //     .WithOne(v => v.AnswerHistory)
-        //     .HasForeignKey(v => v.AnswerHistoryId)
-        //     .IsRequired();
+        builder.Entity<AnswerHistory>()
+            .HasOne(v => v.Student)
+            .WithMany(v => v.AnswerHistories)
+            .HasForeignKey(v => v.StudentId)
+            .IsRequired();
 
-        // builder.Entity<AnswerHistory>()
-        //     .HasOne(v => v.Student)
-        //     .WithMany(v => v.AnswerHistories)
-        //     .HasForeignKey(v => v.StudentId)
-        //     .IsRequired();
+        builder.Entity<AnswerHistory>()
+            .HasOne(v => v.Exam)
+            .WithMany(v => v.AnswerHistories)
+            .HasForeignKey(v => v.ExamId)
+            .IsRequired();
 
-        // builder.Entity<AnswerHistory>()
-        //     .HasOne(v => v.Exam)
-        //     .WithMany(v => v.AnswerHistories)
-        //     .HasForeignKey(v => v.ExamId)
-        //     .IsRequired();
+        builder.Entity<AnswerHistory>()
+            .HasMany(v => v.StudentAnswers)
+            .WithOne(v => v.AnswerHistory)
+            .HasForeignKey(v => v.AnswerHistoryId)
+            .IsRequired();
     }
 }
 
@@ -117,7 +117,7 @@ public class Exam {
     public string ExamName { get; set; } = string.Empty;
     public List<Question> Questions { get; } = [];
     public List<ExamQuestion> ExamQuestions { get; } = [];
-    // public List<AnswerHistory> AnswerHistories { get; } = [];
+    public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
 /// <summary>
@@ -140,7 +140,7 @@ public class Student {
     public string? UserId { get; set; }
     public IdentityUser? User { get; set; }
     public List<StudentAnswer> StudentAnswers { get; } = [];
-    // public List<AnswerHistory> AnswerHistories { get; } = [];
+    public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
 /// <summary>
@@ -154,7 +154,7 @@ public class StudentAnswer {
     public int QuestionId { get; set; }
     public Question Question { get; set; } = null!;
     public int AnswerHistoryId { get; set; }
-    // public AnswerHistory AnswerHistory { get; set; } = null!;
+    public AnswerHistory AnswerHistory { get; set; } = null!;
     /// <summary>
     /// 答案选项（单选题和多选题。用英文逗号","隔开）
     /// </summary>
@@ -165,18 +165,18 @@ public class StudentAnswer {
     public string AnswerText { get; set; } = string.Empty;
 }
 
-// /// <summary>
-// /// 答题历史表
-// /// </summary>
-// public class AnswerHistory {
-//     public int AnswerHistoryId { get; set; }
-//     public int StudentId { get; set; }
-//     public Student Student { get; set; } = null!;
-//     public int ExamId { get; set; }
-//     public Exam Exam { get; set; } = null!;
-//     /// <summary>
-//     /// 交卷时间
-//     /// </summary>
-//     public DateTime SubmissionTime { get; set; }
-//     public List<StudentAnswer> StudentAnswers { get; } = [];
-// }
+/// <summary>
+/// 答题历史表
+/// </summary>
+public class AnswerHistory {
+    public int AnswerHistoryId { get; set; }
+    public int StudentId { get; set; }
+    public Student Student { get; set; } = null!;
+    public int ExamId { get; set; }
+    public Exam Exam { get; set; } = null!;
+    /// <summary>
+    /// 交卷时间
+    /// </summary>
+    public DateTime SubmissionTime { get; set; }
+    public List<StudentAnswer> StudentAnswers { get; } = [];
+}
