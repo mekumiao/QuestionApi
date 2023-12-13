@@ -20,7 +20,7 @@
         <Content Remove="publish\**" />
         <EmbeddedResource Remove="publish\**" />
         <None Remove="publish\**" />
-    </ItemGroup>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Mapster" Version="7.4.0" />
