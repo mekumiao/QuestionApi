@@ -21,6 +21,10 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext(opt
             .HasForeignKey(v => v.QuestionId)
             .IsRequired();
 
+        builder.Entity<Option>()
+            .Property(v => v.OptionCode)
+            .HasDefaultValue('A');
+
         builder.Entity<Exam>()
             .HasMany(e => e.Questions)
             .WithMany(e => e.Exams)

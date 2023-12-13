@@ -59,7 +59,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
 
     [HttpPost]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody, FromForm] ExamCreateDto dto) {
+    public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
         var item = _mapper.Map<Exam>(dto);
         _dbContext.Exams.Add(item);
         await _dbContext.SaveChangesAsync();
@@ -70,7 +70,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     [HttpPut("{examId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] QuestionUpdateDto dto) {
+    public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] ExamInput dto) {
         var item = await _dbContext.Exams.FindAsync(examId);
         if (item is null) {
             return NotFound();

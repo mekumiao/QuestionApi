@@ -39,7 +39,12 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     [HttpGet]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
-        var result = await _dbContext.Questions.AsNoTracking().ProjectToType<QuestionDto>().Skip(offset).Take(limit).ToListAsync();
+        var result = await _dbContext.Questions.AsNoTracking()
+            .Include(v => v.Options)
+            .ProjectToType<QuestionDto>()
+            .Skip(offset)
+            .Take(limit)
+            .ToListAsync();
         return Ok(result);
     }
 
@@ -55,8 +60,11 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
 
     [HttpPost]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody, FromForm] QuestionCreateDto dto) {
+    public async Task<IActionResult> Create([FromBody, FromForm] QuestionInput dto) {
         var item = _mapper.Map<Question>(dto);
+        if (dto.Options is not null) {
+            item.Options.AddRange(_mapper.Map<List<Option>>(dto.Options));
+        }
         _dbContext.Questions.Add(item);
         await _dbContext.SaveChangesAsync();
         var result = _mapper.Map<QuestionDto>(item);
@@ -66,17 +74,16 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     [HttpPut("{questionId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdateDto dto) {
+    public async Task<IActionResult> Update([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdate dto) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
             return NotFound();
         }
-        _mapper.From(dto).AdaptTo(item);
-        await _dbContext.SaveChangesAsync();
-        item = await _dbContext.Questions.FindAsync(questionId);
-        if (item is null) {
-            return NotFound();
+        _mapper.Map(dto, item);
+        if (dto.Options is not null) {
+            item.Options.AddRange(_mapper.Map<List<Option>>(dto.Options));
         }
+        await _dbContext.SaveChangesAsync();
         var result = _mapper.Map<QuestionDto>(item);
         return Ok(result);
     }

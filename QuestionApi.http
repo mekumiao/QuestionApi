@@ -4,7 +4,7 @@
 @badPassword = password
 @password = Az.123123!
 
-# Now a valid one
+# 注册用户
 POST {{HostAddress}}/register
 Content-Type: application/json
 
@@ -16,8 +16,7 @@ Content-Type: application/json
 
 ###
 
-# And the right one. Be sure to copy and paste the tokens from the response.
-# Notice you get when the current token will expire in the response.
+# 使用密码登录获取Token
 POST {{HostAddress}}/login
 Content-Type: application/json
 
@@ -28,13 +27,13 @@ Content-Type: application/json
 
 ###
 
-# these come from the previous response
-@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlBAkcwY5Ys1NNMykOqxLsifvGWPfZTXlNHKq_UUja5SQx-Wxj9CXqKbf7NOkEBJ-hvLvY9f4oKNgrPVwVgy1AukMD0htuEUEOL52BRNPURd1bAYvFcwjpgqqfPWMy8490JdVBZ1hF9RA8-ya5brQf7mb_ySqluMWx7ZdOB9XOSHJVh8OVuAMuH1FCuevP-LGPLcum894hY1FOgmlRgQQ3fcgRkHapPmaymbLfAvba2rKpal9I1JzCYe8tjQTuRZHIu3zFdrfUOmAD4eQSF6u-vziio85DKk6l04i-sNdtCPapj87LSOy9E5ENAMC6NGw8Nl1hSXr0VkLkhuM8edQUDGRjtRhnCuPA6eoroM_hbyqqD-9Pj75a0geDWJguFwGo_4-QF-nNGJvIpKf4-KVVJq81dFDKg6VvOr2Bi0ACuAsZILnoRHPEHNGK1xqXVzTYuQX5H16UgEBgJ9v60dsEbDYYZ8PlWHPuMQJALKdAjQOwLivKrDU1upclGQ6SstM2bDcjc5yXFdKlLHz6YvFpfiQtidgpvqDEVLfkr3HPOtJfQ8gqloUcUNAHp2rH4j5nKD3Qg6rPOWdU5uGpLq6UYWJ20gbMlwydpP6_Ldn1TUnSaapDz9XDQhO7G67NT3ll6LpJWqH_FGAQC-80hROdU06IZ8aKz8473S0WX8TAH8M_gmLUQ7o09N2j0RR0cqpBY
-@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlBelnUa65VBrHEa04ekFdqORTM9cdDjW6qNOczJsExi09dx7-PFUi_epOY6Ibv4XAubYKS1KXcHID4cPmt8b7zwxEOY7ZreKaIapuMrjF2sVH96ec4uke-pxXqEDYHM40bQtzfuNPcHoT8LbE4xttqBjU-YJYgQHlvECsISvW-Eo8125jW_z8YU5EUdvqrGdg2cSEGUeTm2FsP-j1xnj1tzKxqLe3YrfNwCMWpPJeCJCe-fkAT7K79nYjf0ELLGLJpX8d-5WegvSO7FQ-90mD5UA6n1pcJA3Kk5fpoprRmMqwMBZx1N90Lk4dTqLp6b17KxBXlIM755BpQaKtpgNWxbRZV8rvc39jGYrbTNU0v5_em-V4YvQVm0J33QK7tlWwgmhgCgGteedxL6GdOTeSAdrbHxRwawnz-fh-5BNPiHZkBNMNuAT7x3Q1zmbYn0IxYD8yVDbf5Zp0TSDSW0prK7mdIZFJCa8m4iAPbNObgwVTUYF_WJT7Wa_7jL7kvFfYcgCh9uSlWcUbo1Jr7nqOsbEIP8964hIs96X5RMJkYdPsPlIYrzgc13OUTacsr7wqOgqA3QDLVm37lXZR-9vUhpPPRRLd3_bOWJSo08C4tPsKv-NFZCC-wU0Tnnsrp-7betnWsaiD692cssuSJJ-N9YTFTUYO129T5-GrwA0Pp43U_YUxdLbBTbwlbKcsJNzVBHCubrMcLSTwB6Erl62IWw
+# Tokken
+@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlBNAMWel945NuSLFCx2Cp82NCYKcIhwNfgmfgDtOGTUQKnK6oyd8KfbfDWE9m7Fqz-pVH8LEZbikoTmcMFNeu4u1oRkZ5nFZxLPUI2eaKTNnEQy9hTLviA482iM019Ov_5G1jEfUot7QZ7WhYtfi22Ir9la7VSh85JW3RqXBdj8GaqzHW7SKDA4KZQ8CtJ-tHorIK3-R1F1nmNv2jA-MUqSw47_AstN26tRm9XcPAgY6oGPOBoYJ-QIK7aeM3vMnFXQvsPTeWwhx3ULh5oaj9wJg5kFCvxtZQr1_9yFNIpjSS6xUYwkn-GCyxwnSY8EFFcugo_-3SwQkVq9DseJdZ-zdUW6vmWhxp4QAlMI256Qw2g8RYJy_OwkBfIXxNqJ14Lzmn5Pl8IaokoOP77YR3IlyWPtsztEMLACh216BckXQhWTQh3W3_q38REdsmMuc3Ss7gHK61aUdtK__-63-Ra-Ls6k7HqTyQIsN52Rrk-fUXveHmfEmrn0OLq-lf3ee6OPD3EzkV-q_98O-bIYpKVElKeKMWBWfH2n7ZWHRocEj6cEnTB7eAXQtUVfohVpG-7qe9fAD9fMO36XNUwQMQ9yvXUvuXv9mPObgiKCO7uexsn8z2Z5DfI9Ch1p3OolfF409piPCbG-VYR2p3IRx3zJQAet7BDzKXhsfWqk5ZtbzQ
+@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlDGPJ1xAxrSl5pQYA0IAMg87PVCdO_KDecfvbpYpRDMKHwh6ZsurPpULGNMC1ULjNV5aFFYc9EUL8cYDnBxoGBOAj0DyKPn4KvkUf9eyUpz6h_Wt_9z2ADapQxToSTBIp2-1XVWzRpELgrwh4quDS0bgnQLH6Y5h_sNgA4ntbWKSm_2vk6h5pxL2qaLIyx_bSzsIECRIqbWS_LpqS83MBC2sn3q35A7VQ9BYf3Iav9kd3wLtVTlNDXA0c-BIKm_KP95RvWtMBg1Ed1esbnypMfwWkrQFsAnjlcEdSRHe19tNmM_3O6Vax1PDpxIvZDcwzvfnUMzRAKiU-vlTh_qwUwxasCImYZ05o2JG7RQf-B4x7SqjjzP5NwR-ds9mtkW81DW9ERsqknwbr5Fghlsbf6b4lsb7BmAQBZ3iZUSyrLjTAaAeAiDYkvT0FIeEaGjgpSrfcsKCfvUDjN6UxWA7SrUouvmRoz_p-kqGhMYXs7Y9NeNN8fjGUBNUMWSA71wlqne3Tzb8cGy7o7o3xiXpGu7-hafz7ZuY_7lliunWVVgYiJlhysDNZ-Wb2bvngNXJNob0rZU8uSha9qZLObDiOcWfKu-i_txc9gGGe-9luo5PNhms0vrpfaQRkTyIQVg5R2Oelpl-b-ZpjXyL0e8q-hxPvCzY8LY-LduV9GDxCn5ijyEi4KgsriaFPdJd2WZrkr7RD-WP8L79KVzMW38vmFk
 
 ###
 
-# Now assume the session is about to expire and you want to extend the session without forcing the user to login again.
+# 刷新Token
 POST {{HostAddress}}/refresh
 Content-Type: application/json
 
@@ -44,18 +43,21 @@ Content-Type: application/json
 
 ###
 
+# 获取题目总数(一般用于分页)
 GET {{HostAddress}}/Questions/count
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
-GET {{HostAddress}}/Questions/?offset=0&limit=10
+# 获取题目列表
+GET {{HostAddress}}/Questions/?offset=0&limit=100
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
+# 根据题目ID获取题目
 GET {{HostAddress}}/Questions/1
 Authorization: Bearer {{accessToken}}
 Accept: application/json
@@ -63,24 +65,109 @@ Accept: application/json
 
 ###
 
+# 创建单选题目
 POST {{HostAddress}}/Questions/
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
   "QuestionText": "测试题目？",
-  "QuestionType": 3
+  "QuestionType": 0,
+  "CorrectAnswer": "D",
+  "Options": [
+    {
+      "OptionCode": "A",
+      "OptionText": "方法论1",
+      "IsCorrect": false
+    },
+    {
+      "OptionCode": "B",
+      "OptionText": "方法论2",
+      "IsCorrect": false
+    },
+    {
+      "OptionCode": "C",
+      "OptionText": "方法论3",
+      "IsCorrect": false
+    },
+    {
+      "OptionCode": "D",
+      "OptionText": "方法论4",
+      "IsCorrect": true
+    }
+  ]
 }
 
 ###
 
-PUT {{HostAddress}}/Questions/1
+# 创建多选题目
+POST {{HostAddress}}/Questions/
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "QuestionText": "测试题目？tt",
-  "QuestionType": 3
+  "QuestionText": "多选题，题目？",
+  "QuestionType": 1,
+  "CorrectAnswer": "A,C,D",
+  "Options": [
+    {
+      "OptionCode": "A",
+      "OptionText": "方法论1",
+      "IsCorrect": true
+    },
+    {
+      "OptionCode": "B",
+      "OptionText": "方法论2",
+      "IsCorrect": false
+    },
+    {
+      "OptionCode": "C",
+      "OptionText": "方法论3",
+      "IsCorrect": true
+    },
+    {
+      "OptionCode": "D",
+      "OptionText": "方法论4",
+      "IsCorrect": true
+    }
+  ]
+}
+
+###
+
+# 创建判断题目
+POST {{HostAddress}}/Questions/
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "QuestionText": "判断题，题目？",
+  "QuestionType": 2,
+  "CorrectAnswer": "1"
+}
+
+###
+
+# 创建填空题目
+POST {{HostAddress}}/Questions/
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "QuestionText": "填空题？",
+  "QuestionType": 3,
+  "CorrectAnswer": "喔哦喔哦我啊啊啊"
+}
+
+###
+
+# 修改题目
+PUT {{HostAddress}}/Questions/22
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "CorrectAnswer": "D"
 }
 
 ###

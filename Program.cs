@@ -46,6 +46,12 @@ builder.Services.AddSwaggerGen(options => {
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
+TypeAdapterConfig.GlobalSettings.Default.MapToConstructor(true);
+TypeAdapterConfig.GlobalSettings.Apply(new MappingRegister());
+TypeAdapterConfig.GlobalSettings.Compile();
+
+builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+
 var app = builder.Build();
 
 app.UsePathBase("/api");

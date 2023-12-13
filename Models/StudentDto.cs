@@ -11,6 +11,11 @@ public class StudentDto {
     public List<AnswerHistoryDto> AnswerHistories { get; } = [];
 }
 
+public class StudentInput {
+    public string Name { get; set; } = string.Empty;
+    public string? UserId { get; set; }
+}
+
 public class StudentAnswerDto {
     public int AnswerId { get; set; }
     public int StudentId { get; set; }
@@ -19,6 +24,20 @@ public class StudentAnswerDto {
     public QuestionDto Question { get; set; } = null!;
     public int AnswerHistoryId { get; set; }
     public AnswerHistoryDto AnswerHistory { get; set; } = null!;
+    /// <summary>
+    /// 答案选项（单选题和多选题。用英文逗号","隔开）
+    /// </summary>
+    public string ChosenOptions { get; set; } = string.Empty;
+    /// <summary>
+    /// 答案文本（填空题）
+    /// </summary>
+    public string AnswerText { get; set; } = string.Empty;
+}
+
+public class StudentAnswerInput {
+    public int StudentId { get; set; }
+    public int QuestionId { get; set; }
+    public int AnswerHistoryId { get; set; }
     /// <summary>
     /// 答案选项（单选题和多选题。用英文逗号","隔开）
     /// </summary>

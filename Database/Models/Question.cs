@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
 namespace QuestionApi.Database;
 
 /// <summary>
@@ -31,6 +34,10 @@ public class Option {
     public int OptionId { get; set; }
     public int QuestionId { get; set; }
     public Question Question { get; set; } = null!;
+    /// <summary>
+    /// 选项编号。示例：A、B、C、D
+    /// </summary>
+    public char OptionCode { get; set; }
     public string OptionText { get; set; } = string.Empty;
     public bool IsCorrect { get; set; }
 }

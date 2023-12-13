@@ -8,7 +8,7 @@ public class ExamDto {
     public List<AnswerHistoryDto> AnswerHistories { get; } = [];
 }
 
-public class ExamCreateDto {
+public class ExamInput {
     public int ExamId { get; set; }
     public string ExamName { get; set; } = string.Empty;
     public List<QuestionDto> Questions { get; } = [];
