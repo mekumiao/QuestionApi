@@ -37,14 +37,13 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<ExamDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
         var result = await _dbContext.Exams.AsNoTracking()
-                                           .Skip(offset)
-                                           .Take(limit)
-                                           .ProjectToType<ExamDto>()
-                                           .ToListAsync();
-        return Ok(result);
+            .Skip(offset)
+            .Take(limit)
+            .ToListAsync();
+        return Ok(_mapper.Map<List<ExamDto>>(result));
     }
 
     [HttpGet("{examId:int}", Name = "GetExamById")]
@@ -52,9 +51,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetExamById([FromRoute] int examId) {
         var item = await _dbContext.Exams.FindAsync(examId);
-        return item is null
-            ? NotFound()
-            : Ok(_mapper.Map<ExamDto>(item));
+        return item is null ? NotFound() : Ok(_mapper.Map<ExamDto>(item));
     }
 
     [HttpPost]

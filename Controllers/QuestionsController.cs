@@ -37,25 +37,25 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<QuestionDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
         var result = await _dbContext.Questions.AsNoTracking()
-            .Include(v => v.Options)
-            .ProjectToType<QuestionDto>()
+            .Include(v => v.Options.OrderBy(t => t.OptionCode))
+            .OrderBy(v => v.QuestionId)
             .Skip(offset)
             .Take(limit)
             .ToListAsync();
-        return Ok(result);
+        return Ok(_mapper.Map<List<QuestionDto>>(result));
     }
 
     [HttpGet("{questionId:int}", Name = "GetQuestionById")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetQuestionById([FromRoute] int questionId) {
-        var item = await _dbContext.Questions.FindAsync(questionId);
-        return item is null
-            ? NotFound()
-            : Ok(_mapper.Map<QuestionDto>(item));
+        var result = await _dbContext.Questions.AsNoTracking()
+            .Include(v => v.Options.OrderBy(t => t.OptionCode))
+            .FirstOrDefaultAsync(v => v.QuestionId == questionId);
+        return result is null ? NotFound() : Ok(_mapper.Map<QuestionDto>(result));
     }
 
     [HttpPost]
@@ -75,12 +75,13 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdate dto) {
-        var item = await _dbContext.Questions.FindAsync(questionId);
+        var item = await _dbContext.Questions.Include(v => v.Options).FirstOrDefaultAsync(v => v.QuestionId == questionId);
         if (item is null) {
             return NotFound();
         }
         _mapper.Map(dto, item);
         if (dto.Options is not null) {
+            item.Options.Clear();
             item.Options.AddRange(_mapper.Map<List<Option>>(dto.Options));
         }
         await _dbContext.SaveChangesAsync();

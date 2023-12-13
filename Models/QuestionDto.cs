@@ -24,7 +24,7 @@ public class QuestionInput {
 public class QuestionUpdate {
     public string? QuestionText { get; set; }
     public string? CorrectAnswer { get; set; }
-    public List<OptionInput>? Options { get; set; }
+    public List<OptionUpdate>? Options { get; set; }
 }
 
 public class OptionDto {
@@ -32,10 +32,19 @@ public class OptionDto {
     public int QuestionId { get; set; }
     public char OptionCode { get; set; }
     public string OptionText { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
 }
 
 public class OptionInput {
     public string OptionText { get; set; } = string.Empty;
     public char OptionCode { get; set; }
+    public bool IsCorrect { get; set; }
+}
+
+public class OptionUpdate {
+
+    public int OptionId { get; set; }
+    public char OptionCode { get; set; }
+    public string OptionText { get; set; } = string.Empty;
     public bool IsCorrect { get; set; }
 }
