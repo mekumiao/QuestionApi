@@ -22,16 +22,23 @@ namespace QuestionApi.Controllers;
 /// <param name="mapper"></param>
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class ExamController(ILogger<ExamController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
-    private readonly ILogger<ExamController> _logger = logger;
+public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+    private readonly ILogger<ExamsController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
+    [HttpGet("count")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCount() {
+        var result = await _dbContext.Exams.CountAsync();
+        return Ok(result);
+    }
+
     [HttpGet]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetListAsync([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
+    public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
         var result = await _dbContext.Exams.AsNoTracking()
                                            .Skip(offset)
                                            .Take(limit)
@@ -52,7 +59,7 @@ public class ExamController(ILogger<ExamController> logger, QuestionDbContext db
 
     [HttpPost]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateAsync([FromBody, FromForm] ExamCreateDto dto) {
+    public async Task<IActionResult> Create([FromBody, FromForm] ExamCreateDto dto) {
         var item = _mapper.Map<Exam>(dto);
         _dbContext.Exams.Add(item);
         await _dbContext.SaveChangesAsync();
@@ -63,7 +70,7 @@ public class ExamController(ILogger<ExamController> logger, QuestionDbContext db
     [HttpPut("{examId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateAsync([FromRoute] int examId, [FromBody, FromForm] QuestionUpdateDto dto) {
+    public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] QuestionUpdateDto dto) {
         var item = await _dbContext.Exams.FindAsync(examId);
         if (item is null) {
             return NotFound();

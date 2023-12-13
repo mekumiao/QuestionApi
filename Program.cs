@@ -48,6 +48,8 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(builder => builder.
 
 var app = builder.Build();
 
+app.UsePathBase("/api");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
@@ -59,6 +61,7 @@ app.UseHttpsRedirection();
 app.UseForwardedHeaders(new ForwardedHeadersOptions {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
 });
+app.UseAuthorization();
 app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 

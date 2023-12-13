@@ -10,7 +10,7 @@ public class QuestionDto {
     [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public QuestionType QuestionType { get; set; }
     public string CorrectAnswer { get; set; } = string.Empty;
-    public ICollection<Option> Options { get; set; } = [];
+    public ICollection<OptionDto> Options { get; set; } = [];
 }
 
 public class QuestionCreateDto {
@@ -30,7 +30,6 @@ public class QuestionUpdateDto {
 public class OptionDto {
     public int OptionId { get; set; }
     public int QuestionId { get; set; }
-    public Question Question { get; set; } = null!;
     public string OptionText { get; set; } = string.Empty;
     public bool IsCorrect { get; set; }
 }

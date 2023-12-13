@@ -22,16 +22,23 @@ namespace QuestionApi.Controllers;
 /// <param name="mapper"></param>
 [Authorize(Roles = "admin")]
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class QuestionController(ILogger<QuestionController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
-    private readonly ILogger<QuestionController> _logger = logger;
+public class QuestionsController(ILogger<QuestionsController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+    private readonly ILogger<QuestionsController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
+    [HttpGet("count")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCount() {
+        var result = await _dbContext.Questions.CountAsync();
+        return Ok(result);
+    }
+
     [HttpGet]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetListAsync([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
+    public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
         var result = await _dbContext.Questions.AsNoTracking().ProjectToType<QuestionDto>().Skip(offset).Take(limit).ToListAsync();
         return Ok(result);
     }
@@ -48,7 +55,7 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
 
     [HttpPost]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateAsync([FromBody, FromForm] QuestionCreateDto dto) {
+    public async Task<IActionResult> Create([FromBody, FromForm] QuestionCreateDto dto) {
         var item = _mapper.Map<Question>(dto);
         _dbContext.Questions.Add(item);
         await _dbContext.SaveChangesAsync();
@@ -59,7 +66,7 @@ public class QuestionController(ILogger<QuestionController> logger, QuestionDbCo
     [HttpPut("{questionId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateAsync([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdateDto dto) {
+    public async Task<IActionResult> Update([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdateDto dto) {
         var item = await _dbContext.Questions.FindAsync(questionId);
         if (item is null) {
             return NotFound();
