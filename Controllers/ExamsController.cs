@@ -81,4 +81,20 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
         var result = _mapper.Map<ExamDto>(item);
         return Ok(result);
     }
+
+    [HttpDelete("{examId:int}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete([FromRoute] int examId) {
+        try {
+            var item = new Exam { ExamId = examId };
+            _dbContext.Exams.Attach(item);
+            _dbContext.Exams.Remove(item);
+            var rows = await _dbContext.SaveChangesAsync();
+            return rows > 0 ? NoContent() : NotFound();
+        }
+        catch (DbUpdateConcurrencyException) {
+            return NotFound();
+        }
+    }
 }

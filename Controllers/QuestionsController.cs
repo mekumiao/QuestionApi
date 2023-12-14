@@ -88,4 +88,20 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
         var result = _mapper.Map<QuestionDto>(item);
         return Ok(result);
     }
+
+    [HttpDelete("{questionId:int}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete([FromRoute] int questionId) {
+        try {
+            var item = new Question { QuestionId = questionId };
+            _dbContext.Questions.Attach(item);
+            _dbContext.Questions.Remove(item);
+            var rows = await _dbContext.SaveChangesAsync();
+            return rows > 0 ? NoContent() : NotFound();
+        }
+        catch (DbUpdateConcurrencyException) {
+            return NotFound();
+        }
+    }
 }
