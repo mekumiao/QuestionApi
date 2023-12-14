@@ -19,9 +19,11 @@ public class MappingRegister : IRegister {
         config.NewConfig<Exam, ExamDto>();
         config.NewConfig<ExamInput, Exam>();
 
-        config.NewConfig<ExamQuestion, ExamQuestionDto>();
+        config.NewConfig<ExamQuestion, ExamQuestionDto>().Map(dest => dest, src => src.Question);
 
         config.NewConfig<Student, StudentDto>();
         config.NewConfig<StudentInput, Student>();
+
+
     }
 }

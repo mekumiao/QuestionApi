@@ -23,4 +23,8 @@ public class ExamQuestion {
     public Exam Exam { get; set; } = null!;
     public int QuestionId { get; set; }
     public Question Question { get; set; } = null!;
+    /// <summary>
+    /// 题目排序
+    /// </summary>
+    public int Order { get; set; }
 }

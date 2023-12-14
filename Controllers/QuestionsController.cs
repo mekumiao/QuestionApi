@@ -43,7 +43,8 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     public async Task<IActionResult> GetList([FromQuery] QuestionFilter filter,
                                              [FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0,
                                              [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
-        var queryable = _dbContext.Questions.AsNoTracking()
+        var queryable = _dbContext.Questions
+            .AsNoTracking()
             .Include(v => v.Options.OrderBy(t => t.OptionCode))
             .OrderBy(v => v.QuestionId)
             .Skip(offset)
@@ -59,9 +60,10 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetQuestionById([FromRoute] int questionId) {
-        var result = await _dbContext.Questions.AsNoTracking()
+        var result = await _dbContext.Questions
+            .AsNoTracking()
             .Include(v => v.Options.OrderBy(t => t.OptionCode))
-            .FirstOrDefaultAsync(v => v.QuestionId == questionId);
+            .SingleOrDefaultAsync(v => v.QuestionId == questionId);
         return result is null ? NotFound() : Ok(_mapper.Map<QuestionDto>(result));
     }
 
@@ -69,7 +71,7 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] QuestionInput dto) {
         var item = _mapper.Map<Question>(dto);
-        if (dto.Options is not null) {
+        if (dto.Options is not null && dto.Options.Count != 0) {
             item.Options.AddRange(_mapper.Map<List<Option>>(dto.Options));
         }
         _dbContext.Questions.Add(item);
@@ -82,7 +84,9 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(QuestionDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([FromRoute] int questionId, [FromBody, FromForm] QuestionUpdate dto) {
-        var item = await _dbContext.Questions.Include(v => v.Options).FirstOrDefaultAsync(v => v.QuestionId == questionId);
+        var item = await _dbContext.Questions
+            .Include(v => v.Options.OrderBy(t => t.OptionCode))
+            .SingleOrDefaultAsync(v => v.QuestionId == questionId);
         if (item is null) {
             return NotFound();
         }

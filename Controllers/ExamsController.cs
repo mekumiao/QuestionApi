@@ -31,18 +31,29 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
 
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCount() {
-        var result = await _dbContext.Exams.CountAsync();
+    public async Task<IActionResult> GetCount([FromQuery] ExamFilter filter) {
+        var queryable = _dbContext.Exams.AsNoTracking();
+        queryable = filter.Build(queryable);
+        var result = await queryable.CountAsync();
         return Ok(result);
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(List<ExamDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
-        var result = await _dbContext.Exams.AsNoTracking()
+    public async Task<IActionResult> GetList([FromQuery] ExamFilter filter,
+                                             [FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0,
+                                             [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
+        var queryable = _dbContext.Exams
+            .AsNoTracking()
+            .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+            .ThenInclude(v => v.Question)
+            .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
             .Skip(offset)
-            .Take(limit)
-            .ToListAsync();
+            .Take(limit);
+
+        queryable = filter.Build(queryable);
+
+        var result = await queryable.ToListAsync();
         return Ok(_mapper.Map<List<ExamDto>>(result));
     }
 
@@ -50,16 +61,32 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetExamById([FromRoute] int examId) {
-        var item = await _dbContext.Exams.FindAsync(examId);
-        return item is null ? NotFound() : Ok(_mapper.Map<ExamDto>(item));
+        var queryable = _dbContext.Exams
+                    .AsNoTracking()
+                    .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+                    .ThenInclude(v => v.Question)
+                    .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode));
+        var result = await queryable.SingleOrDefaultAsync(v => v.ExamId == examId);
+        return result is null ? NotFound() : Ok(_mapper.Map<ExamDto>(result));
     }
 
     [HttpPost]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
         var item = _mapper.Map<Exam>(dto);
+        if (dto.ExamQuestions.Count != 0) {
+            item.ExamQuestions.AddRange(_mapper.Map<List<ExamQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
+        }
+
+        var questions = dto.ExamQuestions.Select(v => v.QuestionId).ToArray();
+        await _dbContext.Questions
+            .Include(v => v.Options.OrderBy(t => t.OptionCode))
+            .Where(v => questions.Contains(v.QuestionId))
+            .LoadAsync();
+
         _dbContext.Exams.Add(item);
         await _dbContext.SaveChangesAsync();
+
         var result = _mapper.Map<ExamDto>(item);
         return CreatedAtRoute("GetExamById", new { examId = item.ExamId }, result);
     }
@@ -67,17 +94,25 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     [HttpPut("{examId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] ExamInput dto) {
-        var item = await _dbContext.Exams.FindAsync(examId);
+    public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] ExamUpdate dto) {
+        var item = await _dbContext.Exams
+            .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+            .ThenInclude(v => v.Question)
+            .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
+            .SingleOrDefaultAsync(v => v.ExamId == examId);
         if (item is null) {
             return NotFound();
         }
-        _mapper.From(dto).AdaptTo(item);
+
+        _mapper.Map(dto, item);
+
+        if (dto.ExamQuestions is not null) {
+            item.ExamQuestions.Clear();
+            item.ExamQuestions.AddRange(_mapper.Map<List<ExamQuestion>>(dto.ExamQuestions));
+        }
+
         await _dbContext.SaveChangesAsync();
-        item = await _dbContext.Exams.FindAsync(examId);
-        if (item is null) {
-            return NotFound();
-        }
+
         var result = _mapper.Map<ExamDto>(item);
         return Ok(result);
     }

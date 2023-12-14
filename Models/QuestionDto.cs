@@ -9,7 +9,7 @@ public class QuestionFilter {
     public string? QuestionText { get; set; }
     [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public QuestionType? QuestionType { get; set; }
-    [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
+    [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
 
     public IQueryable<Question> Build(IQueryable<Question> queryable) {
@@ -29,10 +29,8 @@ public class QuestionFilter {
 public class QuestionDto {
     public int QuestionId { get; set; }
     public string QuestionText { get; set; } = string.Empty;
-    [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public QuestionType QuestionType { get; set; }
     public string CorrectAnswer { get; set; } = string.Empty;
-    [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
     public ICollection<OptionDto> Options { get; set; } = [];
 }
@@ -42,7 +40,7 @@ public class QuestionInput {
     [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public required QuestionType QuestionType { get; set; }
     public required string CorrectAnswer { get; set; } = string.Empty;
-    [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
+    [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<OptionInput>? Options { get; set; }
 }
@@ -50,6 +48,7 @@ public class QuestionInput {
 public class QuestionUpdate {
     public string? QuestionText { get; set; }
     public string? CorrectAnswer { get; set; }
+    [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<OptionUpdate>? Options { get; set; }
 }
