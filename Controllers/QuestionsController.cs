@@ -31,20 +31,27 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
 
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCount() {
-        var result = await _dbContext.Questions.CountAsync();
+    public async Task<IActionResult> GetCount([FromQuery] QuestionFilter filter) {
+        var queryable = _dbContext.Questions.AsNoTracking();
+        queryable = filter.Build(queryable);
+        var result = await queryable.CountAsync();
         return Ok(result);
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(List<QuestionDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetList([FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0, [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
-        var result = await _dbContext.Questions.AsNoTracking()
+    public async Task<IActionResult> GetList([FromQuery] QuestionFilter filter,
+                                             [FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0,
+                                             [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
+        var queryable = _dbContext.Questions.AsNoTracking()
             .Include(v => v.Options.OrderBy(t => t.OptionCode))
             .OrderBy(v => v.QuestionId)
             .Skip(offset)
-            .Take(limit)
-            .ToListAsync();
+            .Take(limit);
+
+        queryable = filter.Build(queryable);
+
+        var result = await queryable.ToListAsync();
         return Ok(_mapper.Map<List<QuestionDto>>(result));
     }
 
