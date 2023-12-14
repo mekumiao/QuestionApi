@@ -9,6 +9,7 @@ public class Exam {
     public int ExamId { get; set; }
     [MaxLength(500)]
     public string ExamName { get; set; } = string.Empty;
+    public DifficultyLevel DifficultyLevel { get; set; }
     public List<Question> Questions { get; } = [];
     public List<ExamQuestion> ExamQuestions { get; } = [];
     public List<AnswerHistory> AnswerHistories { get; } = [];

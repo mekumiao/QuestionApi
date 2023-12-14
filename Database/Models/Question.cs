@@ -11,6 +11,7 @@ public class Question {
     public string QuestionText { get; set; } = string.Empty;
     public QuestionType QuestionType { get; set; }
     public string CorrectAnswer { get; set; } = string.Empty;
+    public DifficultyLevel DifficultyLevel { get; set; }
     public List<Option> Options { get; } = [];
     public List<Exam> Exams { get; } = [];
     public List<ExamQuestion> ExamQuestions { get; } = [];
@@ -21,6 +22,7 @@ public class Question {
 /// 题型枚举
 /// </summary>
 public enum QuestionType {
+    None,
     SingleChoice,
     MultipleChoice,
     TrueFalse,
@@ -40,4 +42,14 @@ public class Option {
     public char OptionCode { get; set; }
     public string OptionText { get; set; } = string.Empty;
     public bool IsCorrect { get; set; }
+}
+
+/// <summary>
+/// 难度等级
+/// </summary>
+public enum DifficultyLevel {
+    None,
+    Easy,
+    Medium,
+    Hard
 }
