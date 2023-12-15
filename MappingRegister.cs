@@ -1,5 +1,7 @@
 using Mapster;
 
+using Microsoft.AspNetCore.Identity;
+
 using QuestionApi.Database;
 using QuestionApi.Models;
 
@@ -24,6 +26,6 @@ public class MappingRegister : IRegister {
         config.NewConfig<Student, StudentDto>().Map(dest => dest, src => src.User);
         config.NewConfig<StudentUpdate, Student>();
 
-
+        config.NewConfig<IdentityUser, UserDto>().Map(dest => dest.UserId, src => src.Id);
     }
 }

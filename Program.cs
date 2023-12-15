@@ -14,10 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<QuestionDbContext>(options =>
-    options.UseNpgsql("Host=mini.dev;Username=postgres;Database=questiondb",
-    v => v.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-);
+builder.Services.AddDbContext<QuestionDbContext>(options => {
+    options.UseNpgsql("Host=mini.dev;Username=postgres;Database=questiondb", v => v.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+    options.EnableSensitiveDataLogging();
+});
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => {

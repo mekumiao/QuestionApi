@@ -28,7 +28,7 @@ Content-Type: application/json
 ###
 
 # Tokken
-@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlBmH5cKgky1xhoYEyWXHF1iIfQHyoeNOyNbTHrEttdUpeAksdX8uCh_vl_aHqBhvCAS-9_YNxftIvZX_2tqEytDcxzEeuJNRfUMUIW7ktPfXQPbddDk5n_A1U-NjXudC7naLZMWgjiId83vPKQgEHvSlMqg-pvHk_NHKRAumJUvRZaKkoow9EA7OgRvnZmXndwW7MTSgeTewQb1_P5yhfkMB0DQlOrrGwRSU6eHUR8jaMF8xNyYV8W06r8CFzzBvTGmXz76AsL7af6NNBZlOGExLgnPAnlmGlhIvGtLMLTQ7kEL1yedpx2beiF-u2kaO3IqF0uWTB9SskkyHYUtcvGVc-Qo8jkBlw7x1jCfvIXs078G6ZuOuWPa694J_WCFrv2fhIAMQXh6N5X-wHj4q_IPEfn_ergRozMPK2z-TktjjzDTCSPUZP_NpDsYqny8eTPrvKOXxazafsT7P7DLxNoBDYPssAbKY0K2gnwPM7vcR1lQM_rRGzUpk-ufD4nUJ69zgaE5kWqWq5pLxEz7QLr-jXCWvBzNpxQEIYzDQ2U_MM2L1YfMcslfyCdBAxRAqfB8bzVpF9TUOxFAoz9A408ezT_QT9EJMXkv9HCiQAoji4re-wHKU4vixirhlir7cFykedY3cR9MqYq21Zp0SBbj7JAXTfCeKbEaOZv6s9jbbQ
+@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlC9xeRPgrbcHx2aoEXfCn4ag7N7IgW5isxh8IrJykH2pF63gm_01ntLC64TEUYI9UTsyrgRsUW60lo-9ozJJtcn6TyHKoEM3e9BwB1qfij7BVEA326V3Fa970Xvkn_AtiDJVgu7M78LaYid63oxQ8sz0i58H3ic7wsxegsCNmCu8d6FaGrj1YfPV8gl_0psYEy-_CLBYLI7jee2mVvakwT4FWLcgFPnvtda9L68g7EXuCWPObuAz537bgiJcGvH3rMclsnD9Yh0m1flzrh0pbwHi07ppY0kweSqAumCmtFsxFTkRMhs72MV3_fZ4FVobqqF_dc1dbrtdZLpXiZNgXG8dI7OOse9a16-edM8F62FMdKfvCbJL6fJj5rNo0l-ec8oqGXjqZWA3fxyz3E2LYqMHT8takbNDe1sLevNHAAK48fUJ_F5tNqOCF2F28KwvAy0GfGiKv2HiK7ksZhij3ab5Nwo_vuo1yTwjHy69-6Yj0c1ocN9zMZ2R89oa1WUD_hq05mo90j36F7q3bQtHBTaqt7VhoHzE3rk0sVM3gk_P84A4do_9Qx2P9tf25t8wAxZqy8kipADcO4dgMS1gXui7PJb6dKh_ywL92NxWlcrW0GPRPUJk8gkJLEsK9tNPjtyp2UrZFvejd9Na77uiwstinDMI-GNX4-sBvIyaxE7Pw
 @refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlDZZG7V1Tk8whIBFNeDVaPkRSdEw9gBbqwuzawfW-Qff1LUxM-DMBq3XBLU2a3hUxjkbZekxzBhg3gEBm6qcNYTJ2C31a84-m0SjpF65p4NQZoOfqvonwJcIZJx1d_eyUmUWzDczrCS2NuBRoIpJi5-yX7Ok0ioQAGhQkXQoi8WvMGL6avfG6VueX_Ey2Q7DioMnxgQ_tndqALRMfZWPkFCExmTE4sPHJh2wJ-4riPVrIADM3pWFnjHpMRU4xbeyQdKoO6eRZ7xbFg0AjnccvYziZhY3tWjYL9fN8MCw4DNZQrChnyhLMDUv2t7sGqUNdIPeMJcq5k-1WdoRzAkCTJ2BxxU8t3TDian9nPYw9Bh6rZlhcPn4S92Ailv0R5kctjfirHAkbuR2unj8U1lztYV7QJUYi8fbzc-OtvBcYdku1Rbm2_KUwzESILEopJ6zxxIeteVCBFYafLmxWx6JM8UHDoks8uzoJHeajbtfFapEHf7oCOvdlQg4Vl_O7Whx8ctpJU3hacgKXAGSeD5TpDKClUvbzXnziPxC0BeGKxuQT8SwXfZom9lRFJNRI6b5zbXLyAHbuElhyWF5AUxtqhyvz8emgJddGMD2ckCo-puHE_o7-h56fz6NescWMSYjtCO1mlB9OCgul32vyIiXqHoOqQNMfICmTgQh0d5hPTTVg
 
 ###
@@ -39,6 +39,40 @@ Content-Type: application/json
 
 {
   "refreshToken": "{{refreshToken}}"
+}
+
+### 用户接口
+
+# 获取用户总数
+GET {{HostAddress}}/users/count HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+# 获取用户列表
+GET {{HostAddress}}/users/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+# 根据ID获取用户
+GET {{HostAddress}}/users/b23f7e0a-3a76-4f0a-b51f-da03680eaa9d/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+# 修改用户
+PUT {{HostAddress}}/users/b23f7e0a-3a76-4f0a-b51f-da03680eaa9d/
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "Email": "admin12000@qq.com",
+  "userName": "admin0000012",
+  "Roles": ["admin","student"]
 }
 
 ###
