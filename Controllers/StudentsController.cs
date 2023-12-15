@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
 using MapsterMapper;
@@ -38,15 +37,13 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
 
     [HttpGet]
     [ProducesResponseType(typeof(List<StudentDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetList([FromQuery] StudentFilter filter,
-                                             [FromQuery, Range(minimum: 0, maximum: int.MaxValue)] int offset = 0,
-                                             [FromQuery, Range(minimum: 10, maximum: 100)] int limit = 10) {
+    public async Task<IActionResult> GetList([FromQuery] StudentFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Students
             .AsNoTracking()
             .Include(v => v.User)
-            .Skip(offset)
-            .Take(limit);
+            .AsQueryable();
 
+        queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
         var result = await queryable.ToListAsync();
