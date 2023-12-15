@@ -22,19 +22,19 @@ public class Student {
 /// </summary>
 public class StudentAnswer {
     [Key]
-    public int AnswerId { get; set; }
+    public int StudentAnswerId { get; set; }
     public int StudentId { get; set; }
     public Student Student { get; set; } = null!;
     public int QuestionId { get; set; }
     public Question Question { get; set; } = null!;
+    public QuestionType QuestionType { get; set; }
     public int AnswerHistoryId { get; set; }
     public AnswerHistory AnswerHistory { get; set; } = null!;
     /// <summary>
-    /// 答案选项（单选题和多选题。用英文逗号","隔开）
-    /// </summary>
-    public string ChosenOptions { get; set; } = string.Empty;
-    /// <summary>
-    /// 答案文本（填空题）
+    /// 答案:
+    /// 1.单选题和多选题，用英文逗号","隔开）
+    /// 2.判断题，0表示错，1表示对
+    /// 3.填空题，直接填入文本
     /// </summary>
     public string AnswerText { get; set; } = string.Empty;
 }
@@ -49,6 +49,10 @@ public class AnswerHistory {
     public Student Student { get; set; } = null!;
     public int ExamId { get; set; }
     public Exam Exam { get; set; } = null!;
+    /// <summary>
+    /// 开始时间
+    /// </summary>
+    public DateTime StartTime { get; set; }
     /// <summary>
     /// 交卷时间
     /// </summary>

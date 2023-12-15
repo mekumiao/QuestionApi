@@ -21,8 +21,8 @@ public class MappingRegister : IRegister {
 
         config.NewConfig<ExamQuestion, ExamQuestionDto>().Map(dest => dest, src => src.Question);
 
-        config.NewConfig<Student, StudentDto>();
-        config.NewConfig<StudentInput, Student>();
+        config.NewConfig<Student, StudentDto>().Map(dest => dest, src => src.User);
+        config.NewConfig<StudentUpdate, Student>();
 
 
     }
