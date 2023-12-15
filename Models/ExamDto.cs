@@ -5,7 +5,8 @@ using QuestionApi.Database;
 namespace QuestionApi.Models;
 
 public class ExamFilter {
-    public string? ExamName { get; set; } = string.Empty;
+    [MaxLength(50)]
+    public string? ExamName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
 
