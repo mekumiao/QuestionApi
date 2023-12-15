@@ -51,7 +51,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
                             UserId = g.Key.UserId,
                             UserName = g.Key.UserName ?? string.Empty,
                             Email = g.Key.Email ?? string.Empty,
-                            Roles = g.Select(v => v.Name)!
+                            Roles = g.OrderBy(v => v.Id).Select(v => v.Name)!
                         };
 
         var result = await queryable.ToArrayAsync();
