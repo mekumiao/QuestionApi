@@ -36,7 +36,7 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<QuestionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(QuestionDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] QuestionFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Questions
             .AsNoTracking()
@@ -48,7 +48,7 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
         queryable = filter.Build(queryable);
 
         var result = await queryable.ToListAsync();
-        return Ok(_mapper.Map<List<QuestionDto>>(result));
+        return Ok(_mapper.Map<QuestionDto[]>(result));
     }
 
     [HttpGet("{questionId:int}", Name = "GetQuestionById")]

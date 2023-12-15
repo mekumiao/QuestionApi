@@ -65,13 +65,12 @@ Accept: application/json
 ###
 
 # 修改用户
-PUT {{HostAddress}}/users/b23f7e0a-3a76-4f0a-b51f-da03680eaa9d/
+PUT {{HostAddress}}/users/b6501e41-70cf-4c2e-9ad5-a41d656852e9/
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "Email": "admin12000@qq.com",
-  "userName": "admin0000012",
+  "userName": "admin",
   "Roles": ["admin","student"]
 }
 

@@ -36,7 +36,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<ExamDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExamDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] ExamFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Exams
             .AsNoTracking()
@@ -49,7 +49,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
         queryable = filter.Build(queryable);
 
         var result = await queryable.ToListAsync();
-        return Ok(_mapper.Map<List<ExamDto>>(result));
+        return Ok(_mapper.Map<ExamDto[]>(result));
     }
 
     [HttpGet("{examId:int}", Name = "GetExamById")]

@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Security.Claims;
 
 using MapsterMapper;
 
@@ -46,7 +47,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
-        var result = await queryable.ToListAsync();
+        var result = await queryable.ToArrayAsync();
         return Ok(_mapper.Map<List<StudentDto>>(result));
     }
 
@@ -77,14 +78,39 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         return Ok(result);
     }
 
-    [HttpGet("{studentId:int}/answer-history", Name = "GetAnswerHistoryList")]
+    [HttpGet("{studentId:int}/answer-history")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(List<AnswerHistoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryList([FromRoute] int studentId) {
         var result = await _dbContext.AnswerHistories
             .AsNoTracking()
             .Include(v => v.Student)
-            .SingleOrDefaultAsync(v => v.StudentId == studentId);
-        return result is null ? NotFound() : Ok(_mapper.Map<StudentDto>(result));
+            .Where(v => v.StudentId == studentId)
+            .ToArrayAsync();
+        return Ok(_mapper.Map<List<AnswerHistoryDto>>(result));
+    }
+
+    /// <summary>
+    /// 获取当前登录用户的答题记录
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("me/answer-history")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId() {
+        var userId = User.FindFirst(v => v.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userId)) {
+            return NotFound();
+        }
+        var student = await _dbContext.Students.AsNoTracking().SingleOrDefaultAsync(v => v.UserId == userId);
+        if (student is null) {
+            return NotFound();
+        }
+        var result = await _dbContext.AnswerHistories
+            .AsNoTracking()
+            .Include(v => v.Student)
+            .Where(v => v.StudentId == student.StudentId)
+            .ToArrayAsync();
+        return Ok(_mapper.Map<AnswerHistoryDto[]>(result));
     }
 }

@@ -38,7 +38,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
 
     [HttpGet]
     [Authorize(Roles = "admin")]
-    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] UserFilter filter, [FromQuery] Paging paging) {
         var users = paging.Build(_dbContext.Users);
         users = filter.Build(users);
@@ -54,8 +54,8 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
                             Roles = g.Select(v => v.Name)!
                         };
 
-        var result = await queryable.ToListAsync();
-        return Ok(_mapper.Map<List<UserDto>>(result));
+        var result = await queryable.ToArrayAsync();
+        return Ok(_mapper.Map<UserDto[]>(result));
     }
 
     [HttpGet("{userId}", Name = "GetUserById")]
