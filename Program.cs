@@ -20,10 +20,7 @@ builder.Services.AddDbContext<QuestionDbContext>(options => {
 });
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => {
-    options.ClaimsIdentity.RoleClaimType = "role";
-    options.ClaimsIdentity.UserNameClaimType = "name";
-})
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<QuestionDbContext>();
 
@@ -55,9 +52,12 @@ builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 
 var app = builder.Build();
 
-app.UsePathBase("/api");
-
 // Configure the HTTP request pipeline.
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions {
+    ForwardedHeaders = ForwardedHeaders.All // 可转发前缀
+});
+
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -65,9 +65,6 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseCors();
 app.UseHttpsRedirection();
-app.UseForwardedHeaders(new ForwardedHeadersOptions {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
-});
 app.UseAuthorization();
 app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
