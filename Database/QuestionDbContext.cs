@@ -29,8 +29,8 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .HasMany(e => e.Questions)
             .WithMany(e => e.Exams)
             .UsingEntity<ExamPaperQuestion>(
-                l => l.HasOne(v => v.Question).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.QuestionId).IsRequired(),
-                r => r.HasOne(v => v.ExamPaper).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.ExamId).IsRequired());
+                l => l.HasOne(v => v.Question).WithMany(v => v.ExamPaperQuestions).HasForeignKey(e => e.QuestionId).IsRequired(),
+                r => r.HasOne(v => v.ExamPaper).WithMany(v => v.ExamPaperQuestions).HasForeignKey(e => e.ExamPaperId).IsRequired());
 
         builder.Entity<Student>()
             .HasOne(v => v.User)
@@ -59,7 +59,7 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
         builder.Entity<AnswerHistory>()
             .HasOne(v => v.ExamPaper)
             .WithMany(v => v.AnswerHistories)
-            .HasForeignKey(v => v.ExamId)
+            .HasForeignKey(v => v.ExamPaperId)
             .IsRequired();
 
         builder.Entity<AnswerHistory>()

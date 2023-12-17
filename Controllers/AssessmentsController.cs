@@ -21,8 +21,8 @@ namespace QuestionApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class AssessmentsController(ILogger<AssessmentsController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
-    private readonly ILogger<AssessmentsController> _logger = logger;
+public class ExaminationController(ILogger<ExaminationController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+    private readonly ILogger<ExaminationController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
@@ -37,10 +37,10 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
     public async Task<IActionResult> GetAssessmentById([FromRoute] int assessmentId) {
         var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
-                    .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+                    .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
                     .ThenInclude(v => v.Question)
                     .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode));
-        var result = await queryable.SingleOrDefaultAsync(v => v.ExamId == assessmentId);
+        var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == assessmentId);
         return result is null ? NotFound() : Ok(_mapper.Map<ExamDto>(result));
     }
 
@@ -54,7 +54,7 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
     public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
         if (dto.ExamQuestions.Count != 0) {
-            item.ExamQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
+            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
         }
 
         var questions = dto.ExamQuestions.Select(v => v.QuestionId).ToArray();
@@ -67,7 +67,7 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
         await _dbContext.SaveChangesAsync();
 
         var result = _mapper.Map<ExamDto>(item);
-        return CreatedAtRoute("GetExamById", new { examId = item.ExamId }, result);
+        return CreatedAtRoute("GetExamById", new { examId = item.ExamPaperId }, result);
     }
 
     /// <summary>

@@ -39,8 +39,8 @@ public class AnswerHistoryDto {
     public int AnswerHistoryId { get; set; }
     public int StudentId { get; set; }
     public string StudentName { get; set; } = string.Empty;
-    public int ExamId { get; set; }
-    public string ExamName { get; set; } = string.Empty;
+    public int ExamPaperId { get; set; }
+    public string ExamPaperName { get; set; } = string.Empty;
     /// <summary>
     /// 开始时间
     /// </summary>

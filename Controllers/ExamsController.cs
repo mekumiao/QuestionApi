@@ -21,8 +21,8 @@ namespace QuestionApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
-    private readonly ILogger<ExamsController> _logger = logger;
+public class ExamPapersController(ILogger<ExamPapersController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+    private readonly ILogger<ExamPapersController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
@@ -40,7 +40,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     public async Task<IActionResult> GetList([FromQuery] ExamFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.ExamPapers
             .AsNoTracking()
-            .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+            .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
             .AsQueryable();
@@ -58,10 +58,10 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     public async Task<IActionResult> GetExamById([FromRoute] int examId) {
         var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
-                    .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+                    .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
                     .ThenInclude(v => v.Question)
                     .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode));
-        var result = await queryable.SingleOrDefaultAsync(v => v.ExamId == examId);
+        var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == examId);
         return result is null ? NotFound() : Ok(_mapper.Map<ExamDto>(result));
     }
 
@@ -70,7 +70,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
         if (dto.ExamQuestions.Count != 0) {
-            item.ExamQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
+            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
         }
 
         var questions = dto.ExamQuestions.Select(v => v.QuestionId).ToArray();
@@ -83,7 +83,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
         await _dbContext.SaveChangesAsync();
 
         var result = _mapper.Map<ExamDto>(item);
-        return CreatedAtRoute("GetExamById", new { examId = item.ExamId }, result);
+        return CreatedAtRoute("GetExamById", new { examId = item.ExamPaperId }, result);
     }
 
     [HttpPut("{examId:int}")]
@@ -91,10 +91,10 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] ExamUpdate dto) {
         var item = await _dbContext.ExamPapers
-            .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
+            .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
-            .SingleOrDefaultAsync(v => v.ExamId == examId);
+            .SingleOrDefaultAsync(v => v.ExamPaperId == examId);
         if (item is null) {
             return NotFound();
         }
@@ -102,8 +102,8 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
         _mapper.Map(dto, item);
 
         if (dto.ExamQuestions is not null) {
-            item.ExamQuestions.Clear();
-            item.ExamQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions));
+            item.ExamPaperQuestions.Clear();
+            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions));
         }
 
         await _dbContext.SaveChangesAsync();
@@ -117,7 +117,7 @@ public class ExamsController(ILogger<ExamsController> logger, QuestionDbContext 
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete([FromRoute] int examId) {
         try {
-            var item = new ExamPaper { ExamId = examId };
+            var item = new ExamPaper { ExamPaperId = examId };
             _dbContext.ExamPapers.Attach(item);
             _dbContext.ExamPapers.Remove(item);
             var rows = await _dbContext.SaveChangesAsync();

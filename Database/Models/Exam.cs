@@ -8,12 +8,12 @@ namespace QuestionApi.Database;
 /// </summary>
 public class ExamPaper {
     [Key]
-    public int ExamId { get; set; }
+    public int ExamPaperId { get; set; }
     [MaxLength(500)]
-    public string ExamName { get; set; } = string.Empty;
+    public string ExamPaperName { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<Question> Questions { get; } = [];
-    public List<ExamPaperQuestion> ExamQuestions { get; } = [];
+    public List<ExamPaperQuestion> ExamPaperQuestions { get; } = [];
     public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
@@ -21,7 +21,7 @@ public class ExamPaper {
 /// 试卷题目关联表
 /// </summary>
 public class ExamPaperQuestion {
-    public int ExamId { get; set; }
+    public int ExamPaperId { get; set; }
     public ExamPaper ExamPaper { get; set; } = null!;
     public int QuestionId { get; set; }
     public Question Question { get; set; } = null!;

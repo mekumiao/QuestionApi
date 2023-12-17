@@ -14,7 +14,7 @@ public class Question {
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<Option> Options { get; } = [];
     public List<ExamPaper> Exams { get; } = [];
-    public List<ExamPaperQuestion> ExamQuestions { get; } = [];
+    public List<ExamPaperQuestion> ExamPaperQuestions { get; } = [];
     public List<StudentAnswer> StudentAnswers { get; } = [];
 }
 
