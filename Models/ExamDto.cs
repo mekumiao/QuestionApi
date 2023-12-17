@@ -4,7 +4,7 @@ using QuestionApi.Database;
 
 namespace QuestionApi.Models;
 
-public class ExamFilter {
+public class ExamPaperFilter {
     [MaxLength(50)]
     public string? ExamPaperName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
@@ -21,33 +21,33 @@ public class ExamFilter {
     }
 }
 
-public class ExamDto {
+public class ExamPaperDto {
     public int ExamPaperId { get; set; }
     public string ExamPaperName { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
-    public List<ExamQuestionDto> ExamQuestions { get; set; } = [];
+    public List<ExamPaperQuestionDto> ExamQuestions { get; set; } = [];
 }
 
-public class ExamInput {
+public class ExamPaperInput {
     public string ExamPaperName { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
-    public List<ExamQuestionInput> ExamQuestions { get; set; } = [];
+    public List<ExamPaperQuestionInput> ExamQuestions { get; set; } = [];
 }
 
-public class ExamQuestionInput {
+public class ExamPaperQuestionInput {
     public int QuestionId { get; set; }
     public int Order { get; set; }
 }
 
-public class ExamUpdate {
+public class ExamPaperUpdate {
     public string ExamPaperName { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
-    public List<ExamQuestionInput>? ExamQuestions { get; set; }
+    public List<ExamPaperQuestionInput>? ExamQuestions { get; set; }
 }
 
-public class ExamQuestionDto {
+public class ExamPaperQuestionDto {
     public int ExamPaperId { get; set; }
     public int QuestionId { get; set; }
     public string QuestionText { get; set; } = string.Empty;

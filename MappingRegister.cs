@@ -16,10 +16,10 @@ public class MappingRegister : IRegister {
         config.NewConfig<Option, OptionDto>();
         config.NewConfig<OptionInput, Option>();
 
-        config.NewConfig<ExamPaper, ExamDto>();
-        config.NewConfig<ExamInput, ExamPaper>();
+        config.NewConfig<ExamPaper, ExamPaperDto>();
+        config.NewConfig<ExamPaperInput, ExamPaper>();
 
-        config.NewConfig<ExamPaperQuestion, ExamQuestionDto>().Map(dest => dest, src => src.Question);
+        config.NewConfig<ExamPaperQuestion, ExamPaperQuestionDto>().Map(dest => dest, src => src.Question);
 
         config.NewConfig<Student, StudentDto>().Map(dest => dest, src => src.User);
         config.NewConfig<StudentUpdate, Student>();

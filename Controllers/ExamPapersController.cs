@@ -28,7 +28,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
 
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCount([FromQuery] ExamFilter filter) {
+    public async Task<IActionResult> GetCount([FromQuery] ExamPaperFilter filter) {
         var queryable = _dbContext.ExamPapers.AsNoTracking();
         queryable = filter.Build(queryable);
         var result = await queryable.CountAsync();
@@ -36,8 +36,8 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ExamDto[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetList([FromQuery] ExamFilter filter, [FromQuery] Paging paging) {
+    [ProducesResponseType(typeof(ExamPaperDto[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetList([FromQuery] ExamPaperFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.ExamPapers
             .AsNoTracking()
             .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
@@ -49,25 +49,25 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
         queryable = filter.Build(queryable);
 
         var result = await queryable.ToListAsync();
-        return Ok(_mapper.Map<ExamDto[]>(result));
+        return Ok(_mapper.Map<ExamPaperDto[]>(result));
     }
 
-    [HttpGet("{examId:int}", Name = "GetExamById")]
+    [HttpGet("{paperId:int}", Name = "GetExamPaperById")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetExamById([FromRoute] int examId) {
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetExamPaperById([FromRoute] int paperId) {
         var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
                     .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
                     .ThenInclude(v => v.Question)
                     .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode));
-        var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == examId);
-        return result is null ? NotFound() : Ok(_mapper.Map<ExamDto>(result));
+        var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == paperId);
+        return result is null ? NotFound() : Ok(_mapper.Map<ExamPaperDto>(result));
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody, FromForm] ExamPaperInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
         if (dto.ExamQuestions.Count != 0) {
             item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
@@ -82,19 +82,19 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
         _dbContext.ExamPapers.Add(item);
         await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<ExamDto>(item);
-        return CreatedAtRoute("GetExamById", new { examId = item.ExamPaperId }, result);
+        var result = _mapper.Map<ExamPaperDto>(item);
+        return CreatedAtRoute("GetExamPaperById", new { paperId = item.ExamPaperId }, result);
     }
 
-    [HttpPut("{examId:int}")]
+    [HttpPut("{paperId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update([FromRoute] int examId, [FromBody, FromForm] ExamUpdate dto) {
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Update([FromRoute] int paperId, [FromBody, FromForm] ExamPaperUpdate dto) {
         var item = await _dbContext.ExamPapers
             .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
-            .SingleOrDefaultAsync(v => v.ExamPaperId == examId);
+            .SingleOrDefaultAsync(v => v.ExamPaperId == paperId);
         if (item is null) {
             return NotFound();
         }
@@ -108,16 +108,16 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
 
         await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<ExamDto>(item);
+        var result = _mapper.Map<ExamPaperDto>(item);
         return Ok(result);
     }
 
-    [HttpDelete("{examId:int}")]
+    [HttpDelete("{paperId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Delete([FromRoute] int examId) {
+    public async Task<IActionResult> Delete([FromRoute] int paperId) {
         try {
-            var item = new ExamPaper { ExamPaperId = examId };
+            var item = new ExamPaper { ExamPaperId = paperId };
             _dbContext.ExamPapers.Attach(item);
             _dbContext.ExamPapers.Remove(item);
             var rows = await _dbContext.SaveChangesAsync();

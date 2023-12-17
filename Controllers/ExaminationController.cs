@@ -29,19 +29,19 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     /// <summary>
     /// 获取考试（时间、试卷）
     /// </summary>
-    /// <param name="assessmentId"></param>
+    /// <param name="examinationId"></param>
     /// <returns></returns>
-    [HttpGet("{assessmentId:int}", Name = "GetAssessmentById")]
+    [HttpGet("{examinationId:int}", Name = "GetExaminationById")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAssessmentById([FromRoute] int assessmentId) {
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetExaminationById([FromRoute] int examinationId) {
         var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
                     .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
                     .ThenInclude(v => v.Question)
                     .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode));
-        var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == assessmentId);
-        return result is null ? NotFound() : Ok(_mapper.Map<ExamDto>(result));
+        var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == examinationId);
+        return result is null ? NotFound() : Ok(_mapper.Map<ExamPaperDto>(result));
     }
 
     /// <summary>
@@ -50,8 +50,8 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody, FromForm] ExamPaperInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
         if (dto.ExamQuestions.Count != 0) {
             item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
@@ -66,8 +66,8 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
         _dbContext.ExamPapers.Add(item);
         await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<ExamDto>(item);
-        return CreatedAtRoute("GetExamById", new { examId = item.ExamPaperId }, result);
+        var result = _mapper.Map<ExamPaperDto>(item);
+        return CreatedAtRoute("GetExaminationById", new { examId = item.ExamPaperId }, result);
     }
 
     /// <summary>
@@ -75,9 +75,9 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    [HttpPut("{assessmentId:int}/submit")]
-    [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> SubmitExam([FromRoute] int assessmentId,
+    [HttpPut("{examinationId:int}/submit")]
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> SubmitExam([FromRoute] int examinationId,
                                                 [FromBody, FromForm] List<AnswerInput> inputs) {
         var userClaim = User.FindFirst(v => v.Type == "sub")!;
         var student = await _dbContext.Students.SingleOrDefaultAsync(v => v.UserId == userClaim.Value);
@@ -93,7 +93,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
 
         await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<ExamDto>(item);
+        var result = _mapper.Map<ExamPaperDto>(item);
         return Ok();
     }
 }
