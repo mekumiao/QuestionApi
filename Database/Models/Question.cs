@@ -13,8 +13,8 @@ public class Question {
     public string CorrectAnswer { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<Option> Options { get; } = [];
-    public List<Exam> Exams { get; } = [];
-    public List<ExamQuestion> ExamQuestions { get; } = [];
+    public List<ExamPaper> Exams { get; } = [];
+    public List<ExamPaperQuestion> ExamQuestions { get; } = [];
     public List<StudentAnswer> StudentAnswers { get; } = [];
 }
 

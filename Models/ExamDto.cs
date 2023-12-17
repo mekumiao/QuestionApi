@@ -10,7 +10,7 @@ public class ExamFilter {
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
 
-    public IQueryable<Exam> Build(IQueryable<Exam> queryable) {
+    public IQueryable<ExamPaper> Build(IQueryable<ExamPaper> queryable) {
         if (!string.IsNullOrWhiteSpace(ExamName)) {
             queryable = queryable.Where(v => v.ExamName.Contains(ExamName));
         }

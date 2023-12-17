@@ -6,24 +6,23 @@ namespace QuestionApi.Database;
 /// <summary>
 /// 试卷表
 /// </summary>
-[Table("ExamPapers")]
-public class Exam {
+public class ExamPaper {
+    [Key]
     public int ExamId { get; set; }
     [MaxLength(500)]
     public string ExamName { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<Question> Questions { get; } = [];
-    public List<ExamQuestion> ExamQuestions { get; } = [];
+    public List<ExamPaperQuestion> ExamQuestions { get; } = [];
     public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
 /// <summary>
 /// 试卷题目关联表
 /// </summary>
-[Table("ExamPaperQuestions")]
-public class ExamQuestion {
+public class ExamPaperQuestion {
     public int ExamId { get; set; }
-    public Exam Exam { get; set; } = null!;
+    public ExamPaper ExamPaper { get; set; } = null!;
     public int QuestionId { get; set; }
     public Question Question { get; set; } = null!;
     /// <summary>

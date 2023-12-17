@@ -35,7 +35,7 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAssessmentById([FromRoute] int assessmentId) {
-        var queryable = _dbContext.Exams
+        var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
                     .Include(v => v.ExamQuestions.OrderBy(t => t.Order))
                     .ThenInclude(v => v.Question)
@@ -52,9 +52,9 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
     [HttpPost]
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] ExamInput dto) {
-        var item = _mapper.Map<Exam>(dto);
+        var item = _mapper.Map<ExamPaper>(dto);
         if (dto.ExamQuestions.Count != 0) {
-            item.ExamQuestions.AddRange(_mapper.Map<List<ExamQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
+            item.ExamQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
         }
 
         var questions = dto.ExamQuestions.Select(v => v.QuestionId).ToArray();
@@ -63,7 +63,7 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
             .Where(v => questions.Contains(v.QuestionId))
             .LoadAsync();
 
-        _dbContext.Exams.Add(item);
+        _dbContext.ExamPapers.Add(item);
         await _dbContext.SaveChangesAsync();
 
         var result = _mapper.Map<ExamDto>(item);

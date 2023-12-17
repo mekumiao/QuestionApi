@@ -6,8 +6,8 @@ namespace QuestionApi.Database;
 public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options) {
     public DbSet<Question> Questions { get; set; }
     public DbSet<Option> Options { get; set; }
-    public DbSet<Exam> Exams { get; set; }
-    public DbSet<ExamQuestion> ExamQuestions { get; set; }
+    public DbSet<ExamPaper> ExamPapers { get; set; }
+    public DbSet<ExamPaperQuestion> ExamPaperQuestions { get; set; }
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<AnswerHistory> AnswerHistories { get; set; }
@@ -25,12 +25,12 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .Property(v => v.OptionCode)
             .HasDefaultValue('A');
 
-        builder.Entity<Exam>()
+        builder.Entity<ExamPaper>()
             .HasMany(e => e.Questions)
             .WithMany(e => e.Exams)
-            .UsingEntity<ExamQuestion>(
+            .UsingEntity<ExamPaperQuestion>(
                 l => l.HasOne(v => v.Question).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.QuestionId).IsRequired(),
-                r => r.HasOne(v => v.Exam).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.ExamId).IsRequired());
+                r => r.HasOne(v => v.ExamPaper).WithMany(v => v.ExamQuestions).HasForeignKey(e => e.ExamId).IsRequired());
 
         builder.Entity<Student>()
             .HasOne(v => v.User)
@@ -57,7 +57,7 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .IsRequired();
 
         builder.Entity<AnswerHistory>()
-            .HasOne(v => v.Exam)
+            .HasOne(v => v.ExamPaper)
             .WithMany(v => v.AnswerHistories)
             .HasForeignKey(v => v.ExamId)
             .IsRequired();
