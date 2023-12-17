@@ -104,7 +104,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         }
         var student = await _dbContext.Students.AsNoTracking().SingleOrDefaultAsync(v => v.UserId == userId);
         if (student is null) {
-            return NotFound();
+            return Ok(Array.Empty<AnswerHistoryDto>());
         }
         var result = await _dbContext.AnswerHistories
             .AsNoTracking()

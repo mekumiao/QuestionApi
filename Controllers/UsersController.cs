@@ -89,16 +89,6 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
         if (dto.Roles is not null) {
             await _dbContext.UserRoles.Where(v => v.UserId == userId).ExecuteDeleteAsync();
             await userManager.AddToRolesAsync(item, dto.Roles.Distinct());
-
-            if (dto.Roles.Contains("student")) {
-                if (!await _dbContext.Students.AnyAsync(v => v.UserId == userId)) {
-                    _dbContext.Students.Add(new Student {
-                        UserId = userId,
-                        Name = item.UserName ?? string.Empty,
-                    });
-                    await _dbContext.SaveChangesAsync();
-                }
-            }
         }
         _mapper.Map(dto, item);
         await userManager.UpdateAsync(item);
