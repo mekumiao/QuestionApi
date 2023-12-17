@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 
-using Microsoft.AspNetCore.Identity;
-
 namespace QuestionApi.Database;
 
 /// <summary>
@@ -12,7 +10,7 @@ public class Student {
     [MaxLength(500)]
     public string Name { get; set; } = string.Empty;
     public string? UserId { get; set; }
-    public IdentityUser? User { get; set; }
+    public AppUser? User { get; set; }
     public List<StudentAnswer> StudentAnswers { get; } = [];
     public List<AnswerHistory> AnswerHistories { get; } = [];
 }

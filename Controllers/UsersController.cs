@@ -30,7 +30,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] UserFilter filter) {
-        var queryable = _dbContext.Users.AsNoTracking();
+        var queryable = _dbContext.Set<AppUser>().AsNoTracking();
         queryable = filter.Build(queryable);
         var result = await queryable.CountAsync();
         return Ok(result);
@@ -40,21 +40,22 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
     [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(UserDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] UserFilter filter, [FromQuery] Paging paging) {
-        var users = paging.Build(_dbContext.Users);
+        var users = paging.Build(_dbContext.Set<AppUser>());
         users = filter.Build(users);
 
         var queryable = from u in users
                         join us in _dbContext.UserRoles on u.Id equals us.UserId
                         join r in _dbContext.Roles on us.RoleId equals r.Id
-                        group r by new { UserId = u.Id, u.UserName, u.Email } into g
+                        group r by new { UserId = u.Id, u.UserName, u.Email, u.NickName } into g
                         select new UserDto {
                             UserId = g.Key.UserId,
-                            UserName = g.Key.UserName ?? string.Empty,
-                            Email = g.Key.Email ?? string.Empty,
+                            UserName = g.Key.UserName,
+                            NickName = g.Key.NickName,
+                            Email = g.Key.Email,
                             Roles = g.OrderBy(v => v.Id).Select(v => v.Name)!
                         };
 
-        var result = await queryable.ToArrayAsync();
+        var result = await queryable.AsNoTracking().ToArrayAsync();
         return Ok(_mapper.Map<UserDto[]>(result));
     }
 
@@ -62,7 +63,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserById([FromRoute] string userId,
-                                                 [FromServices] UserManager<IdentityUser> userManager) {
+                                                 [FromServices] UserManager<AppUser> userManager) {
         var user = await userManager.FindByIdAsync(userId);
         if (user is null) {
             return NotFound();
@@ -78,8 +79,8 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([FromRoute] string userId,
                                             [FromBody, FromForm] UserUpdate dto,
-                                            [FromServices] UserManager<IdentityUser> userManager) {
-        var item = await _dbContext.Users.FindAsync(userId);
+                                            [FromServices] UserManager<AppUser> userManager) {
+        var item = await userManager.FindByIdAsync(userId);
         if (item is null) {
             return NotFound();
         }

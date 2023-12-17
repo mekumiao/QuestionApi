@@ -70,7 +70,7 @@ public class OptionInput {
 public class OptionUpdate {
 
     public int OptionId { get; set; }
-    public char OptionCode { get; set; }
-    public string OptionText { get; set; } = string.Empty;
-    public bool IsCorrect { get; set; }
+    public char? OptionCode { get; set; }
+    public string? OptionText { get; set; }
+    public bool? IsCorrect { get; set; }
 }

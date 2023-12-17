@@ -20,7 +20,7 @@ builder.Services.AddDbContext<QuestionDbContext>(options => {
 });
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<QuestionDbContext>();
 
@@ -66,7 +66,7 @@ if (app.Environment.IsDevelopment()) {
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.MapIdentityApi<IdentityUser>();
+app.MapIdentityApi<AppUser>();
 app.MapControllers();
 
 app.Run();

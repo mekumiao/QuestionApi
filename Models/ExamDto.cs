@@ -43,7 +43,7 @@ public class ExamQuestionInput {
 public class ExamUpdate {
     public string ExamName { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
-    public DifficultyLevel DifficultyLevel { get; set; }
+    public DifficultyLevel? DifficultyLevel { get; set; }
     public List<ExamQuestionInput>? ExamQuestions { get; set; }
 }
 

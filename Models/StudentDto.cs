@@ -25,7 +25,8 @@ public class StudentDto {
 }
 
 public class StudentUpdate {
-    public string Name { get; set; } = string.Empty;
+    [MaxLength(256)]
+    public string? Name { get; set; }
 }
 
 public class AnswerInput {
