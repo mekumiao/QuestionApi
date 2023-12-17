@@ -1,5 +1,5 @@
-@HostAddress = https://qbank.yuxiaoyu.top/api
-# @HostAddress = https://localhost:7224/api
+# @HostAddress = https://qbank.yuxiaoyu.top/api
+@HostAddress = https://localhost:7224
 @email = admin@qq.com
 @badPassword = password
 @password = Az.123123!
@@ -28,8 +28,8 @@ Content-Type: application/json
 ###
 
 # Token
-@accessToken = CfDJ8D5AZxaCIK9Pp0gjouj9HChIWvvZn65GHBSCqkapFweUymqCgBo_oBJp9Hl9Npjach2Bhyr7tcQQoDBZdlXW5wOPtyLk-nzaoa1cfNqi4NC-BdwM0ZxkPoswHucQ-m4xBGWzsHHl5mhlIGmV5o5R1AG7GsfrKy9V4691Gm_s-Z0PIvvlWJ7RjArROGAaNimOUd_LPstlXpmiZPVEwNEprUp7ucr4mKamIBHifslhzdKyAgo9gaRsHx_XPi5aukFuAddriKhkyChvvN_2oOVbfXs6fhzzummIQYCJ0JtIGvl6_8WaTli_QwXYE8n7DYNmIK0j8jaXV0f6QUUTIbSKCTmjFD6qGCdr_YSYcTcFjeZJJ2PzmAWv-Zj9uXqYMMhT-JSF7X7xU1iK76XUSs7atw0FFZFYBtc47K6J9rsLAjMxEpe7LewjC1XHcw65xNfOXGe_3h-Ra8xUTz1jt6Nw7IX1LAtSWlg2iihHOZ4M1uvbwmIHz5EFxiqT8JDGWyHHosgieGo1Ibi4XvHm4CVRPzEZjDFkp4T5vpBpmDa2O7FUSsg87QmWrfaXe16pgH2fCbZjZIry_SQmfSxInouaRMMN8so0_DspwSzR1fPfhn8_5t76LBgAslouR41nFyO1qD8RAVqva8F_DZsaHoG9Ah5vg5ovWD1TBCYuJ5RETq8C8PHhEoqRwy5wruT0XoK2ITKQafyCoiJrTe-Gnkmyt3f5Z574UwFWfg-pROWqOleTp8y8Z2zy2m6eNutz3C73xFH5o-0CFnMXD7Ks8bKWCDPouIYD3ryO6-gCqpvvCiiHSicpp8shN0t4wO5c5wMj7NzwqLKwLk3f2FZPfvQgane5wrZIt7aGfHR-WEOWtYcffU0gYFrQoVg-MO1SCDGzqLGvDYyDXcUevDxbaao_gno
-@refreshToken = CfDJ8D5AZxaCIK9Pp0gjouj9HCicg3lOpEaBU6v79wKPYpmc85b8sDqY34N-C-bQHeKYuhTRspTBsVGeRALRXGTgaYdQnKSHejKCausVPRP4PQA64K_Xo5Qwh5oN-qKe0fSzF6Mu4o-BKOYWEobQP9ylvsxDUbFvxG5VlfKvP9PpiNQHU0vFL8wZkqpCZ0a746Acz0i5YmLTcUg463H8ecHjTPLIQkJC0q7WdOFH7hWigFcdmsHORkpPmYi4KTxTCydbe_UGmM-VmAXpuuiammagGfWjheWljXO5kjCL2RzUtKr_20OZLbVx28d6P7gxT7pfYJNNTwDtcOxumdBaUxatTRLwNL1dxpLf0qs36pzBqWAuUm6xxMZEeU7cWYisgH1j01KcQGuGgZPZ4Q17ClmnhtD2xainvUi3WQJVPukYud4Tg_oI3fSwZ1ONrSrjUcKN7qDs_Na8bZmTfC_SA4t_nG9g5jdMlvkvP3pBUQQHa1PbFfD81EXG4qc58vxutEbon-DZLOeRPM062a7bTEY3fR3730pUqC_XLGMZxr3KBYDevYFrl3vw3y9I0E33H2ycfdWGCVNpzbTb0qw6tHLu4dl_yHfNTjrd7Xlcmi6tEjRTuKh-hQ0wVy_Iw1cqA3F4i1wcdECXpv32x7l1_bWs81xQ1HpMeJfNeawhgrNlq-SrVVvwZWvlrtwna6QCPXY5koOQV0ktRddoaXztgUpRmKEEtBy3AvK434lgik5Msgp28w-t9UkyvucWtQL4WxCzRZjolo4JAvdQx-8w5FfUAbrnOt3bedDnsdd6NXinEWoPZorEWKdlGzSrEc91Fo0ujzc5WuOOpabIIXaYQjhC3GOwWQamWixpC0dlSzasSkSVpw9vHfJ8nQuvmwod0034doWJEVUfkVT1jNqXX1ii9Q4
+@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlC-OdfjpqNrJmVznyfnvdIzgmyB4eAXgiTwWsIoywQip8Ffj1eQ_0XER1AYhSBnevRgLlj2F4MSDkq0DJ2vWDdwsdGH3FB4iFLPG2iQ0cX9m-LhXxntFgqcl8zdnQbC1S74uIttYmqz05ZrHnwzo085DbF9y3gQ97NvfWxUrMoqmCWHDD9lSSSOCbUaTeDyDBXzwVROnyeNxoYx0CVRkc957RmcGFPBTILRbn2qd1UulgJcnBszRA2xB3b1p11Vyzz5hziuFmE2PKkyKQYN2_zmdXzhVuVZmsLw5HZZGYAIENKOo_9O4rDyNlO5H82qUIMaS_8KI6DDvf8QV_VxXtl6JHs8Ycb-UR1q4Ii88uNeJoNah87-Jz6qEx4bsTNnZG3IiLccQr-psqGZNyi_jkop-USUaDTRWZRUbDaKOPmmhA0qeQa-lTUDTpn2oaTnR78SgTkbu3F4H0p6gLksKRijRA8_HoPS0uQq1Hi4Ynug9J75vyI97dFnwT49SkcCexqfY20eK--dzepN4GjSSXdPH7XXv7CsOl2y9_obLYBlF_ZEKc5lOJfU6g4ycOA0BXWKNHAJZIiqTviYLwJ5BP5erKzFuxYTPEIqaDtqHEPNE09HJG7aVeiGa0gesC5IgMYzGDFA9qVLaNJKdNGTeJ47ahkdB61i6oS6crQe43LurJExmA2JOvc04B7L9WmGhKrghP6v_q5zOslIw9tDtwgdlmfnrFB2gE3aWiuNMc-oKzuK8ET6_Q-o6VnsSHYl2dGgYt2yQz2zvQDeJ1AdzyJjuzYXhoKsvLbj_c1IWjwlAOB2_Uoi14x8vwFNby5B3uumnP3BC1XlQD201HFtlAei_Ih-2pN-CcCuedji0J4URZ4WjJDvxEr49GJSxcLsHkk
+@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlCiWA4mLqjAMj63qUspJtUKTWfMKWer0vh1UbwrfQLsP1wTpvBvVipDCy_c3Ipw0n3E_sL-f-Gm-K8v1p0AXOm3PmxzR6U6CRfmbyWaZlhV1uOSX_XijViMNKyWxUNWTIN2W_dCgjeV4uyX3ChqV5SWrsmc6TPTm_t3XVPUUFenbCLmeUtWtcQf3ZDvHtNasVwyIP0PCXkvA2sLjDyi2yTW3cdB4xgbT_ufAsyhKX17rCkQ-E44ewzZRpSxtiNNp5TvnnCw5mp34mKgJNrEJ3yOrRLFKlJGvE4FWCBkkinwXRabc4hsSBoPTGGUUkhfNiQxmzwmIzy-a60vwza8jsA2_Ljvt-PtEHXPQycrE1odG5Sa_Y6pJMMinux8BNtxFvIaZ-MfPGV3qbN5BnVUDiFEkfKrvAOvvnXz4zJoJuGIxsh1ZSALC9h3IR0uCkwlpqjULfRV5uKdaz824Ly9d3xNZ08GFoG26UxKkK6A5ToHl_0XZgjQy3DJHFvBinruqDPveK2fuOAGNqf8cDIEwXBX8fB_HhZ9lN0g-Eync8ARBG60wCkpJOxb1K-ItAeiqlAkIyBZcB2k-lLjhbILSDJMslJQOZZHtvoTe5Q7ONuvY43Wkn1y58JELCBSA8scCiH7ZQPQSbk2Zvp6_ODZBAJxwIN_JO0Cr8Qsjfm_770cvDS8r1gF75f4mBj98xNWXZrt0QD8sfyrAL3GopYr_jZlP57lBUGshhutfZ1Jdb6_UXXaiKvPxsZ-jG4Uu1agJKZU1iKteYoP_Z6zxdcNUaRAM_Z50wHK4Zerbuggv8ExH6fD8iuFlnz_Ps2XofeChFTzuirESGS4dmkR947jdlDueaUKfvhotHnmZEawlcKwlMY_U9ouhx5MfD64u4WjwA4
 
 ###
 
@@ -91,7 +91,7 @@ Accept: application/json
 ###
 
 # 根据题目ID获取题目
-GET {{HostAddress}}/Questions/31
+GET {{HostAddress}}/Questions/22
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
@@ -227,7 +227,7 @@ Content-Type: application/json
 ###
 
 # 根据ID查询试卷
-GET {{HostAddress}}/Exams/3
+GET {{HostAddress}}/Exams/4
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
@@ -257,6 +257,44 @@ Content-Type: application/json
     {
       "Order": 4,
       "QuestionId": 30
+    }
+  ]
+}
+
+###
+
+# 修改试卷
+PUT  {{HostAddress}}/Exams/4
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ExamName": "第一套试卷",
+  "DifficultyLevel": 3,
+  "ExamQuestions": [
+    {
+      "Order": 1,
+      "QuestionId": 22
+    },
+    {
+      "Order": 2,
+      "QuestionId": 23
+    },
+    {
+      "Order": 3,
+      "QuestionId": 27
+    },
+    {
+      "Order": 4,
+      "QuestionId": 30
+    },
+    {
+      "Order": 5,
+      "QuestionId": 34
+    },
+    {
+      "Order": 6,
+      "QuestionId": 35
     }
   ]
 }
