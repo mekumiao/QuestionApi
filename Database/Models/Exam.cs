@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuestionApi.Database;
 
 /// <summary>
 /// 试卷表
 /// </summary>
+[Table("ExamPapers")]
 public class Exam {
     public int ExamId { get; set; }
     [MaxLength(500)]
@@ -18,6 +20,7 @@ public class Exam {
 /// <summary>
 /// 试卷题目关联表
 /// </summary>
+[Table("ExamPaperQuestions")]
 public class ExamQuestion {
     public int ExamId { get; set; }
     public Exam Exam { get; set; } = null!;
