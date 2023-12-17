@@ -43,18 +43,18 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
         var users = paging.Build(_dbContext.Set<AppUser>());
         users = filter.Build(users);
 
-        var ur_r = from ur in _dbContext.UserRoles join r in _dbContext.Roles on ur.RoleId equals r.Id select new { ur.UserId, r };
-
         var queryable = from u in users
-                        join ur in ur_r on u.Id equals ur.UserId into grouping
-                        from ur in grouping.DefaultIfEmpty()
-                        group new { u, ur } by new { UserId = u.Id, u.UserName, u.Email, u.NickName } into g
+                        join urr in from ur in _dbContext.UserRoles
+                                    join r in _dbContext.Roles on ur.RoleId equals r.Id
+                                    select new { ur.UserId, r } on u.Id equals urr.UserId into grouping
+                        from urr in grouping.DefaultIfEmpty()
+                        group new { u, urr } by new { UserId = u.Id, u.UserName, u.Email, u.NickName } into g
                         select new UserDto {
                             UserId = g.Key.UserId,
                             UserName = g.Key.UserName,
                             NickName = g.Key.NickName,
                             Email = g.Key.Email,
-                            Roles = g.OrderBy(v => v.ur.r.Id).Select(v => v.ur.r.Name)!
+                            Roles = g.OrderBy(v => v.urr.r.Id).Select(v => v.urr.r.Name)!
                         };
 
         var result = await queryable.AsNoTracking().ToArrayAsync();
