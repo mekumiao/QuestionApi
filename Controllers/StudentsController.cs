@@ -1,5 +1,4 @@
 using System.Net.Mime;
-using System.Security.Claims;
 
 using MapsterMapper;
 
@@ -98,7 +97,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId() {
-        var userId = User.FindFirst(v => v.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userId = User.FindFirst(v => v.Type == "sub")?.Value;
         if (string.IsNullOrWhiteSpace(userId)) {
             return NotFound();
         }

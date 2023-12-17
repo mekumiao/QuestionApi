@@ -20,7 +20,16 @@ builder.Services.AddDbContext<QuestionDbContext>(options => {
 });
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUser>()
+builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
+    options.ClaimsIdentity.RoleClaimType = "role";
+    options.ClaimsIdentity.UserNameClaimType = "name";
+    options.ClaimsIdentity.UserIdClaimType = "sub";
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+
+})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<QuestionDbContext>();
 

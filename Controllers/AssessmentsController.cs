@@ -1,5 +1,4 @@
 using System.Net.Mime;
-using System.Security.Claims;
 
 using MapsterMapper;
 
@@ -80,7 +79,7 @@ public class AssessmentsController(ILogger<AssessmentsController> logger, Questi
     [ProducesResponseType(typeof(ExamDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> SubmitExam([FromRoute] int assessmentId,
                                                 [FromBody, FromForm] List<AnswerInput> inputs) {
-        var userClaim = User.FindFirst(v => v.Type == ClaimTypes.NameIdentifier)!;
+        var userClaim = User.FindFirst(v => v.Type == "sub")!;
         var student = await _dbContext.Students.SingleOrDefaultAsync(v => v.UserId == userClaim.Value);
 
         if (student is null) {

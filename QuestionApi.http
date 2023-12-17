@@ -1,6 +1,6 @@
 # @HostAddress = https://qbank.yuxiaoyu.top/api
 @HostAddress = https://localhost:7224
-@email = admin@qq.com
+@email = admintt@qq.com
 @badPassword = password
 @password = Az.123123!
 
@@ -10,8 +10,7 @@ Content-Type: application/json
 
 {
   "email": "{{email}}",
-  "password": "{{password}}",
-  "confirmPassword": "{{password}}"
+  "password": "{{password}}"
 }
 
 ###
