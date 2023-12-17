@@ -43,16 +43,18 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
         var users = paging.Build(_dbContext.Set<AppUser>());
         users = filter.Build(users);
 
+        var ur_r = from ur in _dbContext.UserRoles join r in _dbContext.Roles on ur.RoleId equals r.Id select new { ur.UserId, r };
+
         var queryable = from u in users
-                        join us in _dbContext.UserRoles on u.Id equals us.UserId
-                        join r in _dbContext.Roles on us.RoleId equals r.Id
-                        group r by new { UserId = u.Id, u.UserName, u.Email, u.NickName } into g
+                        join ur in ur_r on u.Id equals ur.UserId into grouping
+                        from ur in grouping.DefaultIfEmpty()
+                        group new { u, ur } by new { UserId = u.Id, u.UserName, u.Email, u.NickName } into g
                         select new UserDto {
                             UserId = g.Key.UserId,
                             UserName = g.Key.UserName,
                             NickName = g.Key.NickName,
                             Email = g.Key.Email,
-                            Roles = g.OrderBy(v => v.Id).Select(v => v.Name)!
+                            Roles = g.OrderBy(v => v.ur.r.Id).Select(v => v.ur.r.Name)!
                         };
 
         var result = await queryable.AsNoTracking().ToArrayAsync();
@@ -99,5 +101,28 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
         result.Roles = roles;
 
         return Ok(result);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody, FromForm] UserInput dto,
+                                            [FromServices] UserManager<AppUser> userManager,
+                                            [FromServices] IUserStore<AppUser> userStore) {
+        var emailStore = (IUserEmailStore<AppUser>)userStore;
+        var user = _mapper.Map<AppUser>(dto);
+        await userStore.SetUserNameAsync(user, dto.Email, CancellationToken.None);
+        await emailStore.SetEmailAsync(user, dto.Email, CancellationToken.None);
+        var result = await userManager.CreateAsync(user, dto.Password);
+        if (!result.Succeeded) {
+            return BadRequest(result);
+        }
+        if (dto.Roles.Count != 0) {
+            await userManager.AddToRolesAsync(user, dto.Roles.Distinct());
+        }
+        var roles = await userManager.GetRolesAsync(user);
+        var poco = _mapper.Map<UserDto>(user);
+        poco.Roles = roles;
+        return CreatedAtRoute("GetUserById", new { userId = user.Id }, poco);
     }
 }

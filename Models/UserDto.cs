@@ -39,3 +39,12 @@ public class UserUpdate {
     public string? NickName { get; set; }
     public List<string>? Roles { get; set; }
 }
+
+public class UserInput {
+    [MaxLength(256)]
+    public string? NickName { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
+    public List<string> Roles { get; set; } = [];
+}
