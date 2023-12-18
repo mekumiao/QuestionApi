@@ -25,5 +25,8 @@ public class MappingRegister : IRegister {
         config.NewConfig<StudentUpdate, Student>();
 
         config.NewConfig<AppUser, UserDto>().Map(dest => dest.UserId, src => src.Id);
+        config.NewConfig<AnswerHistory, AnswerHistoryDto>()
+            .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName)
+            .Map(dest => dest.DifficultyLevel, src => src.ExamPaper.DifficultyLevel);
     }
 }

@@ -41,6 +41,7 @@ public class AnswerHistoryDto {
     public string StudentName { get; set; } = string.Empty;
     public int ExamPaperId { get; set; }
     public string ExamPaperName { get; set; } = string.Empty;
+    public DifficultyLevel DifficultyLevel { get; set; }
     /// <summary>
     /// 开始时间
     /// </summary>

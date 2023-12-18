@@ -34,8 +34,9 @@ builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
     .AddEntityFrameworkStores<QuestionDbContext>();
 
 builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, (options) => {
-    options.BearerTokenExpiration = TimeSpan.FromHours(1);
-    options.RefreshTokenExpiration = TimeSpan.FromDays(14);
+    if (builder.Environment.IsDevelopment()) {
+        options.BearerTokenExpiration = TimeSpan.FromDays(356);
+    }
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

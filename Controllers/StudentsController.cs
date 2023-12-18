@@ -105,12 +105,15 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         if (student is null) {
             return Ok(Array.Empty<AnswerHistoryDto>());
         }
-        var result = await _dbContext.AnswerHistories
+        var items = await _dbContext.AnswerHistories
             .AsNoTracking()
             .Include(v => v.Student)
+            .Include(v => v.ExamPaper)
             .Where(v => v.StudentId == student.StudentId)
             .ToArrayAsync();
-        return Ok(_mapper.Map<AnswerHistoryDto[]>(result));
+        var result = _mapper.Map<AnswerHistoryDto[]>(items);
+        _logger.LogInformation("AnswerHistories: {AnswerHistories}", items[0].ExamPaper.ExamPaperName);
+        return Ok(result);
     }
 
     /// <summary>
