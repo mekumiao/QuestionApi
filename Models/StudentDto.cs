@@ -58,4 +58,5 @@ public class StudentAnswerDto {
     public QuestionType QuestionType { get; set; }
     public int AnswerHistoryId { get; set; }
     public string AnswerText { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
 }

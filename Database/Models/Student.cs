@@ -35,8 +35,8 @@ public class StudentAnswer {
     /// 3.填空题，直接填入文本
     /// </summary>
     public string AnswerText { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
 }
-
 
 /// <summary>
 /// 答题历史表
@@ -47,6 +47,8 @@ public class AnswerHistory {
     public Student Student { get; set; } = null!;
     public int ExamPaperId { get; set; }
     public ExamPaper ExamPaper { get; set; } = null!;
+    public int? ExaminationId { get; set; }
+    public Examination? Examination { get; set; }
     /// <summary>
     /// 开始时间
     /// </summary>

@@ -36,7 +36,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<StudentDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(StudentDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] StudentFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Students
             .AsNoTracking()
@@ -47,7 +47,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         queryable = filter.Build(queryable);
 
         var result = await queryable.ToArrayAsync();
-        return Ok(_mapper.Map<List<StudentDto>>(result));
+        return Ok(_mapper.Map<StudentDto[]>(result));
     }
 
     [HttpGet("{studentId:int}", Name = "GetStudentById")]
@@ -79,21 +79,21 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
 
     [HttpGet("{studentId:int}/answer-history")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(List<AnswerHistoryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryList([FromRoute] int studentId) {
         var result = await _dbContext.AnswerHistories
             .AsNoTracking()
             .Include(v => v.Student)
             .Where(v => v.StudentId == studentId)
             .ToArrayAsync();
-        return Ok(_mapper.Map<List<AnswerHistoryDto>>(result));
+        return Ok(_mapper.Map<AnswerHistoryDto[]>(result));
     }
 
     /// <summary>
     /// 获取当前登录用户的答题记录
     /// </summary>
     /// <returns></returns>
-    [HttpGet("me/answer-history")]
+    [HttpGet("me/answer-history", Name = "GetAnswerHistoryListByCurrentUserId")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId() {
@@ -111,5 +111,93 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             .Where(v => v.StudentId == student.StudentId)
             .ToArrayAsync();
         return Ok(_mapper.Map<AnswerHistoryDto[]>(result));
+    }
+
+    /// <summary>
+    /// 根据考试ID获取当前学生的答题记录
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("me/submit-examination/{examinationId:int}", Name = "GetSubmitExam")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(StudentAnswerDto[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSubmitExam([FromRoute] int examinationId) {
+        var userClaim = User.FindFirst(v => v.Type == "sub")!;
+        var student = await _dbContext.Students
+            .AsNoTracking()
+            .SingleOrDefaultAsync(v => v.UserId == userClaim.Value);
+        if (student is null) {
+            return NotFound();
+        }
+        var items = await _dbContext.StudentAnswers
+            .AsNoTracking()
+            .Where(v => v.StudentId == student.StudentId)
+            .Where(v => v.AnswerHistory.ExaminationId == examinationId)
+            .ToArrayAsync();
+        var result = _mapper.Map<StudentAnswerDto[]>(items);
+        return items.Length == 0 ? NotFound() : Ok(result);
+    }
+
+    /// <summary>
+    /// 交卷
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost("me/submit-examination/{examinationId:int}")]
+    [ProducesResponseType(typeof(StudentAnswerDto[]), StatusCodes.Status201Created)]
+    public async Task<IActionResult> SubmitExam([FromRoute] int examinationId,
+                                                [FromBody, FromForm] AnswerInput[] inputs) {
+        var userClaim = User.FindFirst(v => v.Type == "sub")!;
+        var user = await _dbContext.Set<AppUser>()
+            .Include(v => v.Student)
+            .SingleOrDefaultAsync(v => v.Id == userClaim.Value);
+        if (user is null) {
+            return BadRequest(new BadDetail { Message = "当前登录用户信息不存在或已被删除" });
+        }
+        var examination = await _dbContext.Examinations
+            .Include(v => v.ExamPaper)
+            .ThenInclude(v => v.Questions)
+            .SingleOrDefaultAsync(v => v.ExaminationId == examinationId);
+        if (examination is null) {
+            return BadRequest(new BadDetail { Message = $"考试ID{examinationId}不存在或已被删除" });
+        }
+
+        user.Student ??= new Student {
+            UserId = userClaim.Value,
+            Name = user.NickName ?? user.UserName ?? string.Empty,
+        };
+
+        var histry = new AnswerHistory {
+            Student = user.Student,
+            ExamPaper = examination.ExamPaper,
+            Examination = examination,
+            SubmissionTime = DateTime.UtcNow,
+        };
+
+        var items = _mapper.Map<StudentAnswer[]>(inputs);
+        foreach (var item in items) {
+            item.Student = user.Student;
+            item.StudentId = user.Student.StudentId;
+        }
+
+        histry.StudentAnswers.AddRange(items);
+        _dbContext.AnswerHistories.Add(histry);
+        Correction(items);
+
+        await _dbContext.SaveChangesAsync();
+
+        var result = _mapper.Map<StudentAnswerDto[]>(items);
+        return CreatedAtRoute("GetSubmitExam", new { examinationId }, result);
+    }
+
+    private static void Correction(StudentAnswer[] studentAnswers) {
+        foreach (var item in studentAnswers) {
+            var left = item.AnswerText.Trim();
+            var right = item.Question.CorrectAnswer.Trim();
+            if (item.QuestionType == QuestionType.MultipleChoice) {
+                item.IsCorrect = right.All(v => left.Contains(v));
+                continue;
+            }
+            item.IsCorrect = left == right;
+        }
     }
 }

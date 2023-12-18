@@ -42,7 +42,7 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
 
         builder.Entity<Student>()
             .HasOne(v => v.User)
-            .WithOne()
+            .WithOne(v => v.Student)
             .HasForeignKey<Student>(v => v.UserId)
             .IsRequired(false);
 
@@ -75,6 +75,12 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .WithOne(v => v.AnswerHistory)
             .HasForeignKey(v => v.AnswerHistoryId)
             .IsRequired();
+
+        builder.Entity<AnswerHistory>()
+            .HasOne(v => v.Examination)
+            .WithMany(v => v.AnswerHistories)
+            .HasForeignKey(v => v.ExaminationId)
+            .IsRequired(false);
 
         builder.Entity<Examination>()
             .HasOne(v => v.ExamPaper)

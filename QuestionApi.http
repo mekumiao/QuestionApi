@@ -27,8 +27,8 @@ Content-Type: application/json
 ###
 
 # Token
-@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlDFo-pIZgAuZ9iVTJVbQl0YFPRCScCM76gZe2KzjI8KHF42hrXIwAUs_K-atuxYbFnSRoqpMyegwwzPq86vOQkceMUNm4Ty5pTs-AWQEJ9MRfTYNbaj1ahoBnn7ieEt3AIexSrK2vWzBv_PFyigaxMQwu5VTiOm0Fxi-BAIJhX7IYaAVJ9iopAAYx10vzVExCiDGwumwGLpU_mzgx-SQQ99nl4vMx45doakgBhybk4-xebp6ZUWETiLZBLi3valCsMalXbDb3FXCXLpohENJ3grIZlUQZoFVD44dpsjLPAkcFexCBWFf4meV6rxirAiSBBaw55L8HGrPhFqpS32mcmzCffKr69yRE2cZWEqbs0nABuzkERfi2RdBSerKU-TxgC24AGl-jrqLZc6oXff4IyDCNLLU4OuLazlEUKv-rgk13whQz8SLn1mzo39N1-xKEKt74SvQfnXagjtgxY06WXYAuu8fmNd-dvBbgY-6iVz10-TRhHscFbnA6VfUzBByPwZyhxA7HWTDqCQsPtCWTvs1E_7aREOmy016UfK3dxrJRxkwLrTtsnwlG0YaHjCvZioWpMaWPp_L75WCI5Z7Y7oBzKVTq8qJ2MQ5rQmOA64Zg
-@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlBy2bdx-ZV9N71ty2YcSaQ6JrfwRPOOWn2vgRGxCIT6-z7izmihkAEpTwKrNLcQ1Z4jVee4LMI78LtsWJsNDi8r1rgiqlvz1cOTjYz0VtLkjDsUNWbXp1CNBjmKRvAky4X1_yeSSalwO2rUoKy9cCb_JY1djeg6S0Fassm17r41hmdigw2WaPNI6z5RMppi0MZluFMaKS15_DiuAmk2iuZaCxsFdFv863kr1kEYTW1UOXw4zAqQYR6RueQbY2XIQZIulWnmrJkKlSXmc6tQU79mex8Mz6v6n3hBJfRN9OxC1d6D7cl0gKhCAYmlM2m_4N17XEmRuE4tlZ-SefZ7NwMIih20K5IS-tpYftsQfqRRDVZV92vluLTOt-9C2YkMdDl_twMwmCuBMvIJD799-32mrCNyyz_BRt5ZEyfAnIjScAcmKH8lGw6jFwxJBS1L4iB3lPQf-TB_KbKkRlkw8SGQvvAyCQnFe_MNnefiJXwglUaMghmhMAoNmcbucfNIhcM2thoGCRXOpeXKf4lwJq0xZLfraKZeOtH6CCc9wDdqCJ21x0k0rIwQI6c-htn4SbZeLeteJo21i6tWUY4sTJdXLnjnO0f97QdbbTSjw7sjww
+@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlAdm-vNgajrjl28tJmD661AiAoxCPredsQWjlKKjacPqt2LPy6KimT10icF1P0VadaWzP51KzbDMD50DFven0RFuD_BZM2UeYF6SYX5WwS7PJxq_0ATqyO_r0dvgDvECCRfdr9_11RSk6lL_2633W4aBW-qME3GGog3pO6mOnbAxG3GK0MQP12Vw7JsNaLyn69kosvsqM5jtn5yNfwbPLOC68V1xUbC9VwPwyzkIY9eIYI2npCr-jjBDvyHObAGSbvlfpQVOsqyAgHCiXWcPS9S-f0mj9lVmm3E_mrg566RdeXj1oskH4xVU9CBnesxSQnxNbSNRSlxb_Og2t4NwYB9cZ2hBc9cL3QPsmBv4GKTvbHP78EzWHChaUuidIom5U8DaPWnDhPHojLOoHG0n3GBmf1yi6O3zcXlOnGlx27lzAsP7Rgw9cA2mVUlTnBHIw_RKtnqM0rZllcpbfiOL5NOU9LYjZdDAvFSSRdDkXYAhXsO7A9v3qMhCBJJ41Gfa75AEenErfRazlyhaCmg91IBlXa7QhuN9U9IWd0kuByaMatCL1S7n1MLxSmjcccY_XjYypGekS3ArJfkRkp98tkXK2TSOhycQzak8w-8yAyQRg
+@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlD3qaMRJvORTqDV4arT_HFWaRRnDv_dIgdScvb-RYB74CbzFyKSdF1cORqS4KqN9Q0W2t7tHe0Zzp7SkC6n0s_WRosmZsc6cjaNWzbyfOeqgNhW6e8hHPj3NN0HD01oxmUcC7PhvPVdCk9DMR-eSSZ949AybMufVPeQE53L32oSq442Wppu-Q6uI_8KPY5qPix05s-eu-64UneS3fmCRyDf4aAD-tlYWyjLfGgOVpur3p515iwf4TFv61T8g1byDJdbtLvX-dbXiJV_8k7pV4bxMMWmG2uUFIMt1EaOCmZBWeoxACKrgotKvpiqQu0C4aaugYPhDacBPosU5MrZxyDKEb9TR-0KF5XnrVa8yJP4pyT-WW8i9LpD_2mdWN13BzMQfWFIMBenTTqJt4JhLzVIv2zeWNtWCIJsaLYQjRByyJCOvbzxXj7bkJ51PXqDo1k11eVN0Ns0sE--esTdQRqQZboY04QUmm1rMmlcp9UZB74t9mzwQQRRrvW5rTBqBthKa-_n_KH2FmkvHu1vbjSlU-1LwApfyyprAYUQkwYZv3JpCw4rYTt1t7Tlsa1F2ed0PBZcbjnZgwfJ54C0a5f67gy4ka0QU-XI2LjdsFnmbQ
 
 ###
 
@@ -345,5 +345,38 @@ Content-Type: application/json
 DELETE {{HostAddress}}/examination/16 HTTP/1.1
 Authorization: Bearer {{accessToken}}
 Accept: application/json
+
+###
+
+# 获取交卷
+GET {{HostAddress}}/students/me/submit-examination/15/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+
+# 交卷和批改
+POST {{HostAddress}}/students/me/submit-examination/15/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+[
+  {
+  "QuestionId": "22",
+  "AnswerText": "A"
+  },
+  {
+  "QuestionId": "23",
+  "AnswerText": "ABCD"
+  },
+  {
+  "QuestionId": "27",
+  "AnswerText": "0"
+  },
+  {
+  "QuestionId": "30",
+  "AnswerText": "  喔哦喔哦我23啊5  "
+  }
+]
 
 ###

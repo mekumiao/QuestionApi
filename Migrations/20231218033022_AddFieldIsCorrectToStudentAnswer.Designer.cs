@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuestionApi.Database;
@@ -11,9 +12,11 @@ using QuestionApi.Database;
 namespace QuestionApi.Migrations
 {
     [DbContext(typeof(QuestionDbContext))]
-    partial class QuestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231218033022_AddFieldIsCorrectToStudentAnswer")]
+    partial class AddFieldIsCorrectToStudentAnswer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,9 +168,6 @@ namespace QuestionApi.Migrations
                     b.Property<int>("ExamPaperId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ExaminationId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
 
@@ -180,8 +180,6 @@ namespace QuestionApi.Migrations
                     b.HasKey("AnswerHistoryId");
 
                     b.HasIndex("ExamPaperId");
-
-                    b.HasIndex("ExaminationId");
 
                     b.HasIndex("StudentId");
 
@@ -508,10 +506,6 @@ namespace QuestionApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("QuestionApi.Database.Examination", "Examination")
-                        .WithMany("AnswerHistories")
-                        .HasForeignKey("ExaminationId");
-
                     b.HasOne("QuestionApi.Database.Student", "Student")
                         .WithMany("AnswerHistories")
                         .HasForeignKey("StudentId")
@@ -519,8 +513,6 @@ namespace QuestionApi.Migrations
                         .IsRequired();
 
                     b.Navigation("ExamPaper");
-
-                    b.Navigation("Examination");
 
                     b.Navigation("Student");
                 });
@@ -619,11 +611,6 @@ namespace QuestionApi.Migrations
                     b.Navigation("ExamPaperQuestions");
 
                     b.Navigation("Examinations");
-                });
-
-            modelBuilder.Entity("QuestionApi.Database.Examination", b =>
-                {
-                    b.Navigation("AnswerHistories");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Question", b =>

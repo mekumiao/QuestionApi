@@ -112,31 +112,4 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
             return NotFound();
         }
     }
-
-    // /// <summary>
-    // /// 交卷
-    // /// </summary>
-    // /// <param name="dto"></param>
-    // /// <returns></returns>
-    // [HttpPut("{examinationId:int}/submit")]
-    // [ProducesResponseType(typeof(ExaminationDto), StatusCodes.Status201Created)]
-    // public async Task<IActionResult> SubmitExam([FromRoute] int examinationId,
-    //                                             [FromBody, FromForm] List<AnswerInput> inputs) {
-    //     var userClaim = User.FindFirst(v => v.Type == "sub")!;
-    //     var student = await _dbContext.Students.SingleOrDefaultAsync(v => v.UserId == userClaim.Value);
-
-    //     if (student is null) {
-    //         _dbContext.Students.Add(new Student {
-    //             UserId = userClaim.Value,
-    //             Name = User.Identity?.Name ?? string.Empty,
-    //         });
-    //     }
-
-    //     var item = _mapper.Map<StudentAnswer>(inputs);
-
-    //     await _dbContext.SaveChangesAsync();
-
-    //     var result = _mapper.Map<ExaminationDto>(item);
-    //     return Ok();
-    // }
 }

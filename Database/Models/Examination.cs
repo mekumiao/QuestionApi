@@ -15,6 +15,7 @@ public class Examination {
     /// 持续时间
     /// </summary>
     public int DurationSeconds { get; set; }
+    public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
 public enum ExaminationType {
@@ -27,8 +28,4 @@ public enum ExaminationType {
     /// 模拟考试
     /// </summary>
     Mock,
-    /// <summary>
-    /// 练习
-    /// </summary>
-    Practice
 }
