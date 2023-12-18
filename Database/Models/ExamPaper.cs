@@ -15,6 +15,7 @@ public class ExamPaper {
     public List<Question> Questions { get; } = [];
     public List<ExamPaperQuestion> ExamPaperQuestions { get; } = [];
     public List<AnswerHistory> AnswerHistories { get; } = [];
+    public List<Examination> Examinations { get; } = [];
 }
 
 /// <summary>

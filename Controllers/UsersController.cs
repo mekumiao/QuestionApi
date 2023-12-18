@@ -115,7 +115,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
         await emailStore.SetEmailAsync(user, dto.Email, CancellationToken.None);
         var result = await userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded) {
-            return BadRequest(result);
+            return BadRequest(new BadDetail { Message = result.ToString() });
         }
         if (dto.Roles.Count != 0) {
             await userManager.AddToRolesAsync(user, dto.Roles.Distinct());

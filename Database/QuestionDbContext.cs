@@ -1,3 +1,5 @@
+using EntityFramework.Exceptions.PostgreSQL;
+
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,12 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
     public DbSet<Student> Students { get; set; }
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<AnswerHistory> AnswerHistories { get; set; }
+    public DbSet<Examination> Examinations { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        optionsBuilder.EnableSensitiveDataLogging();
+        optionsBuilder.UseExceptionProcessor();
+    }
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
@@ -66,6 +74,12 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .HasMany(v => v.StudentAnswers)
             .WithOne(v => v.AnswerHistory)
             .HasForeignKey(v => v.AnswerHistoryId)
+            .IsRequired();
+
+        builder.Entity<Examination>()
+            .HasOne(v => v.ExamPaper)
+            .WithMany(v => v.Examinations)
+            .HasForeignKey(v => v.ExamPaperId)
             .IsRequired();
     }
 }

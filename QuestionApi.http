@@ -1,6 +1,6 @@
 # @HostAddress = https://qbank.yuxiaoyu.top/api
 @HostAddress = https://localhost:7224
-@email = admintt@qq.com
+@email = admin@qq.com
 @badPassword = password
 @password = Az.123123!
 
@@ -27,8 +27,8 @@ Content-Type: application/json
 ###
 
 # Token
-@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlC-OdfjpqNrJmVznyfnvdIzgmyB4eAXgiTwWsIoywQip8Ffj1eQ_0XER1AYhSBnevRgLlj2F4MSDkq0DJ2vWDdwsdGH3FB4iFLPG2iQ0cX9m-LhXxntFgqcl8zdnQbC1S74uIttYmqz05ZrHnwzo085DbF9y3gQ97NvfWxUrMoqmCWHDD9lSSSOCbUaTeDyDBXzwVROnyeNxoYx0CVRkc957RmcGFPBTILRbn2qd1UulgJcnBszRA2xB3b1p11Vyzz5hziuFmE2PKkyKQYN2_zmdXzhVuVZmsLw5HZZGYAIENKOo_9O4rDyNlO5H82qUIMaS_8KI6DDvf8QV_VxXtl6JHs8Ycb-UR1q4Ii88uNeJoNah87-Jz6qEx4bsTNnZG3IiLccQr-psqGZNyi_jkop-USUaDTRWZRUbDaKOPmmhA0qeQa-lTUDTpn2oaTnR78SgTkbu3F4H0p6gLksKRijRA8_HoPS0uQq1Hi4Ynug9J75vyI97dFnwT49SkcCexqfY20eK--dzepN4GjSSXdPH7XXv7CsOl2y9_obLYBlF_ZEKc5lOJfU6g4ycOA0BXWKNHAJZIiqTviYLwJ5BP5erKzFuxYTPEIqaDtqHEPNE09HJG7aVeiGa0gesC5IgMYzGDFA9qVLaNJKdNGTeJ47ahkdB61i6oS6crQe43LurJExmA2JOvc04B7L9WmGhKrghP6v_q5zOslIw9tDtwgdlmfnrFB2gE3aWiuNMc-oKzuK8ET6_Q-o6VnsSHYl2dGgYt2yQz2zvQDeJ1AdzyJjuzYXhoKsvLbj_c1IWjwlAOB2_Uoi14x8vwFNby5B3uumnP3BC1XlQD201HFtlAei_Ih-2pN-CcCuedji0J4URZ4WjJDvxEr49GJSxcLsHkk
-@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlCiWA4mLqjAMj63qUspJtUKTWfMKWer0vh1UbwrfQLsP1wTpvBvVipDCy_c3Ipw0n3E_sL-f-Gm-K8v1p0AXOm3PmxzR6U6CRfmbyWaZlhV1uOSX_XijViMNKyWxUNWTIN2W_dCgjeV4uyX3ChqV5SWrsmc6TPTm_t3XVPUUFenbCLmeUtWtcQf3ZDvHtNasVwyIP0PCXkvA2sLjDyi2yTW3cdB4xgbT_ufAsyhKX17rCkQ-E44ewzZRpSxtiNNp5TvnnCw5mp34mKgJNrEJ3yOrRLFKlJGvE4FWCBkkinwXRabc4hsSBoPTGGUUkhfNiQxmzwmIzy-a60vwza8jsA2_Ljvt-PtEHXPQycrE1odG5Sa_Y6pJMMinux8BNtxFvIaZ-MfPGV3qbN5BnVUDiFEkfKrvAOvvnXz4zJoJuGIxsh1ZSALC9h3IR0uCkwlpqjULfRV5uKdaz824Ly9d3xNZ08GFoG26UxKkK6A5ToHl_0XZgjQy3DJHFvBinruqDPveK2fuOAGNqf8cDIEwXBX8fB_HhZ9lN0g-Eync8ARBG60wCkpJOxb1K-ItAeiqlAkIyBZcB2k-lLjhbILSDJMslJQOZZHtvoTe5Q7ONuvY43Wkn1y58JELCBSA8scCiH7ZQPQSbk2Zvp6_ODZBAJxwIN_JO0Cr8Qsjfm_770cvDS8r1gF75f4mBj98xNWXZrt0QD8sfyrAL3GopYr_jZlP57lBUGshhutfZ1Jdb6_UXXaiKvPxsZ-jG4Uu1agJKZU1iKteYoP_Z6zxdcNUaRAM_Z50wHK4Zerbuggv8ExH6fD8iuFlnz_Ps2XofeChFTzuirESGS4dmkR947jdlDueaUKfvhotHnmZEawlcKwlMY_U9ouhx5MfD64u4WjwA4
+@accessToken = CfDJ8AfsKNinfjRPgNkrR0o_RlDFo-pIZgAuZ9iVTJVbQl0YFPRCScCM76gZe2KzjI8KHF42hrXIwAUs_K-atuxYbFnSRoqpMyegwwzPq86vOQkceMUNm4Ty5pTs-AWQEJ9MRfTYNbaj1ahoBnn7ieEt3AIexSrK2vWzBv_PFyigaxMQwu5VTiOm0Fxi-BAIJhX7IYaAVJ9iopAAYx10vzVExCiDGwumwGLpU_mzgx-SQQ99nl4vMx45doakgBhybk4-xebp6ZUWETiLZBLi3valCsMalXbDb3FXCXLpohENJ3grIZlUQZoFVD44dpsjLPAkcFexCBWFf4meV6rxirAiSBBaw55L8HGrPhFqpS32mcmzCffKr69yRE2cZWEqbs0nABuzkERfi2RdBSerKU-TxgC24AGl-jrqLZc6oXff4IyDCNLLU4OuLazlEUKv-rgk13whQz8SLn1mzo39N1-xKEKt74SvQfnXagjtgxY06WXYAuu8fmNd-dvBbgY-6iVz10-TRhHscFbnA6VfUzBByPwZyhxA7HWTDqCQsPtCWTvs1E_7aREOmy016UfK3dxrJRxkwLrTtsnwlG0YaHjCvZioWpMaWPp_L75WCI5Z7Y7oBzKVTq8qJ2MQ5rQmOA64Zg
+@refreshToken = CfDJ8AfsKNinfjRPgNkrR0o_RlBy2bdx-ZV9N71ty2YcSaQ6JrfwRPOOWn2vgRGxCIT6-z7izmihkAEpTwKrNLcQ1Z4jVee4LMI78LtsWJsNDi8r1rgiqlvz1cOTjYz0VtLkjDsUNWbXp1CNBjmKRvAky4X1_yeSSalwO2rUoKy9cCb_JY1djeg6S0Fassm17r41hmdigw2WaPNI6z5RMppi0MZluFMaKS15_DiuAmk2iuZaCxsFdFv863kr1kEYTW1UOXw4zAqQYR6RueQbY2XIQZIulWnmrJkKlSXmc6tQU79mex8Mz6v6n3hBJfRN9OxC1d6D7cl0gKhCAYmlM2m_4N17XEmRuE4tlZ-SefZ7NwMIih20K5IS-tpYftsQfqRRDVZV92vluLTOt-9C2YkMdDl_twMwmCuBMvIJD799-32mrCNyyz_BRt5ZEyfAnIjScAcmKH8lGw6jFwxJBS1L4iB3lPQf-TB_KbKkRlkw8SGQvvAyCQnFe_MNnefiJXwglUaMghmhMAoNmcbucfNIhcM2thoGCRXOpeXKf4lwJq0xZLfraKZeOtH6CCc9wDdqCJ21x0k0rIwQI6c-htn4SbZeLeteJo21i6tWUY4sTJdXLnjnO0f97QdbbTSjw7sjww
 
 ###
 
@@ -297,3 +297,53 @@ Content-Type: application/json
     }
   ]
 }
+
+###
+
+# 创建考试
+POST {{HostAddress}}/examination HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ExaminationName": "六级考试",
+  "ExaminationType": 1,
+  "DifficultyLevel": 1,
+  "ExamPaperId": 4,
+  "DurationSeconds": 1800
+}
+
+###
+
+# 获取考试
+GET {{HostAddress}}/examination/1 HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+# 获取考试列表
+GET {{HostAddress}}/examination/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+# 修改考试
+PUT {{HostAddress}}/examination/1 HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "ExaminationName": "六级考试xxxxxxx",
+  "DurationSeconds": 600
+}
+
+###
+
+# 删除考试
+DELETE {{HostAddress}}/examination/16 HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
