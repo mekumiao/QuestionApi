@@ -76,9 +76,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
             await _dbContext.SaveChangesAsync();
         }
         catch (ReferenceConstraintException) {
-            return BadRequest(new BadDetail {
-                Message = $"试卷ID{dto.ExamPaperId}不存在或已被删除"
-            });
+            return ValidationProblem($"{nameof(dto.ExamPaperId)}: {dto.ExamPaperId} 不存在或已被删除");
         }
         var result = _mapper.Map<ExaminationDto>(item);
         return CreatedAtRoute("GetExaminationById", new { examinationId = item.ExaminationId }, result);

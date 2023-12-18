@@ -131,7 +131,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             .Include(v => v.Student)
             .SingleOrDefaultAsync(v => v.Id == userClaim.Value);
         if (user is null) {
-            return BadRequest(new BadDetail { Message = "当前登录用户信息不存在或已被删除" });
+            return ValidationProblem("当前登录用户信息不存在或已被删除");
         }
 
         user.Student ??= new Student {
@@ -197,7 +197,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             .Include(v => v.Student)
             .SingleOrDefaultAsync(v => v.Id == userClaim.Value);
         if (user is null) {
-            return BadRequest(new BadDetail { Message = "当前登录用户信息不存在或已被删除" });
+            return ValidationProblem("当前登录用户信息不存在或已被删除");
         }
 
         var histry = await _dbContext.AnswerHistories
@@ -207,7 +207,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             return NotFound();
         }
         if (histry.IsSubmission) {
-            return BadRequest(new BadDetail { Message = "您已经交卷" });
+            return ValidationProblem("您已经交卷");
         }
         _dbContext.AnswerHistories.Add(histry);
 
