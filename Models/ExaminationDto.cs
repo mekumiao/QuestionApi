@@ -9,6 +9,8 @@ public class ExaminationFilter {
     public string? ExaminationName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
+    [EnumDataType(typeof(ExaminationType), ErrorMessage = "无效的枚举值")]
+    public ExaminationType? ExaminationType { get; set; }
 
     public IQueryable<Examination> Build(IQueryable<Examination> queryable) {
         if (!string.IsNullOrWhiteSpace(ExaminationName)) {
@@ -16,6 +18,9 @@ public class ExaminationFilter {
         }
         if (DifficultyLevel is not null and > 0) {
             queryable = queryable.Where(v => v.DifficultyLevel == DifficultyLevel);
+        }
+        if (ExaminationType is not null and > 0) {
+            queryable = queryable.Where(v => v.ExaminationType == ExaminationType);
         }
         return queryable;
     }

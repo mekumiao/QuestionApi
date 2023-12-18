@@ -37,7 +37,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExaminationDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetExaminationById([FromRoute] int examinationId) {
-        var queryable = _dbContext.Examinations.AsNoTracking().OrderBy(v => v.Order);
+        var queryable = _dbContext.Examinations.AsNoTracking();
         var result = await queryable.SingleOrDefaultAsync(v => v.ExaminationId == examinationId);
         return result is null ? NotFound() : Ok(_mapper.Map<ExaminationDto>(result));
     }

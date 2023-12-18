@@ -25,14 +25,14 @@ public class ExamPaperDto {
     public int ExamPaperId { get; set; }
     public string ExamPaperName { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
-    public List<ExamPaperQuestionDto> ExamQuestions { get; set; } = [];
+    public List<ExamPaperQuestionDto> ExamPaperQuestions { get; set; } = [];
 }
 
 public class ExamPaperInput {
     public string ExamPaperName { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
-    public List<ExamPaperQuestionInput> ExamQuestions { get; set; } = [];
+    public List<ExamPaperQuestionInput> ExamPaperQuestions { get; set; } = [];
 }
 
 public class ExamPaperQuestionInput {
@@ -44,7 +44,7 @@ public class ExamPaperUpdate {
     public string ExamPaperName { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
-    public List<ExamPaperQuestionInput>? ExamQuestions { get; set; }
+    public List<ExamPaperQuestionInput>? ExamPaperQuestions { get; set; }
 }
 
 public class ExamPaperQuestionDto {

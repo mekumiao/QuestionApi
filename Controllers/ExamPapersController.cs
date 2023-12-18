@@ -69,11 +69,11 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] ExamPaperInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
-        if (dto.ExamQuestions.Count != 0) {
-            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions).OrderBy(v => v.Order));
+        if (dto.ExamPaperQuestions.Count != 0) {
+            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamPaperQuestions).OrderBy(v => v.Order));
         }
 
-        var questions = dto.ExamQuestions.Select(v => v.QuestionId).ToArray();
+        var questions = dto.ExamPaperQuestions.Select(v => v.QuestionId).ToArray();
         await _dbContext.Questions
             .Include(v => v.Options.OrderBy(t => t.OptionCode))
             .Where(v => questions.Contains(v.QuestionId))
@@ -101,9 +101,9 @@ public class ExamPapersController(ILogger<ExamPapersController> logger, Question
 
         _mapper.Map(dto, item);
 
-        if (dto.ExamQuestions is not null) {
+        if (dto.ExamPaperQuestions is not null) {
             item.ExamPaperQuestions.Clear();
-            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamQuestions));
+            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.ExamPaperQuestions));
         }
 
         await _dbContext.SaveChangesAsync();
