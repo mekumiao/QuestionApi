@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 using Mapster;
 
 using Microsoft.AspNetCore.Authentication.BearerToken;
@@ -13,7 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => {
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+});
 builder.Services.AddDbContext<QuestionDbContext>(options =>
     options.UseNpgsql("Host=mini.dev;Username=postgres;Database=questiondb",
         v => v.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
