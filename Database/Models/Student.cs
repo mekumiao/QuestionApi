@@ -57,5 +57,10 @@ public class AnswerHistory {
     /// 交卷时间
     /// </summary>
     public DateTime SubmissionTime { get; set; }
+    public bool IsSubmission { get; set; }
+    /// <summary>
+    /// 错题总数
+    /// </summary>
+    public int TotalIncorrectAnswers { get; set; }
     public List<StudentAnswer> StudentAnswers { get; } = [];
 }

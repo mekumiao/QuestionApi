@@ -49,6 +49,8 @@ public class AnswerHistoryDto {
     /// 交卷时间
     /// </summary>
     public DateTime SubmissionTime { get; set; }
+    public bool IsSubmission { get; set; }
+    public int TotalIncorrectAnswers { get; set; }
 }
 
 public class StudentAnswerDto {
