@@ -20,7 +20,7 @@ namespace QuestionApi.Controllers;
 /// <param name="logger"></param>
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
-[Authorize(Roles = "admin")]
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -28,6 +28,23 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     private readonly ILogger<AnswerBoardController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
+
+    [HttpGet("{answerBoardId:int}", Name = "GetAnswerBoardById")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAnswerBoardById([FromRoute] int answerBoardId) {
+        var userId = User.FindFirst(v => v.Type == "sub")!.Value;
+        var history = await _dbContext.AnswerHistories
+            .Include(v => v.Student.UserId == userId)
+            .Include(v => v.ExamPaper)
+            .ThenInclude(v => v.Questions)
+            .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
+        if (history is null) {
+            return NotFound();
+        }
+        var result = _mapper.Map<AnswerBoard>(history);
+        return Ok(result);
+    }
 
     /// <summary>
     /// 创建答题板
@@ -38,7 +55,6 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateAnswerBoard([FromBody, FromForm] AnswerBoardInput dto) {
-        var userClaim = User.FindFirst(v => v.Type == "sub")!;
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var user = await _dbContext.Set<AppUser>()
             .Include(v => v.Student)
@@ -76,7 +92,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             return ValidationProblem($"试卷ID:{dto.ExamPaperId}或考试ID{dto.ExamPaperId}不存在");
         }
         var result = _mapper.Map<AnswerBoard>(histry);
-        return Ok(result);
+        return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = histry.AnswerHistoryId }, result);
     }
 
     /// <summary>
