@@ -202,11 +202,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         foreach (var item in studentAnswers) {
             var left = item.AnswerText.Trim();
             var right = item.Question.CorrectAnswer.Trim();
-            if (item.Question.QuestionType == QuestionType.MultipleChoice) {
-                item.IsCorrect = right.All(v => left.Contains(v));
-                continue;
-            }
-            item.IsCorrect = left == right;
+            item.IsCorrect = item.Question.QuestionType == QuestionType.MultipleChoice ? right.All(v => left.Contains(v)) : left == right;
             if (item.IsCorrect is false) {
                 total_incorrect_answers++;
             }

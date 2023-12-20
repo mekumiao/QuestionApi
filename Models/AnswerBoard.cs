@@ -15,6 +15,7 @@ public class AnswerBoard {
     public int DurationSeconds { get; set; }
     public int TimeTakenSeconds { get; set; }
     public bool IsTimeout { get; set; }
+    public bool IsSubmission { get; set; }
     public ICollection<AnswerBoardQuestion> Questions { get; set; } = [];
 }
 
