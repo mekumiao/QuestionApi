@@ -12,6 +12,9 @@ public class AnswerBoard {
     public string ExamPaperName { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
     public int TotalIncorrectAnswers { get; set; }
+    public int DurationSeconds { get; set; }
+    public int TimeTakenSeconds { get; set; }
+    public bool IsTimeout { get; set; }
     public ICollection<AnswerBoardQuestion> Questions { get; set; } = [];
 }
 

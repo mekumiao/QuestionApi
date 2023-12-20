@@ -34,6 +34,9 @@ public class AnswerHistoryDto {
     public DateTime SubmissionTime { get; set; }
     public bool IsSubmission { get; set; }
     public int TotalIncorrectAnswers { get; set; }
+    public int DurationSeconds { get; set; }
+    public int TimeTakenSeconds { get; set; }
+    public bool IsTimeout { get; set; }
     public List<StudentAnswerDto> StudentAnswers { get; } = [];
 }
 
