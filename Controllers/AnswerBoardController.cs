@@ -35,12 +35,21 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     public async Task<IActionResult> GetAnswerBoardById([FromRoute] int answerBoardId) {
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var history = await _dbContext.AnswerHistories
-            .Include(v => v.Student.UserId == userId)
+            .Include(v => v.Student)
             .Include(v => v.ExamPaper)
             .ThenInclude(v => v.Questions)
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
         if (history is null) {
             return NotFound();
+        }
+        if (history.Student.UserId != userId) {
+            return ValidationProblem($"答题板ID:{answerBoardId}不属于当前用户");
+        }
+        if (history.IsSubmission is false && history.StartTime != default && history.DurationSeconds > 0) {
+            history.DurationSeconds -= (int)(DateTime.UtcNow - history.StartTime).TotalSeconds;
+            if (history.DurationSeconds < 0) {
+                history.DurationSeconds = 0;
+            }
         }
         var result = _mapper.Map<AnswerBoard>(history);
         return Ok(result);
@@ -68,17 +77,23 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             Name = user.NickName ?? user.UserName ?? string.Empty,
         };
 
-        var examPaper = new ExamPaper { ExamPaperId = dto.ExamPaperId };
-        _dbContext.ExamPapers.Attach(examPaper);
+        var examPaper = await _dbContext.ExamPapers
+            .Include(v => v.Questions)
+            .SingleOrDefaultAsync(v => v.ExamPaperId == dto.ExamPaperId);
+        if (examPaper is null) {
+            return ValidationProblem($"试卷ID:{dto.ExamPaperId}不存在或已经被删除");
+        }
 
         var history = new AnswerHistory {
             Student = user.Student,
             ExamPaper = examPaper,
             StartTime = DateTime.UtcNow,
         };
-        if (dto.ExaminationId is not null and 0) {
-            var examination = new Examination() { ExaminationId = dto.ExaminationId.Value };
-            _dbContext.Examinations.Attach(examination);
+        if (dto.ExaminationId.HasValue) {
+            var examination = await _dbContext.Examinations.FindAsync(dto.ExaminationId.Value);
+            if (examination is null) {
+                return NotFound($"考试ID:{dto.ExaminationId}不存在或已被删除");
+            }
             history.Examination = examination;
             history.DurationSeconds = examination.DurationSeconds;
         }
@@ -90,7 +105,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         }
         catch (ReferenceConstraintException) {
             Debug.Assert(false);
-            return ValidationProblem($"试卷ID:{dto.ExamPaperId}或考试ID{dto.ExamPaperId}不存在");
+            return ValidationProblem($"考试ID:{dto.ExamPaperId}不存在");
         }
         var result = _mapper.Map<AnswerBoard>(history);
         return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = history.AnswerHistoryId }, result);

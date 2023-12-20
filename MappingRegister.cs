@@ -30,6 +30,7 @@ public class MappingRegister : IRegister {
             .Map(dest => dest.DifficultyLevel, src => src.ExamPaper.DifficultyLevel);
 
         config.NewConfig<AnswerHistory, AnswerBoard>()
-            .Map(dest => dest, src => src.ExamPaper);
+            .Map(dest => dest, src => src.ExamPaper)
+            .Map(dest => dest.AnswerBoardId, src => src.AnswerHistoryId);
     }
 }
