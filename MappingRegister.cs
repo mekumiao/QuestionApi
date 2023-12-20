@@ -28,5 +28,8 @@ public class MappingRegister : IRegister {
         config.NewConfig<AnswerHistory, AnswerHistoryDto>()
             .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName)
             .Map(dest => dest.DifficultyLevel, src => src.ExamPaper.DifficultyLevel);
+
+        config.NewConfig<AnswerHistory, AnswerBoard>()
+            .Map(dest => dest, src => src.ExamPaper);
     }
 }
