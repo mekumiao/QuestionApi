@@ -19,7 +19,7 @@ namespace QuestionApi.Controllers;
 /// <param name="logger"></param>
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
-[Authorize(Roles = "admin")]
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
@@ -67,6 +67,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     /// <param name="dto"></param>
     /// <returns></returns>
     [HttpPost]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ExaminationDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] ExaminationInput dto) {
         var item = _mapper.Map<Examination>(dto);
@@ -83,6 +84,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     }
 
     [HttpPut("{examinationId:int}")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExaminationDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([FromRoute] int examinationId, [FromBody, FromForm] ExaminationUpdate dto) {
@@ -97,6 +99,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     }
 
     [HttpDelete("{examinationId:int}")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete([FromRoute] int examinationId) {

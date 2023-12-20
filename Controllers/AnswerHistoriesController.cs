@@ -27,7 +27,6 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
     private readonly IMapper _mapper = mapper;
 
     [HttpGet("count")]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] AnswerHistoryFilter filter) {
         var queryable = _dbContext.AnswerHistories.AsNoTracking();
@@ -37,7 +36,6 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
     }
 
     [HttpGet]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] AnswerHistoryFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.AnswerHistories
