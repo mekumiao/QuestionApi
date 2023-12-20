@@ -71,7 +71,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         var examPaper = new ExamPaper { ExamPaperId = dto.ExamPaperId };
         _dbContext.ExamPapers.Attach(examPaper);
 
-        var histry = new AnswerHistory {
+        var history = new AnswerHistory {
             Student = user.Student,
             ExamPaper = examPaper,
             StartTime = DateTime.UtcNow,
@@ -79,10 +79,11 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         if (dto.ExaminationId is not null and 0) {
             var examination = new Examination() { ExaminationId = dto.ExaminationId.Value };
             _dbContext.Examinations.Attach(examination);
-            histry.Examination = examination;
+            history.Examination = examination;
+            history.DurationSeconds = examination.DurationSeconds;
         }
 
-        _dbContext.AnswerHistories.Add(histry);
+        _dbContext.AnswerHistories.Add(history);
 
         try {
             await _dbContext.SaveChangesAsync();
@@ -91,8 +92,8 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             Debug.Assert(false);
             return ValidationProblem($"试卷ID:{dto.ExamPaperId}或考试ID{dto.ExamPaperId}不存在");
         }
-        var result = _mapper.Map<AnswerBoard>(histry);
-        return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = histry.AnswerHistoryId }, result);
+        var result = _mapper.Map<AnswerBoard>(history);
+        return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = history.AnswerHistoryId }, result);
     }
 
     /// <summary>
@@ -105,6 +106,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateAnswerBoard([FromRoute] int answerBoardId,
                                                        [FromBody, FromForm] AnswerInput[] inputs) {
+        var submissionTime = DateTime.UtcNow;
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var user = await _dbContext.Set<AppUser>()
             .Include(v => v.Student)
@@ -113,16 +115,16 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             return ValidationProblem("当前登录用户信息不存在或已被删除");
         }
 
-        var histry = await _dbContext.AnswerHistories
+        var history = await _dbContext.AnswerHistories
             .Include(v => v.StudentAnswers)
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
-        if (histry is null) {
+        if (history is null) {
             return NotFound();
         }
-        if (histry.IsSubmission) {
+        if (history.IsSubmission) {
             return ValidationProblem("您已经交卷");
         }
-        _dbContext.AnswerHistories.Add(histry);
+        _dbContext.AnswerHistories.Add(history);
 
         user.Student ??= new Student {
             UserId = userId,
@@ -130,17 +132,20 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         };
 
         var items = _mapper.Map<StudentAnswer[]>(inputs);
-        histry.StudentAnswers.AddRange(items);
+        history.StudentAnswers.AddRange(items);
         foreach (var item in items) {
             item.Student = user.Student;
         }
 
         var total_incorrect_answers = Correction(items);
-        histry.IsSubmission = true;//设置为已交卷
-        histry.TotalIncorrectAnswers = total_incorrect_answers;
+        history.IsSubmission = true;//设置为已交卷
+        history.TotalIncorrectAnswers = total_incorrect_answers;
+        history.SubmissionTime = submissionTime;
+        SetTimeTakenSeconds(history);
+        SetTimeout(history);
         await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<AnswerBoard>(histry);
+        var result = _mapper.Map<AnswerBoard>(history);
         return Ok(result);
     }
 
@@ -164,5 +169,26 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             }
         }
         return total_incorrect_answers;
+    }
+
+    private static void SetTimeTakenSeconds(AnswerHistory history) {
+        history.TimeTakenSeconds = history.StartTime == default || history.SubmissionTime == default
+            ? -1
+            : (int)(history.SubmissionTime - history.StartTime).TotalSeconds;
+    }
+
+    private static void SetTimeout(AnswerHistory history) {
+        // 异常的答题时间
+        if (history.TimeTakenSeconds < 0) {
+            history.IsTimeout = true;
+        }
+        // 未限制答题时间
+        else if (history.DurationSeconds <= 0) {
+            history.IsTimeout = false;
+        }
+        // 加10秒的网络延迟补偿
+        else if (history.TimeTakenSeconds > history.DurationSeconds + 10) {
+            history.IsTimeout = false;
+        }
     }
 }

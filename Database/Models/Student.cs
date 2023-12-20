@@ -57,7 +57,16 @@ public class AnswerHistory {
     /// 交卷时间
     /// </summary>
     public DateTime SubmissionTime { get; set; }
+    /// <summary>
+    /// 限制的时长秒
+    /// </summary>
+    public int DurationSeconds { get; set; }
+    /// <summary>
+    /// 答题所用的时间秒
+    /// </summary>
+    public int TimeTakenSeconds { get; set; }
     public bool IsSubmission { get; set; }
+    public bool IsTimeout { get; set; }
     /// <summary>
     /// 错题总数
     /// </summary>
