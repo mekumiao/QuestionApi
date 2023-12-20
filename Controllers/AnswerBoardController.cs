@@ -38,6 +38,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             .Include(v => v.Student)
             .Include(v => v.ExamPaper)
             .ThenInclude(v => v.Questions)
+            .ThenInclude(v => v.Options)
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
         if (history is null) {
             return NotFound();
@@ -79,6 +80,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         var examPaper = await _dbContext.ExamPapers
             .Include(v => v.Questions)
+            .ThenInclude(v => v.Options)
             .SingleOrDefaultAsync(v => v.ExamPaperId == dto.ExamPaperId);
         if (examPaper is null) {
             return ValidationProblem($"试卷ID:{dto.ExamPaperId}不存在或已经被删除");
@@ -131,7 +133,8 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         }
 
         var history = await _dbContext.AnswerHistories
-            .Include(v => v.StudentAnswers)
+            .Include(v => v.ExamPaper)
+            .ThenInclude(v => v.Questions)
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
         if (history is null) {
             return NotFound();
@@ -139,7 +142,6 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         if (history.IsSubmission) {
             return ValidationProblem("您已经交卷");
         }
-        _dbContext.AnswerHistories.Add(history);
 
         user.Student ??= new Student {
             UserId = userId,
@@ -150,17 +152,43 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         history.StudentAnswers.AddRange(items);
         foreach (var item in items) {
             item.Student = user.Student;
+            item.QuestionType = history.ExamPaper.Questions.Find(v => v.QuestionId == item.QuestionId)?.QuestionType
+                ?? QuestionType.None;
         }
 
-        var total_incorrect_answers = Correction(items);
         history.IsSubmission = true;//设置为已交卷
-        history.TotalIncorrectAnswers = total_incorrect_answers;
         history.SubmissionTime = submissionTime;
         SetTimeTakenSeconds(history);
         SetTimeout(history);
-        await _dbContext.SaveChangesAsync();
 
-        var result = _mapper.Map<AnswerBoard>(history);
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (ReferenceConstraintException ex) {
+            Debug.Assert(false);
+            _logger.LogError(ex, "交卷保存信息到数据库时失败");
+            return ValidationProblem("请检查数据");
+        }
+
+        var total_incorrect_answers = Correction(items);
+        history.TotalIncorrectAnswers = total_incorrect_answers;
+
+        try {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (ReferenceConstraintException ex) {
+            Debug.Assert(false);
+            _logger.LogError(ex, "交卷保存信息到数据库时失败");
+            return ValidationProblem("请检查数据");
+        }
+        await transaction.CommitAsync();
+
+        var result = _mapper
+             .From(history)
+             .ForkConfig(f => f.ForType<AnswerHistory, AnswerBoard>()
+             .Map(dest => dest.Questions, src => src.StudentAnswers), "sub-exam")
+             .AdaptToType<AnswerBoard>();
         return Ok(result);
     }
 
@@ -174,7 +202,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         foreach (var item in studentAnswers) {
             var left = item.AnswerText.Trim();
             var right = item.Question.CorrectAnswer.Trim();
-            if (item.QuestionType == QuestionType.MultipleChoice) {
+            if (item.Question.QuestionType == QuestionType.MultipleChoice) {
                 item.IsCorrect = right.All(v => left.Contains(v));
                 continue;
             }

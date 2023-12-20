@@ -22,6 +22,10 @@ public class AnswerBoardQuestion {
     public int QuestionId { get; set; }
     public string QuestionText { get; set; } = string.Empty;
     public QuestionType QuestionType { get; set; }
+    /// <summary>
+    /// 是否答对
+    /// </summary>
+    public bool? IsCorrect { get; set; }
     public ICollection<AnswerBoardQuestionOption> Options { get; set; } = [];
 }
 
