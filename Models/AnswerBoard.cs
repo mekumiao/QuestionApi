@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using QuestionApi.Database;
 
 namespace QuestionApi.Models;
@@ -30,4 +32,10 @@ public class AnswerBoardQuestionOption {
 public class AnswerBoardInput {
     public int ExamPaperId { get; set; }
     public int? ExaminationId { get; set; }
+}
+
+public class AnswerInput {
+    public int QuestionId { get; set; }
+    [MaxLength(500)]
+    public string AnswerText { get; set; } = string.Empty;
 }

@@ -50,7 +50,7 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
         return Ok(_mapper.Map<AnswerHistoryDto[]>(result));
     }
 
-    [HttpGet("{answerHistoryId:int}", Name = "GetAnswerHistoryById")]
+    [HttpGet("{answerHistoryId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerHistoryDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryById([FromRoute] int answerHistoryId) {

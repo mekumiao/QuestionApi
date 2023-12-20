@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 using QuestionApi.Database;
 
 namespace QuestionApi.Models;
@@ -17,12 +15,6 @@ public class AnswerHistoryFilter {
         }
         return queryable;
     }
-}
-
-public class AnswerInput {
-    public int QuestionId { get; set; }
-    [MaxLength(500)]
-    public string AnswerText { get; set; } = string.Empty;
 }
 
 public class AnswerHistoryDto {
