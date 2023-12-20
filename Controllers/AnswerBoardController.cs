@@ -1,4 +1,7 @@
+using System.Diagnostics;
 using System.Net.Mime;
+
+using EntityFramework.Exceptions.Common;
 
 using MapsterMapper;
 
@@ -27,11 +30,14 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     private readonly IMapper _mapper = mapper;
 
     /// <summary>
-    /// 创建答题记录，并返回答题板
+    /// 创建答题板
     /// </summary>
     /// <returns></returns>
-    [NonAction]
-    public async Task<IActionResult> CreateAnswerBoard(int examPaperId, Examination? examination) {
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CreateAnswerBoard([FromBody, FromForm] AnswerBoardInput dto) {
         var userClaim = User.FindFirst(v => v.Type == "sub")!;
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var user = await _dbContext.Set<AppUser>()
@@ -46,31 +52,31 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             Name = user.NickName ?? user.UserName ?? string.Empty,
         };
 
-        var examPaper = new ExamPaper { ExamPaperId = examPaperId };
+        var examPaper = new ExamPaper { ExamPaperId = dto.ExamPaperId };
         _dbContext.ExamPapers.Attach(examPaper);
 
         var histry = new AnswerHistory {
             Student = user.Student,
             ExamPaper = examPaper,
-            Examination = examination,
             StartTime = DateTime.UtcNow,
         };
+        if (dto.ExaminationId is not null and 0) {
+            var examination = new Examination() { ExaminationId = dto.ExaminationId.Value };
+            _dbContext.Examinations.Attach(examination);
+            histry.Examination = examination;
+        }
+
         _dbContext.AnswerHistories.Add(histry);
-        await _dbContext.SaveChangesAsync();
+
+        try {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (ReferenceConstraintException) {
+            Debug.Assert(false);
+            return ValidationProblem($"试卷ID:{dto.ExamPaperId}或考试ID{dto.ExamPaperId}不存在");
+        }
         var result = _mapper.Map<AnswerBoard>(histry);
         return Ok(result);
-    }
-
-    /// <summary>
-    /// 创建答题板
-    /// </summary>
-    /// <returns></returns>
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateAnswerBoard([FromBody, FromForm] int examPaperId) {
-        return await CreateAnswerBoard(examPaperId, null);
     }
 
     /// <summary>

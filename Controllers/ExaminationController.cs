@@ -110,18 +110,4 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
             return NotFound();
         }
     }
-
-    /// <summary>
-    /// 开始考试
-    /// </summary>
-    /// <param name="examinationId">考试id</param>
-    /// <returns></returns>
-    [HttpPost("me/examination/{examinationId:int}/start")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
-    public async Task<IActionResult> StartExam([FromRoute] int examinationId, [FromServices] StudentsController studentsController) {
-        var examination = await _dbContext.Examinations.FindAsync(examinationId);
-        return examination is null ? NotFound() : await studentsController.CreateAnswerHistory(examination.ExamPaperId, examination);
-    }
 }

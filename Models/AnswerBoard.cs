@@ -26,3 +26,8 @@ public class AnswerBoardQuestionOption {
     public char OptionCode { get; set; }
     public string OptionText { get; set; } = string.Empty;
 }
+
+public class AnswerBoardInput {
+    public int ExamPaperId { get; set; }
+    public int? ExaminationId { get; set; }
+}
