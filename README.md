@@ -63,3 +63,13 @@ dotnet publish QuestionApi.csproj -c Release -a x64 --os win -o publish/win-x64
 在`考试历史`页面点击恢复答题即可
 
 可以分类别：考试记录（包含模拟考试）、练习记录
+
+## MapsterMap 的 Fork 用法
+
+```cs
+var result = _mapper
+    .From(history)
+    .ForkConfig(f => f.ForType<AnswerHistory, AnswerBoard>()
+    .Map(dest => dest.Questions, src => src.StudentAnswers), "sub-exam")
+    .AdaptToType<AnswerBoard>();
+```

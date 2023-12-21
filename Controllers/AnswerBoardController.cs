@@ -36,9 +36,9 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var history = await _dbContext.AnswerHistories
             .Include(v => v.Student)
-            .Include(v => v.ExamPaper)
-            .ThenInclude(v => v.Questions)
-            .ThenInclude(v => v.Options)
+            .Include(v => v.StudentAnswers)
+            .ThenInclude(v => v.Question)
+            .ThenInclude(v => v.Options.OrderBy(n => n.OptionCode))
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
         if (history is null) {
             return NotFound();
@@ -80,10 +80,13 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         var examPaper = await _dbContext.ExamPapers
             .Include(v => v.Questions)
-            .ThenInclude(v => v.Options)
+            .ThenInclude(v => v.Options.OrderBy(n => n.OptionCode))
             .SingleOrDefaultAsync(v => v.ExamPaperId == dto.ExamPaperId);
         if (examPaper is null) {
             return ValidationProblem($"试卷ID:{dto.ExamPaperId}不存在或已经被删除");
+        }
+        if (examPaper.Questions.Count == default) {
+            return ValidationProblem($"试卷ID:{dto.ExamPaperId}没有设置题目");
         }
 
         var history = new AnswerHistory {
@@ -91,6 +94,12 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             ExamPaper = examPaper,
             StartTime = DateTime.UtcNow,
         };
+        var answers = _mapper.Map<StudentAnswer[]>(examPaper.Questions);
+        foreach (var item in answers) {
+            item.Student = user.Student;
+        }
+        history.StudentAnswers.AddRange(answers);
+
         if (dto.ExaminationId.HasValue) {
             var examination = await _dbContext.Examinations.FindAsync(dto.ExaminationId.Value);
             if (examination is null) {
@@ -125,35 +134,28 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
                                                        [FromBody, FromForm] AnswerInput[] inputs) {
         var submissionTime = DateTime.UtcNow;
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
-        var user = await _dbContext.Set<AppUser>()
-            .Include(v => v.Student)
-            .SingleOrDefaultAsync(v => v.Id == userId);
-        if (user is null) {
-            return ValidationProblem("当前登录用户信息不存在或已被删除");
-        }
 
         var history = await _dbContext.AnswerHistories
-            .Include(v => v.ExamPaper)
-            .ThenInclude(v => v.Questions)
+            .Include(v => v.Student)
+            .Include(v => v.StudentAnswers)
+            .ThenInclude(v => v.Question)
+            .ThenInclude(v => v.Options)
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
         if (history is null) {
             return NotFound();
+        }
+        if (history.Student.UserId != userId) {
+            return ValidationProblem($"答题板ID:{answerBoardId}不属于当前用户");
         }
         if (history.IsSubmission) {
             return ValidationProblem("您已经交卷");
         }
 
-        user.Student ??= new Student {
-            UserId = userId,
-            Name = user.NickName ?? user.UserName ?? string.Empty,
-        };
-
-        var items = _mapper.Map<StudentAnswer[]>(inputs);
-        history.StudentAnswers.AddRange(items);
-        foreach (var item in items) {
-            item.Student = user.Student;
-            item.QuestionType = history.ExamPaper.Questions.Find(v => v.QuestionId == item.QuestionId)?.QuestionType
-                ?? QuestionType.None;
+        foreach (var input in inputs) {
+            var record = history.StudentAnswers.Find(v => v.QuestionId == input.QuestionId);
+            if (record is not null) {
+                record.AnswerText = input.AnswerText.Trim();
+            }
         }
 
         history.IsSubmission = true;//设置为已交卷
@@ -171,7 +173,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             return ValidationProblem("请检查数据");
         }
 
-        var total_incorrect_answers = Correction(items);
+        var total_incorrect_answers = Correction(history.StudentAnswers);
         history.TotalIncorrectAnswers = total_incorrect_answers;
 
         try {
@@ -184,11 +186,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         }
         await transaction.CommitAsync();
 
-        var result = _mapper
-             .From(history)
-             .ForkConfig(f => f.ForType<AnswerHistory, AnswerBoard>()
-             .Map(dest => dest.Questions, src => src.StudentAnswers), "sub-exam")
-             .AdaptToType<AnswerBoard>();
+        var result = _mapper.Map<AnswerBoard>(history);
         return Ok(result);
     }
 
@@ -197,17 +195,22 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     /// </summary>
     /// <param name="studentAnswers"></param>
     /// <returns></returns>
-    private static int Correction(StudentAnswer[] studentAnswers) {
-        var total_incorrect_answers = 0;
+    private static int Correction(ICollection<StudentAnswer> studentAnswers) {
+        var totalCorrectNumber = 0;
         foreach (var item in studentAnswers) {
-            var left = item.AnswerText.Trim();
-            var right = item.Question.CorrectAnswer.Trim();
-            item.IsCorrect = item.Question.QuestionType == QuestionType.MultipleChoice ? right.All(v => left.Contains(v)) : left == right;
-            if (item.IsCorrect is false) {
-                total_incorrect_answers++;
+            var left = item.AnswerText;
+            var right = item.Question.CorrectAnswer;
+            if (item.Question.QuestionType == QuestionType.MultipleChoice) {
+                if (right.All(v => left.Contains(v))) {
+                    totalCorrectNumber++;
+                }
+            }
+            else if (left == right) {
+                item.IsCorrect = true;
+                totalCorrectNumber++;
             }
         }
-        return total_incorrect_answers;
+        return studentAnswers.Count - totalCorrectNumber;
     }
 
     private static void SetTimeTakenSeconds(AnswerHistory history) {
