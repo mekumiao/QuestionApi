@@ -42,6 +42,8 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
             .AsNoTracking()
             .Include(v => v.Student)
             .Include(v => v.Examination)
+            .Include(v => v.ExamPaper)
+            .OrderByDescending(v => v.AnswerHistoryId)
             .AsQueryable();
 
         queryable = paging.Build(queryable);
