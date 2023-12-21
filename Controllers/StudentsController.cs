@@ -81,6 +81,24 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         return Ok(result);
     }
 
+    [HttpGet("me/answer-history/count")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAnswerHistoryCountByCurrentUserId() {
+        var userId = User.FindFirst(v => v.Type == "sub")?.Value;
+        if (string.IsNullOrWhiteSpace(userId)) {
+            return NotFound();
+        }
+
+        var queryable = _dbContext.AnswerHistories
+            .AsNoTracking()
+            .Include(v => v.Student)
+            .Where(v => v.Student.UserId == userId);
+
+        var count = await queryable.CountAsync();
+        return Ok(count);
+    }
+
     /// <summary>
     /// 获取当前登录用户的答题记录
     /// </summary>
@@ -88,23 +106,22 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     [HttpGet("me/answer-history")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId() {
+    public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId([FromQuery] Paging paging) {
         var userId = User.FindFirst(v => v.Type == "sub")?.Value;
         if (string.IsNullOrWhiteSpace(userId)) {
             return NotFound();
         }
-        var student = await _dbContext.Students.AsNoTracking().SingleOrDefaultAsync(v => v.UserId == userId);
-        if (student is null) {
-            return Ok(Array.Empty<AnswerHistoryDto>());
-        }
-        var items = await _dbContext.AnswerHistories
+
+        var queryable = _dbContext.AnswerHistories
             .AsNoTracking()
             .Include(v => v.Student)
             .Include(v => v.ExamPaper)
-            .Where(v => v.StudentId == student.StudentId)
-            .ToArrayAsync();
+            .Where(v => v.Student.UserId == userId);
+
+        queryable = paging.Build(queryable);
+
+        var items = await queryable.ToArrayAsync();
         var result = _mapper.Map<AnswerHistoryDto[]>(items);
-        _logger.LogInformation("AnswerHistories: {AnswerHistories}", items[0].ExamPaper.ExamPaperName);
         return Ok(result);
     }
 
