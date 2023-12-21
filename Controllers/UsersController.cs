@@ -1,4 +1,6 @@
 using System.Net.Mime;
+using System.Text;
+using System.Text.RegularExpressions;
 
 using MapsterMapper;
 
@@ -22,7 +24,7 @@ namespace QuestionApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class UsersController(ILogger<UsersController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+public partial class UsersController(ILogger<UsersController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
     private readonly ILogger<UsersController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
@@ -48,17 +50,30 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
                                     join r in _dbContext.Roles on ur.RoleId equals r.Id
                                     select new { ur.UserId, r } on u.Id equals urr.UserId into grouping
                         from urr in grouping.DefaultIfEmpty()
-                        group new { u, urr } by new { UserId = u.Id, u.UserName, u.Email, u.NickName } into g
+                        group new { u, urr } by new { UserId = u.Id, u.UserName, u.Email, u.NickName, u.Avatar, u.CreateTime } into g
                         select new UserDto {
                             UserId = g.Key.UserId,
                             UserName = g.Key.UserName,
                             NickName = g.Key.NickName,
+                            Avatar = g.Key.Avatar,
+                            CreateTime = g.Key.CreateTime,
                             Email = g.Key.Email,
                             Roles = g.OrderBy(v => v.urr.r.Id).Select(v => v.urr.r.Name)!
                         };
 
-        var result = await queryable.AsNoTracking().ToArrayAsync();
-        return Ok(_mapper.Map<UserDto[]>(result));
+        var result = await queryable.AsNoTracking().OrderByDescending(v => v.CreateTime).ToArrayAsync();
+        var avatarBuilder = new UriBuilder(HttpContext.Request.Host.Value);
+        var pathBase = HttpContext.Request.PathBase.Value?.TrimEnd('/');
+        foreach (var item in result) {
+            if (!string.IsNullOrWhiteSpace(item.Avatar)) {
+                if (HttpSchemeRegex().IsMatch(item.Avatar)) {
+                    continue;
+                }
+                avatarBuilder.Path = $"{pathBase}/{item.Avatar.TrimStart('/')}";
+                item.Avatar = avatarBuilder.Uri.AbsoluteUri;
+            }
+        }
+        return Ok(result);
     }
 
     [HttpGet("{userId}", Name = "GetUserById")]
@@ -111,6 +126,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
                                             [FromServices] IUserStore<AppUser> userStore) {
         var emailStore = (IUserEmailStore<AppUser>)userStore;
         var user = _mapper.Map<AppUser>(dto);
+        user.CreateTime = DateTime.UtcNow;
         await userStore.SetUserNameAsync(user, dto.Email, CancellationToken.None);
         await emailStore.SetEmailAsync(user, dto.Email, CancellationToken.None);
         var result = await userManager.CreateAsync(user, dto.Password);
@@ -125,4 +141,7 @@ public class UsersController(ILogger<UsersController> logger, QuestionDbContext 
         poco.Roles = roles;
         return CreatedAtRoute("GetUserById", new { userId = user.Id }, poco);
     }
+
+    [GeneratedRegex("^http[s]?://")]
+    private static partial Regex HttpSchemeRegex();
 }

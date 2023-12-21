@@ -30,7 +30,9 @@ public class UserDto {
     public string UserId { get; set; } = string.Empty;
     public string? UserName { get; set; }
     public string? NickName { get; set; }
+    public string? Avatar { get; set; }
     public string? Email { get; set; }
+    public DateTime? CreateTime { get; set; }
     public IEnumerable<string> Roles { get; set; } = [];
 }
 
@@ -47,5 +49,7 @@ public class UserInput {
     public required string Email { get; set; } = string.Empty;
     [StringLength(256, MinimumLength = 6)]
     public required string Password { get; set; } = string.Empty;
+    [MaxLength(256)]
+    public string? Avatar { get; set; }
     public List<string> Roles { get; set; } = [];
 }
