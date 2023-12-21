@@ -41,7 +41,7 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
         var queryable = _dbContext.Questions
             .AsNoTracking()
             .Include(v => v.Options.OrderBy(t => t.OptionCode))
-            .OrderBy(v => v.QuestionId)
+            .OrderByDescending(v => v.QuestionId)
             .AsQueryable();
 
         queryable = paging.Build(queryable);
