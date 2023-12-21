@@ -41,6 +41,7 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
         var queryable = _dbContext.AnswerHistories
             .AsNoTracking()
             .Include(v => v.Student)
+            .Include(v => v.Examination)
             .AsQueryable();
 
         queryable = paging.Build(queryable);

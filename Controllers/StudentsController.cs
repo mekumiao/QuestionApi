@@ -116,6 +116,8 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             .AsNoTracking()
             .Include(v => v.Student)
             .Include(v => v.ExamPaper)
+            .Include(v => v.Examination)
+            .OrderByDescending(v => v.AnswerHistoryId)
             .Where(v => v.Student.UserId == userId);
 
         queryable = paging.Build(queryable);

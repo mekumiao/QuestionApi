@@ -93,6 +93,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             Student = user.Student,
             ExamPaper = examPaper,
             StartTime = DateTime.UtcNow,
+            DifficultyLevel = examPaper.DifficultyLevel,
         };
         var answers = _mapper.Map<StudentAnswer[]>(examPaper.Questions);
         foreach (var item in answers) {
@@ -107,6 +108,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             }
             history.Examination = examination;
             history.DurationSeconds = examination.DurationSeconds;
+            history.DifficultyLevel = examination.DifficultyLevel;
         }
 
         _dbContext.AnswerHistories.Add(history);
