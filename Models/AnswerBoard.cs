@@ -27,6 +27,10 @@ public class AnswerBoardQuestion {
     /// 是否答对
     /// </summary>
     public bool? IsCorrect { get; set; }
+    /// <summary>
+    /// 学生作答
+    /// </summary>
+    public string? AnswerText { get; set; }
     public ICollection<AnswerBoardQuestionOption> Options { get; set; } = [];
 }
 
@@ -45,5 +49,5 @@ public class AnswerBoardInput {
 public class AnswerInput {
     public int QuestionId { get; set; }
     [MaxLength(500)]
-    public string AnswerText { get; set; } = string.Empty;
+    public string? AnswerText { get; set; }
 }

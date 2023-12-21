@@ -153,8 +153,9 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         foreach (var input in inputs) {
             var record = history.StudentAnswers.Find(v => v.QuestionId == input.QuestionId);
-            if (record is not null) {
-                record.AnswerText = input.AnswerText.Trim();
+            var answer = input.AnswerText?.Trim();
+            if (record is not null && !string.IsNullOrWhiteSpace(answer)) {
+                record.AnswerText = answer;
             }
         }
 
@@ -200,6 +201,10 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         foreach (var item in studentAnswers) {
             var left = item.AnswerText;
             var right = item.Question.CorrectAnswer;
+            if (string.IsNullOrWhiteSpace(left)) {
+                // 跳过未作答的题目
+                continue;
+            }
             if (item.Question.QuestionType == QuestionType.MultipleChoice) {
                 if (right.All(v => left.Contains(v))) {
                     totalCorrectNumber++;
@@ -208,6 +213,9 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             else if (left == right) {
                 item.IsCorrect = true;
                 totalCorrectNumber++;
+            }
+            else {
+                item.IsCorrect = false;
             }
         }
         return studentAnswers.Count - totalCorrectNumber;
