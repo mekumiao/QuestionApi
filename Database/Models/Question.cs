@@ -41,6 +41,7 @@ public class Option {
     /// </summary>
     public char OptionCode { get; set; }
     public string OptionText { get; set; } = string.Empty;
+    [Obsolete("弃用这个字段，统一由 Question.CorrectAnswer 决定")]
     public bool IsCorrect { get; set; }
 }
 
