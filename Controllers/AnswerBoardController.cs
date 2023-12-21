@@ -199,7 +199,6 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     /// <param name="studentAnswers"></param>
     /// <returns></returns>
     private static int Correction(ICollection<StudentAnswer> studentAnswers) {
-        var totalCorrectNumber = 0;
         foreach (var item in studentAnswers) {
             var left = item.AnswerText;
             var right = item.Question.CorrectAnswer;
@@ -207,20 +206,11 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
                 // 跳过未作答的题目
                 continue;
             }
-            if (item.Question.QuestionType == QuestionType.MultipleChoice) {
-                if (right.All(v => left.Contains(v))) {
-                    totalCorrectNumber++;
-                }
-            }
-            else if (left == right) {
-                item.IsCorrect = true;
-                totalCorrectNumber++;
-            }
-            else {
-                item.IsCorrect = false;
-            }
+            item.IsCorrect = item.Question.QuestionType == QuestionType.MultipleChoice
+                ? left.Length == right.Length && right.Join(left, v => v, n => n, (v, n) => v).Count() == right.Length
+                : left == right;
         }
-        return studentAnswers.Count - totalCorrectNumber;
+        return studentAnswers.Count(v => v.IsCorrect is false or null);
     }
 
     private static void SetTimeTakenSeconds(AnswerHistory history) {
