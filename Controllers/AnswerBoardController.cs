@@ -36,6 +36,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var history = await _dbContext.AnswerHistories
             .Include(v => v.Student)
+            .Include(v => v.ExamPaper)
             .Include(v => v.StudentAnswers)
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(n => n.OptionCode))
@@ -139,6 +140,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         var history = await _dbContext.AnswerHistories
             .Include(v => v.Student)
+            .Include(v => v.ExamPaper)
             .Include(v => v.StudentAnswers)
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options)

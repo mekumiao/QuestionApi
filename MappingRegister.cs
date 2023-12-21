@@ -34,6 +34,7 @@ public class MappingRegister : IRegister {
             .Fork(f => f.ForType<StudentAnswer, AnswerBoardQuestion>()
             .Map(dest => dest.QuestionText, src => src.Question.QuestionText)
             .Map(dest => dest.Options, src => src.Question.Options.OrderBy(v => v.OptionCode)))
+            .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName)
             .Map(dest => dest.Questions, src => src.StudentAnswers)
             .Map(dest => dest.AnswerBoardId, src => src.AnswerHistoryId);
     }
