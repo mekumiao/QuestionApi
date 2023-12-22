@@ -171,10 +171,11 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
             return ValidationProblem(new ValidationProblemDetails(errors));
         }
 
-        var result = _mapper.From(examPapers)
-             .ForkConfig(f => f.NewConfig<ExamPaper, ExamPaperDto>()
-             .Map(dest => dest.Questions, src => src.Questions))
-             .AdaptToType<ExamPaperDto[]>();
+        // var result = _mapper.From(examPapers)
+        //      .ForkConfig(f => f.NewConfig<ExamPaper, ExamPaperDto>()
+        //      .Map(dest => dest.Questions, src => src.Questions))
+        //      .AdaptToType<ExamPaperDto[]>();
+        var result = _mapper.Map<ExamPaperDto[]>(examPapers);
         return Ok(result);
     }
 }

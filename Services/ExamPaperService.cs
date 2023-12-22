@@ -71,7 +71,13 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
     public async Task<(List<ExamPaper> examPapers, Dictionary<string, string[]> errors)> ImportFromExcelAsync(string examPaperName, Stream stream) {
         var parser = new ExamPaperExcelParser();
         var result = parser.Parse(stream);
+        if (result.errors.Count > 0) {
+            return result;
+        }
         try {
+            foreach (var item in result.examPapers) {
+                item.ExamPaperName = examPaperName;
+            }
             await _dbContext.ExamPapers.AddRangeAsync(result.examPapers);
             await _dbContext.SaveChangesAsync();
         }
@@ -96,7 +102,7 @@ public partial class ExamPaperExcelParser {
         for (int i = 0; i < package.Workbook.Worksheets.Count; i++) {
             var worksheet = package.Workbook.Worksheets[0];
             var (examPaper, subErrors) = ParseWorksheet(worksheet);
-            if (examPaper is null) {
+            if (subErrors.Count > 0) {
                 errors.Add(worksheet.Name, [.. subErrors]);
                 continue;
             }
@@ -105,13 +111,13 @@ public partial class ExamPaperExcelParser {
         return (examPapers, errors);
     }
 
-    private static (ExamPaper? examPaper, List<string> errors) ParseWorksheet(ExcelWorksheet worksheet) {
+    private static (ExamPaper examPaper, List<string> errors) ParseWorksheet(ExcelWorksheet worksheet) {
         string? message;
         var errors = new List<string>(1);
 
         var examPaper = new ExamPaper { ExamPaperName = worksheet.Name, ExamPaperType = ExamPaperType.Import };
         for (int row = 2; row <= worksheet.Dimension.Rows; row++) {
-            var question = new Question();
+            var question = new ExamPaperQuestion { Question = new Question() };
             for (int col = 1; col <= worksheet.Dimension.Columns; col++) {
                 var cellValue = worksheet.Cells[row, col].Text.Trim();
                 if (cellValue.Length > 256) {
@@ -120,24 +126,30 @@ public partial class ExamPaperExcelParser {
                 }
                 switch (col) {
                     case 1:
-                        message = SetQuestionText(question, cellValue, row, col);
+                        message = SetOrder(question, cellValue, row, col);
                         if (message is not null) {
                             errors.Add(message);
                         }
                         break;
                     case 2:
-                        message = SetQuestionType(question, cellValue, row, col);
+                        message = SetQuestionText(question, cellValue, row, col);
                         if (message is not null) {
                             errors.Add(message);
                         }
                         break;
                     case 3:
-                        message = SetDifficultyLevel(question, cellValue, row, col);
+                        message = SetQuestionType(question, cellValue, row, col);
                         if (message is not null) {
                             errors.Add(message);
                         }
                         break;
                     case 4:
+                        message = SetDifficultyLevel(question, cellValue, row, col);
+                        if (message is not null) {
+                            errors.Add(message);
+                        }
+                        break;
+                    case 5:
                         message = SetCorrectAnswer(question, cellValue, row, col);
                         if (message is not null) {
                             errors.Add(message);
@@ -151,24 +163,32 @@ public partial class ExamPaperExcelParser {
                         }
                         break;
                 }
-                Console.Write($"{cellValue}\t");
             }
-            examPaper.Questions.Add(question);
-            Console.WriteLine();
+            examPaper.ExamPaperQuestions.Add(question);
         }
-
         return (examPaper, errors);
     }
 
-    private static string? SetQuestionText(Question question, string cellValue, int row, int col) {
+    private static string? SetOrder(ExamPaperQuestion question, string cellValue, int row, int col) {
         if (string.IsNullOrWhiteSpace(cellValue)) {
             return $"第{row}行{col}列的值不能为空白";
         }
-        question.QuestionText = cellValue;
+        if (!int.TryParse(cellValue, out var order)) {
+            return $"第{row}行{col}列的值必须时数字";
+        }
+        question.Order = order;
         return null;
     }
 
-    private static string? SetQuestionType(Question question, string cellValue, int row, int col) {
+    private static string? SetQuestionText(ExamPaperQuestion question, string cellValue, int row, int col) {
+        if (string.IsNullOrWhiteSpace(cellValue)) {
+            return $"第{row}行{col}列的值不能为空白";
+        }
+        question.Question.QuestionText = cellValue;
+        return null;
+    }
+
+    private static string? SetQuestionType(ExamPaperQuestion question, string cellValue, int row, int col) {
         if (string.IsNullOrWhiteSpace(cellValue)) {
             return $"第{row}行{col}列的值{cellValue}不能为空白";
         }
@@ -182,11 +202,11 @@ public partial class ExamPaperExcelParser {
         if (questionType == QuestionType.None) {
             return $"第{row}行{col}列的值{cellValue}格式错误。正确值分别为：单选题、多选题、判断题、填空题";
         }
-        question.QuestionType = questionType;
+        question.Question.QuestionType = questionType;
         return null;
     }
 
-    private static string? SetDifficultyLevel(Question question, string cellValue, int row, int col) {
+    private static string? SetDifficultyLevel(ExamPaperQuestion question, string cellValue, int row, int col) {
         if (string.IsNullOrWhiteSpace(cellValue)) {
             return $"第{row}行{col}列的值{cellValue}不能为空白";
         }
@@ -199,35 +219,35 @@ public partial class ExamPaperExcelParser {
         if (difficultyLevel == DifficultyLevel.None) {
             return $"第{row}行{col}列的值{cellValue}格式错误。正确值分别为：1、2、3";
         }
-        question.DifficultyLevel = difficultyLevel;
+        question.Question.DifficultyLevel = difficultyLevel;
         return null;
     }
 
-    private static string? SetCorrectAnswer(Question question, string cellValue, int row, int col) {
+    private static string? SetCorrectAnswer(ExamPaperQuestion question, string cellValue, int row, int col) {
         if (string.IsNullOrWhiteSpace(cellValue)) {
             return $"第{row}行{col}列的值{cellValue}不能为空白";
         }
-        switch (question.QuestionType) {
+        switch (question.Question.QuestionType) {
             case QuestionType.SingleChoice:
                 if (!char.IsLetter(cellValue, 0)) {
                     return $"第{row}行{col}列的值{cellValue}必须是字母";
                 }
-                question.CorrectAnswer = cellValue.ToUpper();
+                question.Question.CorrectAnswer = cellValue.ToUpper();
                 break;
             case QuestionType.MultipleChoice:
                 if (!IsLetter().IsMatch(cellValue)) {
                     return $"第{row}行{col}列的值{cellValue}必须是字母";
                 }
-                question.CorrectAnswer = cellValue.ToUpper();
+                question.Question.CorrectAnswer = cellValue.ToUpper();
                 break;
             case QuestionType.TrueFalse:
-                if (cellValue != "0" || cellValue != "1") {
+                if (cellValue != "0" && cellValue != "1") {
                     return $"第{row}行{col}列的值{cellValue}必须是0或1";
                 }
-                question.CorrectAnswer = cellValue;
+                question.Question.CorrectAnswer = cellValue;
                 break;
             case QuestionType.FillInTheBlank:
-                question.CorrectAnswer = cellValue;
+                question.Question.CorrectAnswer = cellValue;
                 break;
             default:
                 break;
@@ -235,8 +255,8 @@ public partial class ExamPaperExcelParser {
         return null;
     }
 
-    private static string? AddQuestionOption(Question question, string cellValue, int row, int col) {
-        if (question.QuestionType == QuestionType.SingleChoice || question.QuestionType == QuestionType.MultipleChoice) {
+    private static string? AddQuestionOption(ExamPaperQuestion question, string cellValue, int row, int col) {
+        if (question.Question.QuestionType == QuestionType.SingleChoice || question.Question.QuestionType == QuestionType.MultipleChoice) {
             if (string.IsNullOrWhiteSpace(cellValue)) {
                 return $"第{row}行{col}列的值{cellValue}不能为空白";
             }
@@ -248,7 +268,7 @@ public partial class ExamPaperExcelParser {
                 OptionText = cellValue,
                 OptionCode = Convert.ToChar(c + 64),//减去前面的4列，A字母的ASCII是65，列索引从1开始
             };
-            question.Options.Add(option);
+            question.Question.Options.Add(option);
         }
         return null;
     }
