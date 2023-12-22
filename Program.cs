@@ -96,7 +96,9 @@ if (app.Environment.IsDevelopment()) {
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
-// app.MapIdentityApi<AppUser>();
+if (app.Environment.IsProduction()) {
+    app.MapIdentityApi<AppUser>();
+}
 app.MapControllers();
 
 app.Run();
