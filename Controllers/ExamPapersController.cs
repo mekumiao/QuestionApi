@@ -19,21 +19,20 @@ namespace QuestionApi.Controllers;
 /// <param name="logger"></param>
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
-[Authorize]
 [ApiController]
+[Authorize(Roles = "admin")]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 public class ExamPapersController(ILogger<ExamPapersController> logger,
-                                  QuestionDbContext dbContext,
-                                  ExamPaperService examPaperService,
-                                  IMapper mapper) : ControllerBase {
+                              QuestionDbContext dbContext,
+                              ExamPaperService examPaperService,
+                              IMapper mapper) : ControllerBase {
     private readonly ILogger<ExamPapersController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly ExamPaperService _examPaperService = examPaperService;
     private readonly IMapper _mapper = mapper;
 
     [HttpGet("count")]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] ExamPaperFilter filter) {
         var queryable = _dbContext.ExamPapers.AsNoTracking();
@@ -43,7 +42,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpGet]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ExamPaperDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] ExamPaperFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.ExamPapers
@@ -61,7 +59,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpGet("{paperId:int}", Name = "GetExamPaperById")]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetExamPaperById([FromRoute] int paperId) {
@@ -75,7 +72,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpPost]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] ExamPaperInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
@@ -99,7 +95,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpPut("{paperId:int}")]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([FromRoute] int paperId, [FromBody, FromForm] ExamPaperUpdate dto) {
@@ -126,7 +121,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpDelete("{paperId:int}")]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Delete([FromRoute] int paperId) {
@@ -147,7 +141,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     /// </summary>
     /// <returns></returns>
     [HttpPost("random")]
-    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> RandomGeneration([FromBody, FromForm] RandomGenerationInput input) {
         var userName = User.FindFirstValue("name") ?? string.Empty;
