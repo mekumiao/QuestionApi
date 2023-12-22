@@ -233,7 +233,7 @@ Content-Type: application/json
 ###
 
 # 根据ID查询试卷
-GET {{HostAddress}}/exampapers/10
+GET {{HostAddress}}/exampapers/21
 # Authorization: Bearer {{accessToken}}
 AuthorizationCode: 123123
 Content-Type: application/json
@@ -422,3 +422,21 @@ Content-Type: application/json
 {
   "DifficultyLevel": 3
 }
+
+###
+
+# 导入试卷
+POST {{HostAddress}}/exampapers/import HTTP/1.1
+AuthorizationCode: 123123
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="ExamPaperName"
+
+导入的试卷
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="1.png"
+Content-Type: multipart/form-data
+
+< ./试卷导入模板.xlsx
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

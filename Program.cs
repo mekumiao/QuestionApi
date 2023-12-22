@@ -9,9 +9,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
+using OfficeOpenXml;
+
 using QuestionApi;
 using QuestionApi.Database;
 using QuestionApi.Services;
+
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +31,7 @@ builder.Services.AddDbContext<QuestionDbContext>(options =>
 );
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 
 if (builder.Environment.IsDevelopment()) {
     builder.Services.AddAuthentication().AddAuthorizationCode();

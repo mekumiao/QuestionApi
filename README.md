@@ -73,3 +73,11 @@ var result = _mapper
     .Map(dest => dest.Questions, src => src.StudentAnswers), "sub-exam")
     .AdaptToType<AnswerBoard>();
 ```
+
+## EFCore 异常处理
+
+[EntityFramework.Exceptions](https://github.com/Giorgi/EntityFramework.Exceptions.git)
+
+## REST Client 文档
+
+[参考](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)

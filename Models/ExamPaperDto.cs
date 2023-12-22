@@ -66,3 +66,9 @@ public class ExamPaperQuestionDto {
 public class RandomGenerationInput {
     public DifficultyLevel? DifficultyLevel { get; set; }
 }
+
+public class ImportExamPaperFromExcelInput {
+    [MaxLength(256)]
+    public string? ExamPaperName { get; set; }
+    public required IFormFile? File { get; set; }
+}

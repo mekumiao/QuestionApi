@@ -151,4 +151,30 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         var result = _mapper.Map<ExamPaperDto>(examPaper);
         return CreatedAtRoute("GetExamPaperById", new { paperId = examPaper.ExamPaperId }, result);
     }
+
+    /// <summary>
+    /// 导入试卷
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("import")]
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ImportFromExcel([FromForm] ImportExamPaperFromExcelInput input) {
+        if (input.File == null || input.File.Length == 0) {
+            return ValidationProblem("未选择文件或文件为空");
+        }
+        using var memoryStream = new MemoryStream();
+        await input.File.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+        var (examPapers, errors) = await _examPaperService.ImportFromExcelAsync(input.ExamPaperName ?? string.Empty, memoryStream);
+        if (errors.Count > 0) {
+            return ValidationProblem(new ValidationProblemDetails(errors));
+        }
+
+        var result = _mapper.From(examPapers)
+             .ForkConfig(f => f.NewConfig<ExamPaper, ExamPaperDto>()
+             .Map(dest => dest.Questions, src => src.Questions))
+             .AdaptToType<ExamPaperDto[]>();
+        return Ok(result);
+    }
 }
