@@ -1,16 +1,14 @@
 ﻿using System;
+
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace QuestionApi.Migrations
-{
+namespace QuestionApi.Migrations {
     /// <inheritdoc />
-    public partial class AddFieldStartTimeToAnswerHistory : Migration
-    {
+    public partial class AddFieldStartTimeToAnswerHistory : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<DateTime>(
                 name: "StartTime",
                 table: "AnswerHistories",
@@ -20,8 +18,7 @@ namespace QuestionApi.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropColumn(
                 name: "StartTime",
                 table: "AnswerHistories");

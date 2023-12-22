@@ -1,16 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace QuestionApi.Migrations
-{
+namespace QuestionApi.Migrations {
     /// <inheritdoc />
-    public partial class AddFieldQuestionTypeToStudentAnswer : Migration
-    {
+    public partial class AddFieldQuestionTypeToStudentAnswer : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropPrimaryKey(
                 name: "PK_StudentAnswers",
                 table: "StudentAnswers");
@@ -48,8 +46,7 @@ namespace QuestionApi.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropPrimaryKey(
                 name: "PK_StudentAnswers",
                 table: "StudentAnswers");

@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace QuestionApi.Migrations
-{
+namespace QuestionApi.Migrations {
     /// <inheritdoc />
-    public partial class AddForeignKeyExaminationIdToAnswerHistory : Migration
-    {
+    public partial class AddForeignKeyExaminationIdToAnswerHistory : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<int>(
                 name: "ExaminationId",
                 table: "AnswerHistories",
@@ -30,8 +27,7 @@ namespace QuestionApi.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropForeignKey(
                 name: "FK_AnswerHistories_Examinations_ExaminationId",
                 table: "AnswerHistories");

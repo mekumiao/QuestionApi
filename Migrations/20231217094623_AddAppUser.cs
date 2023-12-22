@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace QuestionApi.Migrations
-{
+namespace QuestionApi.Migrations {
     /// <inheritdoc />
-    public partial class AddAppUser : Migration
-    {
+    public partial class AddAppUser : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<string>(
                 name: "NickName",
                 table: "AspNetUsers",
@@ -19,8 +16,7 @@ namespace QuestionApi.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropColumn(
                 name: "NickName",
                 table: "AspNetUsers");

@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace QuestionApi.Migrations
-{
+namespace QuestionApi.Migrations {
     /// <inheritdoc />
-    public partial class AddFieldOptionCodeToOptions : Migration
-    {
+    public partial class AddFieldOptionCodeToOptions : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<char>(
                 name: "OptionCode",
                 table: "Options",
@@ -19,8 +16,7 @@ namespace QuestionApi.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropColumn(
                 name: "OptionCode",
                 table: "Options");

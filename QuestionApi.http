@@ -226,21 +226,22 @@ Content-Type: application/json
 ### 试卷相关API
 
 # 查询试卷列表
-GET {{HostAddress}}/Exams/
+GET {{HostAddress}}/exampapers/
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 ###
 
 # 根据ID查询试卷
-GET {{HostAddress}}/Exams/4
-Authorization: Bearer {{accessToken}}
+GET {{HostAddress}}/exampapers/10
+# Authorization: Bearer {{accessToken}}
+AuthorizationCode: 123123
 Content-Type: application/json
 
 ###
 
 # 创建试卷
-POST {{HostAddress}}/Exams/
+POST {{HostAddress}}/exampapers/
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
@@ -394,3 +395,30 @@ Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
+
+# 随机生成试卷
+POST {{HostAddress}}/exampapers/random HTTP/1.1
+AuthorizationCode: 123123
+Content-Type: application/json
+
+{
+  "DifficultyLevel": 3
+}
+
+###
+
+# 错题重做
+POST {{HostAddress}}/AnswerBoard/124/redo-incorrect HTTP/1.1
+AuthorizationCode: 123123
+Content-Type: application/json
+
+###
+
+# 随机答题
+POST {{HostAddress}}/answerBoard/random HTTP/1.1
+AuthorizationCode: 123123
+Content-Type: application/json
+
+{
+  "DifficultyLevel": 3
+}

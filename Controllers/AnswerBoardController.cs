@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net.Mime;
+using System.Security.Claims;
 
 using EntityFramework.Exceptions.Common;
 
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 using QuestionApi.Database;
 using QuestionApi.Models;
+using QuestionApi.Services;
 
 namespace QuestionApi.Controllers;
 
@@ -39,7 +41,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             .Include(v => v.ExamPaper)
             .Include(v => v.StudentAnswers)
             .ThenInclude(v => v.Question)
-            .ThenInclude(v => v.Options.OrderBy(n => n.OptionCode))
+            .ThenInclude(v => v.Options)
             .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
         if (history is null) {
             return NotFound();
@@ -64,7 +66,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateAnswerBoard([FromBody, FromForm] AnswerBoardInput dto) {
         var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var user = await _dbContext.Set<AppUser>()
@@ -80,8 +82,9 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         };
 
         var examPaper = await _dbContext.ExamPapers
-            .Include(v => v.Questions)
-            .ThenInclude(v => v.Options.OrderBy(n => n.OptionCode))
+            .Include(v => v.ExamPaperQuestions)
+            .ThenInclude(v => v.Question)
+            .ThenInclude(v => v.Options)
             .SingleOrDefaultAsync(v => v.ExamPaperId == dto.ExamPaperId);
         if (examPaper is null) {
             return ValidationProblem($"试卷ID:{dto.ExamPaperId}不存在或已经被删除");
@@ -96,9 +99,11 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             StartTime = DateTime.UtcNow,
             DifficultyLevel = examPaper.DifficultyLevel,
         };
-        var answers = _mapper.Map<StudentAnswer[]>(examPaper.Questions);
+        var answers = _mapper.Map<StudentAnswer[]>(examPaper.ExamPaperQuestions);
         foreach (var item in answers) {
             item.Student = user.Student;
+            // ExamPaperQuestion到StudentAnswer会将Question赋值过来，所以需要置空，让EF不创建Question
+            item.Question = null!;
         }
         history.StudentAnswers.AddRange(answers);
 
@@ -123,6 +128,80 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         }
         var result = _mapper.Map<AnswerBoard>(history);
         return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = history.AnswerHistoryId }, result);
+    }
+
+    /// <summary>
+    /// 随机创建答题板
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    [HttpPost("random")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status201Created)]
+    public async Task<IActionResult> RandomlyCreateAnswerBoard([FromBody, FromForm] RandomGenerationInput input,
+                                                               [FromServices] ExamPaperService examPaperService) {
+        var userName = User.FindFirstValue("name") ?? string.Empty;
+        var (exampaper, result) = await examPaperService.RandomGenerationAsync(userName, input.DifficultyLevel);
+        if (exampaper is null) {
+            return ValidationProblem(result);
+        }
+
+        var boardInput = new AnswerBoardInput { ExamPaperId = exampaper.ExamPaperId };
+        return await CreateAnswerBoard(boardInput);
+    }
+
+    /// <summary>
+    /// 错题重做
+    /// </summary>
+    /// <param name="answerBoardId"></param>
+    /// <returns></returns>
+    [HttpPost("{answerBoardId:int}/redo-incorrect")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status201Created)]
+    public async Task<IActionResult> RedoIncorrectQuestions([FromRoute] int answerBoardId) {
+        var userName = User.FindFirstValue("name")!;
+
+        var examPaper = new ExamPaper {
+            ExamPaperType = ExamPaperType.RedoIncorrect,
+            ExamPaperName = $"错题重做-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+        };
+
+        using (var scope = HttpContext.RequestServices.CreateAsyncScope()) {
+            using var dbContext = scope.ServiceProvider.GetRequiredService<QuestionDbContext>();
+
+            var ids = await dbContext.AnswerHistories
+                .Include(v => v.StudentAnswers.Where(n => n.IsCorrect != true))
+                .ThenInclude(v => v.Question)
+                .Where(v => v.AnswerHistoryId == answerBoardId)
+                .SelectMany(v => v.StudentAnswers.Select(n => new {
+                    n.QuestionId,
+                    n.Question.DifficultyLevel,
+                    n.Order
+                }))
+                .Distinct()
+                .ToArrayAsync();
+
+            examPaper.DifficultyLevel = (DifficultyLevel)ids.Average(v => (int)v.DifficultyLevel);
+
+            var questions = ids.Select(v => new ExamPaperQuestion {
+                QuestionId = v.QuestionId,
+                Order = v.Order
+            });
+            examPaper.ExamPaperQuestions.AddRange(questions);
+            try {
+                await dbContext.ExamPapers.AddAsync(examPaper);
+                await dbContext.SaveChangesAsync();
+            }
+            catch (ReferenceConstraintException ex) {
+                Debug.Assert(false);
+                _logger.LogError(ex, "保存错题重做生成的试卷时失败");
+                return ValidationProblem("错题重做生成失败，请尝试重新生成");
+            }
+        }
+
+        var boardInput = new AnswerBoardInput { ExamPaperId = examPaper.ExamPaperId };
+        return await CreateAnswerBoard(boardInput);
     }
 
     /// <summary>

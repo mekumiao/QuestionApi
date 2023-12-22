@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace QuestionApi.Migrations
-{
+namespace QuestionApi.Migrations {
     /// <inheritdoc />
-    public partial class UpdateFieldIsCorrectToNullable : Migration
-    {
+    public partial class UpdateFieldIsCorrectToNullable : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterColumn<bool>(
                 name: "IsCorrect",
                 table: "StudentAnswers",
@@ -28,8 +25,7 @@ namespace QuestionApi.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterColumn<bool>(
                 name: "IsCorrect",
                 table: "StudentAnswers",

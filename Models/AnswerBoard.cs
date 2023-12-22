@@ -35,6 +35,10 @@ public class AnswerBoardQuestion {
     /// 正确答案：提交答题板后返回正确答案
     /// </summary>
     public string? CorrectAnswer { get; set; }
+    /// <summary>
+    /// 题目排序
+    /// </summary>
+    public int Order { get; set; }
     public ICollection<AnswerBoardQuestionOption> Options { get; set; } = [];
 }
 

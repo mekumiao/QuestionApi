@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 
 using QuestionApi;
 using QuestionApi.Database;
+using QuestionApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,24 +27,32 @@ builder.Services.AddDbContext<QuestionDbContext>(options =>
 );
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
-    options.ClaimsIdentity.RoleClaimType = "role";
-    options.ClaimsIdentity.UserNameClaimType = "name";
-    options.ClaimsIdentity.UserIdClaimType = "sub";
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
 
-})
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<QuestionDbContext>();
+if (builder.Environment.IsDevelopment()) {
+    builder.Services.AddAuthentication().AddAuthorizationCode();
+}
+else {
+    builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
+        options.ClaimsIdentity.RoleClaimType = "role";
+        options.ClaimsIdentity.UserNameClaimType = "name";
+        options.ClaimsIdentity.UserIdClaimType = "sub";
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+
+    })
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<QuestionDbContext>();
+}
 
 builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, (options) => {
     if (builder.Environment.IsDevelopment()) {
         options.BearerTokenExpiration = TimeSpan.FromDays(356);
     }
 });
+
+builder.Services.AddScoped<ExamPaperService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -82,7 +91,7 @@ if (app.Environment.IsDevelopment()) {
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.MapIdentityApi<AppUser>();
+// app.MapIdentityApi<AppUser>();
 app.MapControllers();
 
 app.Run();

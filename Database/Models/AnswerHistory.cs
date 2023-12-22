@@ -61,4 +61,8 @@ public class StudentAnswer {
     /// </summary>
     public string? AnswerText { get; set; }
     public bool? IsCorrect { get; set; }
+    /// <summary>
+    /// 题目排序
+    /// </summary>
+    public int Order { get; set; }
 }

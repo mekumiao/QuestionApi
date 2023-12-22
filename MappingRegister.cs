@@ -38,5 +38,11 @@ public class MappingRegister : IRegister {
             .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName)
             .Map(dest => dest.Questions, src => src.StudentAnswers)
             .Map(dest => dest.AnswerBoardId, src => src.AnswerHistoryId);
+
+        config.NewConfig<ExamPaperQuestion, StudentAnswer>()
+            .Map(dest => dest, src => src.Question);
+
+        config.NewConfig<ExamPaper, ExamPaperDto>()
+            .Map(dest => dest.Questions, src => src.ExamPaperQuestions);
     }
 }

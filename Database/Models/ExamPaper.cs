@@ -11,6 +11,7 @@ public class ExamPaper {
     public int ExamPaperId { get; set; }
     [MaxLength(500)]
     public string ExamPaperName { get; set; } = string.Empty;
+    public ExamPaperType ExamPaperType { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<Question> Questions { get; } = [];
     public List<ExamPaperQuestion> ExamPaperQuestions { get; } = [];
@@ -30,4 +31,12 @@ public class ExamPaperQuestion {
     /// 题目排序
     /// </summary>
     public int Order { get; set; }
+}
+
+public enum ExamPaperType {
+    None = 0,
+    Random,
+    Import,
+    Create,
+    RedoIncorrect,
 }
