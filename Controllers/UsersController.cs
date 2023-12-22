@@ -142,6 +142,6 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
         return CreatedAtRoute("GetUserById", new { userId = user.Id }, poco);
     }
 
-    [GeneratedRegex("^http[s]?://")]
+    [GeneratedRegex("^https?://")]
     private static partial Regex HttpSchemeRegex();
 }
