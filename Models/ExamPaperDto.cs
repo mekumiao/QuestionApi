@@ -66,6 +66,9 @@ public class ExamPaperQuestionDto {
 public class RandomGenerationInput {
     [MaxLength(256), Required]
     public string? ExamPaperName { get; set; }
+    /// <summary>
+    /// 允许出现低于或等于此难度级别的题目
+    /// </summary>
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
 }
