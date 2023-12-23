@@ -171,16 +171,22 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             using var dbContext = scope.ServiceProvider.GetRequiredService<QuestionDbContext>();
 
             var ids = await dbContext.AnswerHistories
-                .Include(v => v.StudentAnswers.Where(n => n.IsCorrect != true))
+                .Include(v => v.StudentAnswers)
                 .ThenInclude(v => v.Question)
                 .Where(v => v.AnswerHistoryId == answerBoardId)
                 .SelectMany(v => v.StudentAnswers.Select(n => new {
                     n.QuestionId,
                     n.Question.DifficultyLevel,
-                    n.Order
+                    n.Order,
+                    n.IsCorrect,
                 }))
+                .Where(v => v.IsCorrect != true)
                 .Distinct()
                 .ToArrayAsync();
+
+            if (ids.Length == 0) {
+                return ValidationProblem($"答题历史:{answerBoardId}没有错题");
+            }
 
             examPaper.DifficultyLevel = (DifficultyLevel)ids.Average(v => (int)v.DifficultyLevel);
 
