@@ -106,6 +106,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             item.Question = null!;
         }
         history.StudentAnswers.AddRange(answers);
+        history.TotalQuestions = history.StudentAnswers.Count;
 
         if (dto.ExaminationId.HasValue) {
             var examination = await _dbContext.Examinations.FindAsync(dto.ExaminationId.Value);
@@ -202,6 +203,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
                 Order = v.Order
             });
             examPaper.ExamPaperQuestions.AddRange(questions);
+            examPaper.TotalQuestions = examPaper.ExamPaperQuestions.Count;
             try {
                 await dbContext.ExamPapers.AddAsync(examPaper);
                 await dbContext.SaveChangesAsync();
@@ -252,6 +254,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             var answer = input.AnswerText?.Trim();
             if (record is not null && !string.IsNullOrWhiteSpace(answer)) {
                 record.AnswerText = answer;
+                history.TotalNumberAnswers++;
             }
         }
 

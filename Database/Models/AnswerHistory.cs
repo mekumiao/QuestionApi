@@ -36,6 +36,14 @@ public class AnswerHistory {
     /// 错题总数
     /// </summary>
     public int TotalIncorrectAnswers { get; set; }
+    /// <summary>
+    /// 题目总数
+    /// </summary>
+    public int TotalQuestions { get; set; }
+    /// <summary>
+    /// 作答总数
+    /// </summary>
+    public int TotalNumberAnswers { get; set; }
     public List<StudentAnswer> StudentAnswers { get; } = [];
 }
 

@@ -29,6 +29,7 @@ public class ExamPaperFilter {
 public class ExamPaperDto {
     public int ExamPaperId { get; set; }
     public string ExamPaperName { get; set; } = string.Empty;
+    public int TotalQuestions { get; set; }
     public ExamPaperType ExamPaperType { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<ExamPaperQuestionDto> Questions { get; set; } = [];

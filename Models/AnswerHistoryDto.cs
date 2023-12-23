@@ -40,6 +40,8 @@ public class AnswerHistoryDto {
     public int DurationSeconds { get; set; }
     public int TimeTakenSeconds { get; set; }
     public bool IsTimeout { get; set; }
+    public int TotalNumberAnswers { get; set; }
+    public int TotalQuestions { get; set; }
     public List<StudentAnswerDto> StudentAnswers { get; } = [];
 }
 

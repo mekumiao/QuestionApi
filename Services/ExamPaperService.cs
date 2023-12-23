@@ -46,6 +46,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
         int order = 1;
         var questions = singleQuestions.Select(v => new ExamPaperQuestion { QuestionId = v, Order = order++ });
         initExamPaper.ExamPaperQuestions.AddRange(questions);
+        initExamPaper.TotalQuestions = initExamPaper.ExamPaperQuestions.Count;
 
         try {
             await _dbContext.ExamPapers.AddAsync(initExamPaper);
@@ -191,6 +192,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
                 OptionText = "选项4",
             },
         ]);
+        examPaper.TotalQuestions = examPaper.ExamPaperQuestions.Count;
 
         ExamPaperExcelGenerator.Generate(stream, [examPaper]);
         return (examPaper.ExamPaperName, null);
@@ -272,6 +274,7 @@ public partial class ExamPaperExcelParser {
                 }
             }
             examPaper.ExamPaperQuestions.Add(question);
+            examPaper.TotalQuestions = examPaper.ExamPaperQuestions.Count;
         }
         examPaper.DifficultyLevel = (DifficultyLevel)examPaper.ExamPaperQuestions.Average(v => (int)v.Question.DifficultyLevel);
         return (examPaper, errors);

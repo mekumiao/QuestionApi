@@ -82,6 +82,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         var item = _mapper.Map<ExamPaper>(dto);
         if (dto.Questions.Count != 0) {
             item.ExamPaperQuestions.AddRange(_mapper.Map<ExamPaperQuestion[]>(dto.Questions));
+            item.TotalQuestions = item.ExamPaperQuestions.Count;
         }
 
         var questionIds = dto.Questions.Select(v => v.QuestionId).ToArray();
@@ -117,6 +118,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         if (dto.Questions is not null) {
             item.ExamPaperQuestions.Clear();
             item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.Questions));
+            item.TotalQuestions = item.ExamPaperQuestions.Count;
         }
 
         await _dbContext.SaveChangesAsync();

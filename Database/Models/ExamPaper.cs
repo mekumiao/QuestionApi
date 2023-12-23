@@ -11,6 +11,7 @@ public class ExamPaper {
     public int ExamPaperId { get; set; }
     [MaxLength(500)]
     public string ExamPaperName { get; set; } = string.Empty;
+    public int TotalQuestions { get; set; }
     public ExamPaperType ExamPaperType { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<Question> Questions { get; } = [];
