@@ -75,8 +75,10 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
             return result;
         }
         try {
-            foreach (var item in result.examPapers) {
-                item.ExamPaperName = examPaperName;
+            if (string.IsNullOrWhiteSpace(examPaperName) is false) {
+                foreach (var item in result.examPapers) {
+                    item.ExamPaperName = examPaperName;
+                }
             }
             await _dbContext.ExamPapers.AddRangeAsync(result.examPapers);
             await _dbContext.SaveChangesAsync();
