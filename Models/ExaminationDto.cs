@@ -54,6 +54,5 @@ public class ExaminationUpdate {
     public ExaminationType? ExaminationType { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
-    public int? ExamPaperId { get; set; }
     public int? DurationSeconds { get; set; }
 }
