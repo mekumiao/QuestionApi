@@ -11,7 +11,7 @@ public class AuthorizationCodeAuthenticationOptions : AuthenticationSchemeOption
         var identity = new ClaimsIdentity(scheme, "name", "role");
 
         identity.AddClaim(new Claim("role", "admin"));
-        identity.AddClaim(new Claim("sub", "9ba21b2a-0987-45e0-80e2-9c20fb8670cf", ClaimValueTypes.String));
+        identity.AddClaim(new Claim("sub", "1", ClaimValueTypes.Integer32));
         identity.AddClaim(new Claim("name", "admin"));
         identity.AddClaim(new Claim("nickname", "admin"));
 

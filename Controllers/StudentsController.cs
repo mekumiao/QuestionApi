@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Security.Claims;
 
 using MapsterMapper;
 
@@ -85,10 +86,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryCountByCurrentUserId() {
-        var userId = User.FindFirst(v => v.Type == "sub")?.Value;
-        if (string.IsNullOrWhiteSpace(userId)) {
-            return NotFound();
-        }
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
 
         var queryable = _dbContext.AnswerHistories
             .AsNoTracking()
@@ -107,10 +105,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId([FromQuery] Paging paging) {
-        var userId = User.FindFirst(v => v.Type == "sub")?.Value;
-        if (string.IsNullOrWhiteSpace(userId)) {
-            return NotFound();
-        }
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
 
         var queryable = _dbContext.AnswerHistories
             .AsNoTracking()
@@ -136,6 +131,8 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerHistoryDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryById([FromRoute] int answerHistoryId) {
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
+
         var history = await _dbContext.AnswerHistories
             .Include(v => v.Student)
             .Include(v => v.StudentAnswers)
@@ -145,7 +142,6 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         if (history is null) {
             return NotFound();
         }
-        var userId = User.FindFirst(v => v.Type == "sub")!.Value;
         var student = await _dbContext.Students
                 .AsNoTracking()
                 .SingleOrDefaultAsync(v => v.UserId == userId);

@@ -27,7 +27,7 @@ public class UserFilter {
 
 
 public class UserDto {
-    public string UserId { get; set; } = string.Empty;
+    public int UserId { get; set; }
     public string? UserName { get; set; }
     public string? NickName { get; set; }
     public string? Avatar { get; set; }

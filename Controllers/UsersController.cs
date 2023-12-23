@@ -76,12 +76,12 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
         return Ok(result);
     }
 
-    [HttpGet("{userId}", Name = "GetUserById")]
+    [HttpGet("{userId:int}", Name = "GetUserById")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUserById([FromRoute] string userId,
+    public async Task<IActionResult> GetUserById([FromRoute] int userId,
                                                  [FromServices] UserManager<AppUser> userManager) {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null) {
             return NotFound();
         }
@@ -91,13 +91,13 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
         return Ok(result);
     }
 
-    [HttpPut("{userId}")]
+    [HttpPut("{userId:int}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update([FromRoute] string userId,
+    public async Task<IActionResult> Update([FromRoute] int userId,
                                             [FromBody, FromForm] UserUpdate dto,
                                             [FromServices] UserManager<AppUser> userManager) {
-        var item = await userManager.FindByIdAsync(userId);
+        var item = await userManager.FindByIdAsync(userId.ToString());
         if (item is null) {
             return NotFound();
         }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuestionApi.Database;
 
-public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options) {
+public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<AppUser, AppRole, int>(options) {
     public DbSet<Question> Questions { get; set; }
     public DbSet<Option> Options { get; set; }
     public DbSet<ExamPaper> ExamPapers { get; set; }

@@ -42,7 +42,7 @@ builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
 })
-    .AddRoles<IdentityRole>()
+    .AddRoles<AppRole>()
     .AddEntityFrameworkStores<QuestionDbContext>();
 
 builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, (options) => {

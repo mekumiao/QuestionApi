@@ -35,7 +35,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerBoardById([FromRoute] int answerBoardId) {
-        var userId = User.FindFirst(v => v.Type == "sub")!.Value;
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
         var history = await _dbContext.AnswerHistories
             .Include(v => v.Student)
             .Include(v => v.ExamPaper)
@@ -68,7 +68,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateAnswerBoard([FromBody, FromForm] AnswerBoardInput dto) {
-        var userId = User.FindFirst(v => v.Type == "sub")!.Value;
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
         var user = await _dbContext.Set<AppUser>()
             .Include(v => v.Student)
             .SingleOrDefaultAsync(v => v.Id == userId);
@@ -215,7 +215,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     public async Task<IActionResult> UpdateAnswerBoard([FromRoute] int answerBoardId,
                                                        [FromBody, FromForm] AnswerInput[] inputs) {
         var submissionTime = DateTime.UtcNow;
-        var userId = User.FindFirst(v => v.Type == "sub")!.Value;
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
 
         var history = await _dbContext.AnswerHistories
             .Include(v => v.Student)
