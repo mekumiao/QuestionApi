@@ -49,7 +49,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     public async Task<IActionResult> GetList([FromQuery] ExamPaperFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.ExamPapers
             .AsNoTracking()
-            .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
+            .Include(v => v.ExamPaperQuestions.OrderByDescending(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
             .OrderByDescending(v => v.ExamPaperId)
@@ -68,7 +68,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     public async Task<IActionResult> GetExamPaperById([FromRoute] int paperId) {
         var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
-                    .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order).ThenBy(v => v.QuestionId))
+                    .Include(v => v.ExamPaperQuestions.OrderByDescending(t => t.Order).ThenBy(v => v.QuestionId))
                     .ThenInclude(v => v.Question)
                     .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode));
         var result = await queryable.SingleOrDefaultAsync(v => v.ExamPaperId == paperId);

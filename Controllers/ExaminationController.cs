@@ -45,7 +45,12 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     [HttpGet]
     [ProducesResponseType(typeof(ExaminationDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] ExaminationFilter filter, [FromQuery] Paging paging) {
-        var queryable = _dbContext.Examinations.AsNoTracking().OrderBy(v => v.Order).AsQueryable();
+        var queryable = _dbContext.Examinations
+            .AsNoTracking()
+            .Include(v => v.ExamPaper)
+            .OrderByDescending(v => v.Order)
+            .ThenByDescending(v => v.ExaminationId)
+            .AsQueryable();
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
         var result = await queryable.ToArrayAsync();

@@ -32,7 +32,9 @@ public class ExaminationDto {
     public ExaminationType ExaminationType { get; set; }
     public DifficultyLevel DifficultyLevel { get; set; }
     public int ExamPaperId { get; set; }
+    public string ExamPaperName { get; set; } = string.Empty;
     public int DurationSeconds { get; set; }
+    public int Order { get; set; }
 }
 
 
@@ -45,6 +47,7 @@ public class ExaminationInput {
     public DifficultyLevel DifficultyLevel { get; set; }
     public int ExamPaperId { get; set; }
     public int DurationSeconds { get; set; }
+    public int Order { get; set; }
 }
 
 public class ExaminationUpdate {
@@ -55,4 +58,5 @@ public class ExaminationUpdate {
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
     public int? DurationSeconds { get; set; }
+    public int Order { get; set; }
 }
