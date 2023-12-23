@@ -1,32 +1,41 @@
 ﻿using System;
-
 using Microsoft.EntityFrameworkCore.Migrations;
-
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace QuestionApi.Migrations {
+namespace QuestionApi.Migrations
+{
     /// <inheritdoc />
-    public partial class InitialCreate : Migration {
+    public partial class InitialCreate : Migration
+    {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder) {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
-                columns: table => new {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
-                columns: table => new {
-                    Id = table.Column<string>(type: "text", nullable: false),
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    NickName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    CreateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Avatar = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -42,44 +51,54 @@ namespace QuestionApi.Migrations {
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exams",
-                columns: table => new {
-                    ExamId = table.Column<int>(type: "integer", nullable: false)
+                name: "ExamPapers",
+                columns: table => new
+                {
+                    ExamPaperId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ExamName = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
+                    ExamPaperName = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    ExamPaperType = table.Column<int>(type: "integer", nullable: false),
+                    DifficultyLevel = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
-                    table.PrimaryKey("PK_Exams", x => x.ExamId);
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamPapers", x => x.ExamPaperId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Questions",
-                columns: table => new {
+                columns: table => new
+                {
                     QuestionId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     QuestionText = table.Column<string>(type: "text", nullable: false),
                     QuestionType = table.Column<int>(type: "integer", nullable: false),
-                    CorrectAnswer = table.Column<string>(type: "text", nullable: false)
+                    CorrectAnswer = table.Column<string>(type: "text", nullable: false),
+                    DifficultyLevel = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_Questions", x => x.QuestionId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
-                columns: table => new {
+                columns: table => new
+                {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
@@ -91,14 +110,16 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
-                columns: table => new {
+                columns: table => new
+                {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AspNetUserClaims_AspNetUsers_UserId",
@@ -110,13 +131,15 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
-                columns: table => new {
+                columns: table => new
+                {
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
                         name: "FK_AspNetUserLogins_AspNetUsers_UserId",
@@ -128,11 +151,13 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
-                columns: table => new {
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    RoleId = table.Column<string>(type: "text", nullable: false)
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
@@ -150,13 +175,15 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
-                columns: table => new {
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "integer", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
                         name: "FK_AspNetUserTokens_AspNetUsers_UserId",
@@ -168,13 +195,15 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "Students",
-                columns: table => new {
+                columns: table => new
+                {
                     StudentId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: true)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_Students", x => x.StudentId);
                     table.ForeignKey(
                         name: "FK_Students_AspNetUsers_UserId",
@@ -184,21 +213,48 @@ namespace QuestionApi.Migrations {
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExamQuestions",
-                columns: table => new {
-                    ExamId = table.Column<int>(type: "integer", nullable: false),
-                    QuestionId = table.Column<int>(type: "integer", nullable: false)
+                name: "Examinations",
+                columns: table => new
+                {
+                    ExaminationId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ExaminationName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    DifficultyLevel = table.Column<int>(type: "integer", nullable: false),
+                    ExaminationType = table.Column<int>(type: "integer", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    ExamPaperId = table.Column<int>(type: "integer", nullable: false),
+                    DurationSeconds = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
-                    table.PrimaryKey("PK_ExamQuestions", x => new { x.ExamId, x.QuestionId });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Examinations", x => x.ExaminationId);
                     table.ForeignKey(
-                        name: "FK_ExamQuestions_Exams_ExamId",
-                        column: x => x.ExamId,
-                        principalTable: "Exams",
-                        principalColumn: "ExamId",
+                        name: "FK_Examinations_ExamPapers_ExamPaperId",
+                        column: x => x.ExamPaperId,
+                        principalTable: "ExamPapers",
+                        principalColumn: "ExamPaperId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamPaperQuestions",
+                columns: table => new
+                {
+                    ExamPaperId = table.Column<int>(type: "integer", nullable: false),
+                    QuestionId = table.Column<int>(type: "integer", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamPaperQuestions", x => new { x.ExamPaperId, x.QuestionId });
+                    table.ForeignKey(
+                        name: "FK_ExamPaperQuestions_ExamPapers_ExamPaperId",
+                        column: x => x.ExamPaperId,
+                        principalTable: "ExamPapers",
+                        principalColumn: "ExamPaperId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ExamQuestions_Questions_QuestionId",
+                        name: "FK_ExamPaperQuestions_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "QuestionId",
@@ -207,14 +263,17 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "Options",
-                columns: table => new {
+                columns: table => new
+                {
                     OptionId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     QuestionId = table.Column<int>(type: "integer", nullable: false),
+                    OptionCode = table.Column<char>(type: "character(1)", nullable: false, defaultValue: 'A'),
                     OptionText = table.Column<string>(type: "text", nullable: false),
                     IsCorrect = table.Column<bool>(type: "boolean", nullable: false)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_Options", x => x.OptionId);
                     table.ForeignKey(
                         name: "FK_Options_Questions_QuestionId",
@@ -226,21 +285,36 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "AnswerHistories",
-                columns: table => new {
+                columns: table => new
+                {
                     AnswerHistoryId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
-                    ExamId = table.Column<int>(type: "integer", nullable: false),
-                    SubmissionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    ExamPaperId = table.Column<int>(type: "integer", nullable: false),
+                    ExaminationId = table.Column<int>(type: "integer", nullable: true),
+                    DifficultyLevel = table.Column<int>(type: "integer", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SubmissionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DurationSeconds = table.Column<int>(type: "integer", nullable: false),
+                    TimeTakenSeconds = table.Column<int>(type: "integer", nullable: false),
+                    IsSubmission = table.Column<bool>(type: "boolean", nullable: false),
+                    IsTimeout = table.Column<bool>(type: "boolean", nullable: false),
+                    TotalIncorrectAnswers = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
+                constraints: table =>
+                {
                     table.PrimaryKey("PK_AnswerHistories", x => x.AnswerHistoryId);
                     table.ForeignKey(
-                        name: "FK_AnswerHistories_Exams_ExamId",
-                        column: x => x.ExamId,
-                        principalTable: "Exams",
-                        principalColumn: "ExamId",
+                        name: "FK_AnswerHistories_ExamPapers_ExamPaperId",
+                        column: x => x.ExamPaperId,
+                        principalTable: "ExamPapers",
+                        principalColumn: "ExamPaperId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnswerHistories_Examinations_ExaminationId",
+                        column: x => x.ExaminationId,
+                        principalTable: "Examinations",
+                        principalColumn: "ExaminationId");
                     table.ForeignKey(
                         name: "FK_AnswerHistories_Students_StudentId",
                         column: x => x.StudentId,
@@ -251,17 +325,21 @@ namespace QuestionApi.Migrations {
 
             migrationBuilder.CreateTable(
                 name: "StudentAnswers",
-                columns: table => new {
-                    AnswerId = table.Column<int>(type: "integer", nullable: false)
+                columns: table => new
+                {
+                    StudentAnswerId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     QuestionId = table.Column<int>(type: "integer", nullable: false),
+                    QuestionType = table.Column<int>(type: "integer", nullable: false),
                     AnswerHistoryId = table.Column<int>(type: "integer", nullable: false),
-                    ChosenOptions = table.Column<string>(type: "text", nullable: false),
-                    AnswerText = table.Column<string>(type: "text", nullable: false)
+                    AnswerText = table.Column<string>(type: "text", nullable: true),
+                    IsCorrect = table.Column<bool>(type: "boolean", nullable: true),
+                    Order = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => {
-                    table.PrimaryKey("PK_StudentAnswers", x => x.AnswerId);
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentAnswers", x => x.StudentAnswerId);
                     table.ForeignKey(
                         name: "FK_StudentAnswers_AnswerHistories_AnswerHistoryId",
                         column: x => x.AnswerHistoryId,
@@ -283,9 +361,14 @@ namespace QuestionApi.Migrations {
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AnswerHistories_ExamId",
+                name: "IX_AnswerHistories_ExamPaperId",
                 table: "AnswerHistories",
-                column: "ExamId");
+                column: "ExamPaperId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnswerHistories_ExaminationId",
+                table: "AnswerHistories",
+                column: "ExaminationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AnswerHistories_StudentId",
@@ -330,9 +413,14 @@ namespace QuestionApi.Migrations {
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamQuestions_QuestionId",
-                table: "ExamQuestions",
+                name: "IX_ExamPaperQuestions_QuestionId",
+                table: "ExamPaperQuestions",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Examinations_ExamPaperId",
+                table: "Examinations",
+                column: "ExamPaperId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Options_QuestionId",
@@ -362,7 +450,8 @@ namespace QuestionApi.Migrations {
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder) {
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -379,7 +468,7 @@ namespace QuestionApi.Migrations {
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ExamQuestions");
+                name: "ExamPaperQuestions");
 
             migrationBuilder.DropTable(
                 name: "Options");
@@ -397,10 +486,13 @@ namespace QuestionApi.Migrations {
                 name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "Exams");
+                name: "Examinations");
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "ExamPapers");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

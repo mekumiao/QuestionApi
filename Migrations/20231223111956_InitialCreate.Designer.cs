@@ -12,8 +12,8 @@ using QuestionApi.Database;
 namespace QuestionApi.Migrations
 {
     [DbContext(typeof(QuestionDbContext))]
-    [Migration("20231214060343_AddFieldOrderToExamQuestions")]
-    partial class AddFieldOrderToExamQuestions
+    [Migration("20231223111956_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,10 +25,168 @@ namespace QuestionApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
                         .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.AnswerHistory", b =>
+                {
+                    b.Property<int>("AnswerHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AnswerHistoryId"));
+
+                    b.Property<int>("DifficultyLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ExamPaperId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ExaminationId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsSubmission")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTimeout")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SubmissionTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TimeTakenSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalIncorrectAnswers")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AnswerHistoryId");
+
+                    b.HasIndex("ExamPaperId");
+
+                    b.HasIndex("ExaminationId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("AnswerHistories");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.AppRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -51,7 +209,7 @@ namespace QuestionApi.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("QuestionApi.Database.AppUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,34 +217,19 @@ namespace QuestionApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Avatar")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("CreateTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -100,6 +243,10 @@ namespace QuestionApi.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NickName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -140,137 +287,33 @@ namespace QuestionApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("QuestionApi.Database.ExamPaper", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ExamPaperId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("QuestionApi.Database.AnswerHistory", b =>
-                {
-                    b.Property<int>("AnswerHistoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AnswerHistoryId"));
-
-                    b.Property<int>("ExamId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("SubmissionTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("AnswerHistoryId");
-
-                    b.HasIndex("ExamId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("AnswerHistories");
-                });
-
-            modelBuilder.Entity("QuestionApi.Database.Exam", b =>
-                {
-                    b.Property<int>("ExamId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExamId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExamPaperId"));
 
                     b.Property<int>("DifficultyLevel")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ExamName")
+                    b.Property<string>("ExamPaperName")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.HasKey("ExamId");
+                    b.Property<int>("ExamPaperType")
+                        .HasColumnType("integer");
 
-                    b.ToTable("Exams");
+                    b.HasKey("ExamPaperId");
+
+                    b.ToTable("ExamPapers");
                 });
 
-            modelBuilder.Entity("QuestionApi.Database.ExamQuestion", b =>
+            modelBuilder.Entity("QuestionApi.Database.ExamPaperQuestion", b =>
                 {
-                    b.Property<int>("ExamId")
+                    b.Property<int>("ExamPaperId")
                         .HasColumnType("integer");
 
                     b.Property<int>("QuestionId")
@@ -279,11 +322,46 @@ namespace QuestionApi.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.HasKey("ExamId", "QuestionId");
+                    b.HasKey("ExamPaperId", "QuestionId");
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("ExamQuestions");
+                    b.ToTable("ExamPaperQuestions");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.Examination", b =>
+                {
+                    b.Property<int>("ExaminationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExaminationId"));
+
+                    b.Property<int>("DifficultyLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ExamPaperId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ExaminationName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("ExaminationType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ExaminationId");
+
+                    b.HasIndex("ExamPaperId");
+
+                    b.ToTable("Examinations");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Option", b =>
@@ -356,8 +434,8 @@ namespace QuestionApi.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("StudentId");
 
@@ -369,30 +447,34 @@ namespace QuestionApi.Migrations
 
             modelBuilder.Entity("QuestionApi.Database.StudentAnswer", b =>
                 {
-                    b.Property<int>("AnswerId")
+                    b.Property<int>("StudentAnswerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AnswerId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentAnswerId"));
 
                     b.Property<int>("AnswerHistoryId")
                         .HasColumnType("integer");
 
                     b.Property<string>("AnswerText")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ChosenOptions")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool?>("IsCorrect")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
 
                     b.Property<int>("QuestionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuestionType")
                         .HasColumnType("integer");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
-                    b.HasKey("AnswerId");
+                    b.HasKey("StudentAnswerId");
 
                     b.HasIndex("AnswerHistoryId");
 
@@ -403,51 +485,51 @@ namespace QuestionApi.Migrations
                     b.ToTable("StudentAnswers");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("QuestionApi.Database.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("QuestionApi.Database.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("QuestionApi.Database.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("QuestionApi.Database.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("QuestionApi.Database.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("QuestionApi.Database.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -456,11 +538,15 @@ namespace QuestionApi.Migrations
 
             modelBuilder.Entity("QuestionApi.Database.AnswerHistory", b =>
                 {
-                    b.HasOne("QuestionApi.Database.Exam", "Exam")
+                    b.HasOne("QuestionApi.Database.ExamPaper", "ExamPaper")
                         .WithMany("AnswerHistories")
-                        .HasForeignKey("ExamId")
+                        .HasForeignKey("ExamPaperId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("QuestionApi.Database.Examination", "Examination")
+                        .WithMany("AnswerHistories")
+                        .HasForeignKey("ExaminationId");
 
                     b.HasOne("QuestionApi.Database.Student", "Student")
                         .WithMany("AnswerHistories")
@@ -468,28 +554,41 @@ namespace QuestionApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Exam");
+                    b.Navigation("ExamPaper");
+
+                    b.Navigation("Examination");
 
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("QuestionApi.Database.ExamQuestion", b =>
+            modelBuilder.Entity("QuestionApi.Database.ExamPaperQuestion", b =>
                 {
-                    b.HasOne("QuestionApi.Database.Exam", "Exam")
-                        .WithMany("ExamQuestions")
-                        .HasForeignKey("ExamId")
+                    b.HasOne("QuestionApi.Database.ExamPaper", "ExamPaper")
+                        .WithMany("ExamPaperQuestions")
+                        .HasForeignKey("ExamPaperId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("QuestionApi.Database.Question", "Question")
-                        .WithMany("ExamQuestions")
+                        .WithMany("ExamPaperQuestions")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Exam");
+                    b.Navigation("ExamPaper");
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.Examination", b =>
+                {
+                    b.HasOne("QuestionApi.Database.ExamPaper", "ExamPaper")
+                        .WithMany("Examinations")
+                        .HasForeignKey("ExamPaperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExamPaper");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Option", b =>
@@ -505,8 +604,8 @@ namespace QuestionApi.Migrations
 
             modelBuilder.Entity("QuestionApi.Database.Student", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithOne()
+                    b.HasOne("QuestionApi.Database.AppUser", "User")
+                        .WithOne("Student")
                         .HasForeignKey("QuestionApi.Database.Student", "UserId");
 
                     b.Navigation("User");
@@ -544,16 +643,28 @@ namespace QuestionApi.Migrations
                     b.Navigation("StudentAnswers");
                 });
 
-            modelBuilder.Entity("QuestionApi.Database.Exam", b =>
+            modelBuilder.Entity("QuestionApi.Database.AppUser", b =>
+                {
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.ExamPaper", b =>
                 {
                     b.Navigation("AnswerHistories");
 
-                    b.Navigation("ExamQuestions");
+                    b.Navigation("ExamPaperQuestions");
+
+                    b.Navigation("Examinations");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.Examination", b =>
+                {
+                    b.Navigation("AnswerHistories");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Question", b =>
                 {
-                    b.Navigation("ExamQuestions");
+                    b.Navigation("ExamPaperQuestions");
 
                     b.Navigation("Options");
 
