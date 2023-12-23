@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Security.Claims;
 
@@ -5,6 +6,7 @@ using MapsterMapper;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 
 using QuestionApi.Database;
@@ -31,6 +33,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly ExamPaperService _examPaperService = examPaperService;
     private readonly IMapper _mapper = mapper;
+    private readonly static FileExtensionContentTypeProvider TypeProvider = new();
 
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -173,5 +176,25 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         }
         var result = _mapper.Map<ExamPaperDto[]>(examPapers);
         return Ok(result);
+    }
+
+    [HttpPost("export")]
+    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ExportToExcel([FromBody, MaxLength(10), MinLength(1)] int[] input) {
+        var memoryStream = new MemoryStream();
+        var (firstName, error) = await _examPaperService.ExportToExcelAsync(memoryStream, input);
+        if (error is not null) {
+            return ValidationProblem(error);
+        }
+        var contentType = GetContentType("file.xlsx");
+        var fileName = $"{firstName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.xlsx";
+        return File(memoryStream, contentType, fileName);
+    }
+
+    private static string GetContentType(string filePath) {
+        string contentType = TypeProvider.TryGetContentType(filePath, out string? foundContentType)
+                ? foundContentType
+                : "application/octet-stream"; // 如果无法确定文件类型，默认使用二进制流
+        return contentType;
     }
 }

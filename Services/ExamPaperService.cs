@@ -90,6 +90,22 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
         }
         return result;
     }
+
+    public async Task<(string? firstName, string? error)> ExportToExcelAsync(Stream stream, int[] examPaperIds) {
+        var examPapers = await _dbContext.ExamPapers
+            .AsNoTracking()
+            .Include(v => v.ExamPaperQuestions)
+            .ThenInclude(v => v.Question)
+            .ThenInclude(v => v.Options)
+            .Where(v => examPaperIds.Contains(v.ExamPaperId))
+            .ToArrayAsync();
+        if (examPaperIds.Length == 0) {
+            return (null, "没有找到任何的试卷");
+        }
+        var generator = new ExamPaperExcelGenerator();
+        generator.Generate(stream, examPapers);
+        return (examPapers[0].ExamPaperName, null);
+    }
 }
 
 public partial class ExamPaperExcelParser {
@@ -274,5 +290,59 @@ public partial class ExamPaperExcelParser {
             question.Question.Options.Add(option);
         }
         return null;
+    }
+}
+
+public class ExamPaperExcelGenerator {
+
+    public void Generate(Stream stream, ExamPaper[] examPapers) {
+        using var package = new ExcelPackage();
+        foreach (var examPaper in examPapers) {
+            var worksheet = package.Workbook.Worksheets.Add(examPaper.ExamPaperName);
+            SetTitle(worksheet);
+            for (int row = 2; row < examPaper.ExamPaperQuestions.Count + 2; row++) {
+                var item = examPaper.ExamPaperQuestions[row - 2];
+                worksheet.Cells[row, 1].Value = item.Order;
+                worksheet.Cells[row, 2].Value = item.Question.QuestionText;
+                worksheet.Cells[row, 3].Value = GetQuestionTypeString(item.Question.QuestionType);
+                worksheet.Cells[row, 4].Value = (int)item.Question.DifficultyLevel;
+                worksheet.Cells[row, 5].Value = item.Question.CorrectAnswer;
+                int i = 1;
+                foreach (var option in item.Question.Options) {
+                    worksheet.Cells[row, 5 + i].Value = option.OptionText;
+                    i++;
+                }
+            }
+        }
+
+        stream.Position = 0;
+        package.SaveAs(stream);
+        stream.Position = 0;
+    }
+
+    private static void SetTitle(ExcelWorksheet worksheet) {
+        worksheet.Cells[1, 1].Value = "排序";
+        worksheet.Cells[1, 2].Value = "题目";
+        worksheet.Cells[1, 3].Value = "类型";
+        worksheet.Cells[1, 4].Value = "难度";
+        worksheet.Cells[1, 5].Value = "答案";
+        worksheet.Cells[1, 6].Value = "选项A";
+        worksheet.Cells[1, 7].Value = "选项B";
+        worksheet.Cells[1, 8].Value = "选项C";
+        worksheet.Cells[1, 9].Value = "选项D";
+
+        using var range = worksheet.Cells["A1:I1"];
+        range.Style.Font.Bold = true;
+    }
+
+    private static string? GetQuestionTypeString(QuestionType questionType) {
+        return questionType switch {
+            QuestionType.SingleChoice => "单选题",
+            QuestionType.MultipleChoice => "多选题",
+            QuestionType.TrueFalse => "判断题",
+            QuestionType.FillInTheBlank => "填空题",
+            QuestionType.None => null,
+            _ => throw new NotImplementedException(),
+        };
     }
 }
