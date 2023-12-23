@@ -398,7 +398,7 @@ Accept: application/json
 
 # 随机生成试卷
 POST {{HostAddress}}/exampapers/random HTTP/1.1
-AuthorizationCode: 123123
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -409,14 +409,14 @@ Content-Type: application/json
 
 # 错题重做
 POST {{HostAddress}}/AnswerBoard/124/redo-incorrect HTTP/1.1
-AuthorizationCode: 123123
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 ###
 
 # 随机答题
 POST {{HostAddress}}/answerBoard/random HTTP/1.1
-AuthorizationCode: 123123
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
@@ -427,7 +427,7 @@ Content-Type: application/json
 
 # 导入试卷
 POST {{HostAddress}}/exampapers/import HTTP/1.1
-AuthorizationCode: 123123
+Authorization: Bearer {{accessToken}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW

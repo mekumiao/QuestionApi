@@ -81,3 +81,22 @@ var result = _mapper
 ## REST Client 文档
 
 [参考](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
+
+## 添加自定义认证
+
+```cs
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("api", options => {
+        options.RequireAuthenticatedUser();
+        options.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme);
+        options.AddAuthenticationSchemes(IdentityConstants.BearerScheme);
+        options.AddAuthenticationSchemes("Identity.BearerAndApplication");
+        if (builder.Environment.IsDevelopment()) {
+            options.AddAuthenticationSchemes(AuthorizationCodeAuthenticationDefaults.AuthenticationScheme);
+        }
+    });
+    options.DefaultPolicy = options.GetPolicy("api")!;
+});
+
+builder.Services.AddAuthentication(AuthorizationCodeAuthenticationDefaults.AuthenticationScheme).AddAuthorizationCode();
+```

@@ -33,23 +33,17 @@ builder.Services.AddMapster();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
-if (builder.Environment.IsDevelopment()) {
-    builder.Services.AddAuthentication().AddAuthorizationCode();
-}
-else {
-    builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
-        options.ClaimsIdentity.RoleClaimType = "role";
-        options.ClaimsIdentity.UserNameClaimType = "name";
-        options.ClaimsIdentity.UserIdClaimType = "sub";
-        options.Password.RequireUppercase = false;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireDigit = false;
-        options.Password.RequireLowercase = false;
-
-    })
-        .AddRoles<IdentityRole>()
-        .AddEntityFrameworkStores<QuestionDbContext>();
-}
+builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
+    options.ClaimsIdentity.RoleClaimType = "role";
+    options.ClaimsIdentity.UserNameClaimType = "name";
+    options.ClaimsIdentity.UserIdClaimType = "sub";
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+})
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<QuestionDbContext>();
 
 builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, (options) => {
     if (builder.Environment.IsDevelopment()) {
@@ -95,10 +89,9 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseCors();
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
-if (app.Environment.IsProduction()) {
-    app.MapIdentityApi<AppUser>();
-}
+app.MapIdentityApi<AppUser>();
 app.MapControllers();
 
 app.Run();
