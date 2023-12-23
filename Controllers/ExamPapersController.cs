@@ -179,13 +179,23 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpPost("export")]
-    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ExportToExcel([FromBody, MaxLength(10), MinLength(1)] int[] input) {
         var memoryStream = new MemoryStream();
         var (firstName, error) = await _examPaperService.ExportToExcelAsync(memoryStream, input);
         if (error is not null) {
             return ValidationProblem(error);
         }
+        var contentType = GetContentType("file.xlsx");
+        var fileName = $"{firstName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.xlsx";
+        return File(memoryStream, contentType, fileName);
+    }
+
+    [HttpPost("export/template")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult ExportToExcelTemplate() {
+        var memoryStream = new MemoryStream();
+        var (firstName, _) = _examPaperService.ExportToExcelTemplate(memoryStream);
         var contentType = GetContentType("file.xlsx");
         var fileName = $"{firstName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.xlsx";
         return File(memoryStream, contentType, fileName);

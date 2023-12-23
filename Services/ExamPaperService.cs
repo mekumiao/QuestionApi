@@ -17,6 +17,8 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
     private readonly ILogger<ExamPaperService> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
+    private readonly static ExamPaperExcelGenerator ExamPaperExcelGenerator = new();
+    private readonly static ExamPaperExcelParser ExamPaperExcelParser = new();
 
     /// <summary>
     /// 随机生成试卷
@@ -69,8 +71,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
     }
 
     public async Task<(List<ExamPaper> examPapers, Dictionary<string, string[]> errors)> ImportFromExcelAsync(string examPaperName, Stream stream) {
-        var parser = new ExamPaperExcelParser();
-        var result = parser.Parse(stream);
+        var result = ExamPaperExcelParser.Parse(stream);
         if (result.errors.Count > 0) {
             return result;
         }
@@ -103,9 +104,101 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
         if (examPaperIds.Length == 0) {
             return (null, "没有找到任何的试卷");
         }
-        var generator = new ExamPaperExcelGenerator();
-        generator.Generate(stream, examPapers);
+        ExamPaperExcelGenerator.Generate(stream, examPapers);
         return (examPapers[0].ExamPaperName, null);
+    }
+
+    public (string? firstName, string? error) ExportToExcelTemplate(Stream stream) {
+        var examPaper = new ExamPaper {
+            ExamPaperName = "试卷导入模板",
+        };
+
+        examPaper.ExamPaperQuestions.AddRange([
+            new ExamPaperQuestion {
+                Order = 1,
+                Question = new Question {
+                    QuestionText = "题目1描述？",
+                    QuestionType = QuestionType.SingleChoice,
+                    DifficultyLevel = DifficultyLevel.Easy,
+                    CorrectAnswer = "A",
+                }
+            },
+            new ExamPaperQuestion {
+                Order = 2,
+                Question = new Question {
+                    QuestionText = "题目2描述？",
+                    QuestionType = QuestionType.MultipleChoice,
+                    DifficultyLevel = DifficultyLevel.Medium,
+                    CorrectAnswer = "ABC",
+                }
+            },
+            new ExamPaperQuestion {
+                Order = 3,
+                Question = new Question {
+                    QuestionText = "题目3描述？",
+                    QuestionType = QuestionType.TrueFalse,
+                    DifficultyLevel = DifficultyLevel.Medium,
+                    CorrectAnswer = "1",
+                }
+            },
+            new ExamPaperQuestion {
+                Order = 4,
+                Question = new Question {
+                    QuestionText = "题目4描述？",
+                    QuestionType = QuestionType.TrueFalse,
+                    DifficultyLevel = DifficultyLevel.Medium,
+                    CorrectAnswer = "0",
+                }
+            },
+            new ExamPaperQuestion {
+                Order = 5,
+                Question = new Question {
+                    QuestionText = "题目5描述？",
+                    QuestionType = QuestionType.FillInTheBlank,
+                    DifficultyLevel = DifficultyLevel.Hard,
+                    CorrectAnswer = "填空题答案",
+                }
+            },
+        ]);
+        examPaper.ExamPaperQuestions[0].Question.Options.AddRange([
+            new Option {
+                OptionCode = 'A',
+                OptionText = "选项1",
+            },
+            new Option {
+                OptionCode = 'B',
+                OptionText = "选项2",
+            },
+            new Option {
+                OptionCode = 'C',
+                OptionText = "选项3",
+            },
+            new Option {
+                OptionCode = 'D',
+                OptionText = "选项4",
+            },
+        ]);
+        examPaper.ExamPaperQuestions[1].Question.Options.AddRange([
+             new Option {
+                OptionCode = 'A',
+                OptionText = "选项1",
+            },
+            new Option {
+                OptionCode = 'B',
+                OptionText = "选项2",
+            },
+            new Option {
+                OptionCode = 'C',
+                OptionText = "选项3",
+            },
+            new Option {
+                OptionCode = 'D',
+                OptionText = "选项4",
+            },
+        ]);
+
+        ExamPaperExcelGenerator.Generate(stream, [examPaper]);
+        return (examPaper.ExamPaperName, null);
     }
 }
 
