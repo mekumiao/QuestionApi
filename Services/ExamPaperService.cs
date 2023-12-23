@@ -24,7 +24,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
     /// 随机生成试卷
     /// </summary>
     /// <returns></returns>
-    public async Task<(ExamPaper? examPaper, string? message)> RandomGenerationAsync(string userName, DifficultyLevel? difficultyLevel) {
+    public async Task<(ExamPaper? examPaper, string? message)> RandomGenerationAsync(string examPaperName, DifficultyLevel difficultyLevel) {
         var queryable = _dbContext.Questions.AsNoTracking();
         queryable = _dbContext.Database.ProviderName?.Contains("sqlserver", StringComparison.CurrentCultureIgnoreCase) is true
             ? queryable.OrderBy(x => Guid.NewGuid())
@@ -45,8 +45,8 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
 
         var examPaper = new ExamPaper {
             ExamPaperType = ExamPaperType.Random,
-            ExamPaperName = $"随机生成-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
-            DifficultyLevel = difficultyLevel ?? DifficultyLevel.None,
+            ExamPaperName = examPaperName,
+            DifficultyLevel = difficultyLevel,
         };
 
         var questions = singleQuestions.Select(v => new ExamPaperQuestion { QuestionId = v });

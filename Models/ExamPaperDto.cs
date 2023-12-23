@@ -44,8 +44,8 @@ public class ExamPaperQuestionInput {
 }
 
 public class ExamPaperUpdate {
-    [MaxLength(500)]
-    public string? ExamPaperName { get; set; } = string.Empty;
+    [MaxLength(256)]
+    public string? ExamPaperName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
     [MaxLength(100), MinLength(1)]
@@ -64,6 +64,9 @@ public class ExamPaperQuestionDto {
 }
 
 public class RandomGenerationInput {
+    [MaxLength(256), Required]
+    public string? ExamPaperName { get; set; }
+    [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
 }
 

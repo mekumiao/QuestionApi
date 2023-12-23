@@ -141,7 +141,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     public async Task<IActionResult> RandomlyCreateAnswerBoard([FromBody, FromForm] RandomGenerationInput input,
                                                                [FromServices] ExamPaperService examPaperService) {
         var userName = User.FindFirstValue("name") ?? string.Empty;
-        var (exampaper, result) = await examPaperService.RandomGenerationAsync(userName, input.DifficultyLevel);
+        var (exampaper, result) = await examPaperService.RandomGenerationAsync(userName, input.DifficultyLevel ?? DifficultyLevel.None);
         if (exampaper is null) {
             return ValidationProblem(result);
         }

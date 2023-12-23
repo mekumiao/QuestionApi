@@ -148,7 +148,8 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> RandomGeneration([FromBody, FromForm] RandomGenerationInput input) {
         var userName = User.FindFirstValue("name") ?? string.Empty;
-        var (examPaper, message) = await _examPaperService.RandomGenerationAsync(userName, input.DifficultyLevel ?? DifficultyLevel.None);
+        var examPaperName = input.ExamPaperName ?? $"随机生成-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        var (examPaper, message) = await _examPaperService.RandomGenerationAsync(examPaperName, input.DifficultyLevel ?? DifficultyLevel.None);
         if (examPaper is null) {
             return ValidationProblem(message);
         }
