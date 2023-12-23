@@ -34,7 +34,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
             queryable = queryable.Where(v => v.DifficultyLevel <= difficultyLevel);
         }
 
-        var singleQuestions = await queryable.Where(v => v.QuestionType == QuestionType.SingleChoice).Select(v => v.QuestionId).Take(10).ToListAsync();
+        var singleQuestions = await queryable.Where(v => v.QuestionType == QuestionType.SingleChoice).Select(v => v.QuestionId).Take(5).ToListAsync();
         var multipleQuestions = await queryable.Where(v => v.QuestionType == QuestionType.MultipleChoice).Select(v => v.QuestionId).Take(5).ToArrayAsync();
         var truefalseQuestions = await queryable.Where(v => v.QuestionType == QuestionType.TrueFalse).Select(v => v.QuestionId).Take(5).ToArrayAsync();
         var fillblankQuestions = await queryable.Where(v => v.QuestionType == QuestionType.FillInTheBlank).Select(v => v.QuestionId).Take(5).ToArrayAsync();
@@ -49,7 +49,8 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
             DifficultyLevel = difficultyLevel,
         };
 
-        var questions = singleQuestions.Select(v => new ExamPaperQuestion { QuestionId = v });
+        int order = 1;
+        var questions = singleQuestions.Select(v => new ExamPaperQuestion { QuestionId = v, Order = order++ });
         examPaper.ExamPaperQuestions.AddRange(questions);
 
         try {
@@ -403,7 +404,7 @@ public class ExamPaperExcelGenerator {
             var worksheet = package.Workbook.Worksheets.Add(name);
             SetTitle(worksheet);
             for (int row = 2; row < examPaper.ExamPaperQuestions.Count + 2; row++) {
-                var item = examPaper.ExamPaperQuestions[row - 2];
+                var item = examPaper.ExamPaperQuestions.OrderBy(v => v.Order).ToArray()[row - 2];
                 worksheet.Cells[row, 1].Value = item.Order;
                 worksheet.Cells[row, 2].Value = item.Question.QuestionText;
                 worksheet.Cells[row, 3].Value = GetQuestionTypeString(item.Question.QuestionType);

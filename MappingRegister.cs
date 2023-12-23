@@ -43,7 +43,7 @@ public class MappingRegister : IRegister {
             .Map(dest => dest, src => src.Question);
 
         config.NewConfig<ExamPaper, ExamPaperDto>()
-            .Map(dest => dest.Questions, src => src.ExamPaperQuestions, should => should.ExamPaperQuestions.Count > 0);
+            .Map(dest => dest.Questions, src => src.ExamPaperQuestions.OrderBy(v => v.Order), should => should.ExamPaperQuestions.Count > 0);
 
         config.NewConfig<Examination, ExaminationDto>()
             .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName);
