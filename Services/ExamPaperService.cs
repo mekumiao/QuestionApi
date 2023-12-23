@@ -98,6 +98,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options)
             .Where(v => examPaperIds.Contains(v.ExamPaperId))
+            .OrderByDescending(v => v.ExamPaperId)
             .ToArrayAsync();
         if (examPaperIds.Length == 0) {
             return (null, "没有找到任何的试卷");
@@ -296,9 +297,17 @@ public partial class ExamPaperExcelParser {
 public class ExamPaperExcelGenerator {
 
     public void Generate(Stream stream, ExamPaper[] examPapers) {
+        int sheetIndex = 0;
+        string name = string.Empty;
         using var package = new ExcelPackage();
         foreach (var examPaper in examPapers) {
-            var worksheet = package.Workbook.Worksheets.Add(examPaper.ExamPaperName);
+            name = examPaper.ExamPaperName;
+        isExists:
+            if (package.Workbook.Worksheets.Any(v => v.Name == name)) {
+                name = $"{name}-{sheetIndex++}";
+                goto isExists;
+            }
+            var worksheet = package.Workbook.Worksheets.Add(name);
             SetTitle(worksheet);
             for (int row = 2; row < examPaper.ExamPaperQuestions.Count + 2; row++) {
                 var item = examPaper.ExamPaperQuestions[row - 2];
