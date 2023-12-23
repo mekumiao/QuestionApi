@@ -49,6 +49,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
             .Include(v => v.ExamPaperQuestions.OrderBy(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
+            .OrderByDescending(v => v.ExamPaperId)
             .AsQueryable();
 
         queryable = paging.Build(queryable);
@@ -170,11 +171,6 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         if (errors.Count > 0) {
             return ValidationProblem(new ValidationProblemDetails(errors));
         }
-
-        // var result = _mapper.From(examPapers)
-        //      .ForkConfig(f => f.NewConfig<ExamPaper, ExamPaperDto>()
-        //      .Map(dest => dest.Questions, src => src.Questions))
-        //      .AdaptToType<ExamPaperDto[]>();
         var result = _mapper.Map<ExamPaperDto[]>(examPapers);
         return Ok(result);
     }

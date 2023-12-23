@@ -166,6 +166,7 @@ public partial class ExamPaperExcelParser {
             }
             examPaper.ExamPaperQuestions.Add(question);
         }
+        examPaper.DifficultyLevel = (DifficultyLevel)examPaper.ExamPaperQuestions.Average(v => (int)v.Question.DifficultyLevel);
         return (examPaper, errors);
     }
 
@@ -260,13 +261,13 @@ public partial class ExamPaperExcelParser {
             if (string.IsNullOrWhiteSpace(cellValue)) {
                 return $"第{row}行{col}列的值{cellValue}不能为空白";
             }
-            var c = col - 4;
+            var c = col - 5;// 减去前面的5列
             if (c > 26) {
                 return null;
             }
             var option = new Option {
                 OptionText = cellValue,
-                OptionCode = Convert.ToChar(c + 64),//减去前面的4列，A字母的ASCII是65，列索引从1开始
+                OptionCode = Convert.ToChar(c + 64),// A字母的ASCII是65，列索引从1开始
             };
             question.Question.Options.Add(option);
         }
