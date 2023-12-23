@@ -39,4 +39,5 @@ public enum ExamPaperType {
     Import,
     Create,
     RedoIncorrect,
+    RandomPractice,
 }

@@ -24,14 +24,14 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
     /// 随机生成试卷
     /// </summary>
     /// <returns></returns>
-    public async Task<(ExamPaper? examPaper, string? message)> RandomGenerationAsync(string examPaperName, DifficultyLevel difficultyLevel) {
+    public async Task<(ExamPaper examPaper, string? message)> RandomGenerationAsync(ExamPaper initExamPaper) {
         var queryable = _dbContext.Questions.AsNoTracking();
         queryable = _dbContext.Database.ProviderName?.Contains("sqlserver", StringComparison.CurrentCultureIgnoreCase) is true
             ? queryable.OrderBy(x => Guid.NewGuid())
             : queryable.OrderBy(x => EF.Functions.Random());
 
-        if (difficultyLevel > DifficultyLevel.None) {
-            queryable = queryable.Where(v => v.DifficultyLevel <= difficultyLevel);
+        if (initExamPaper.DifficultyLevel > DifficultyLevel.None) {
+            queryable = queryable.Where(v => v.DifficultyLevel <= initExamPaper.DifficultyLevel);
         }
 
         var singleQuestions = await queryable.Where(v => v.QuestionType == QuestionType.SingleChoice).Select(v => v.QuestionId).Take(5).ToListAsync();
@@ -43,24 +43,18 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
         singleQuestions.AddRange(truefalseQuestions);
         singleQuestions.AddRange(fillblankQuestions);
 
-        var examPaper = new ExamPaper {
-            ExamPaperType = ExamPaperType.Random,
-            ExamPaperName = examPaperName,
-            DifficultyLevel = difficultyLevel,
-        };
-
         int order = 1;
         var questions = singleQuestions.Select(v => new ExamPaperQuestion { QuestionId = v, Order = order++ });
-        examPaper.ExamPaperQuestions.AddRange(questions);
+        initExamPaper.ExamPaperQuestions.AddRange(questions);
 
         try {
-            await _dbContext.ExamPapers.AddAsync(examPaper);
+            await _dbContext.ExamPapers.AddAsync(initExamPaper);
             await _dbContext.SaveChangesAsync();
         }
         catch (ReferenceConstraintException ex) {
             Debug.Assert(false);
             _logger.LogError(ex, "保存随机生成的试卷时失败");
-            return (null, "随机生成失败，请尝试重新生成");
+            return (initExamPaper, "随机生成失败，请尝试重新生成");
         }
         catch (Exception ex) {
             Debug.Assert(false);
@@ -68,7 +62,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
             throw;
         }
 
-        return (examPaper, null);
+        return (initExamPaper, null);
     }
 
     public async Task<(List<ExamPaper> examPapers, Dictionary<string, string[]> errors)> ImportFromExcelAsync(string examPaperName, Stream stream) {

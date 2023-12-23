@@ -131,7 +131,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     }
 
     /// <summary>
-    /// 随机创建答题板
+    /// 随机创建答题板(随机练习)
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
@@ -141,12 +141,19 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     public async Task<IActionResult> RandomlyCreateAnswerBoard([FromBody, FromForm] RandomGenerationInput input,
                                                                [FromServices] ExamPaperService examPaperService) {
         var userName = User.FindFirstValue("name") ?? string.Empty;
-        var (exampaper, result) = await examPaperService.RandomGenerationAsync(userName, input.DifficultyLevel ?? DifficultyLevel.None);
-        if (exampaper is null) {
+
+        var examPaper = new ExamPaper {
+            ExamPaperType = ExamPaperType.RandomPractice,
+            ExamPaperName = input.ExamPaperName ?? $"随机练习-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+            DifficultyLevel = input.DifficultyLevel ?? DifficultyLevel.None,
+        };
+
+        var (_, result) = await examPaperService.RandomGenerationAsync(examPaper);
+        if (result is not null) {
             return ValidationProblem(result);
         }
 
-        var boardInput = new AnswerBoardInput { ExamPaperId = exampaper.ExamPaperId };
+        var boardInput = new AnswerBoardInput { ExamPaperId = examPaper.ExamPaperId };
         return await CreateAnswerBoard(boardInput);
     }
 
@@ -181,13 +188,13 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
                     n.IsCorrect,
                 }))
                 .Where(v => v.IsCorrect != true)
-                .Distinct()
                 .ToArrayAsync();
 
             if (ids.Length == 0) {
                 return ValidationProblem($"答题历史:{answerBoardId}没有错题");
             }
 
+            ids = ids.DistinctBy(v => v.QuestionId).ToArray();
             examPaper.DifficultyLevel = (DifficultyLevel)ids.Average(v => (int)v.DifficultyLevel);
 
             var questions = ids.Select(v => new ExamPaperQuestion {

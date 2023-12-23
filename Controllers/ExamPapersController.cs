@@ -52,6 +52,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
             .Include(v => v.ExamPaperQuestions.OrderByDescending(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
+            .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect)
             .OrderByDescending(v => v.ExamPaperId)
             .AsQueryable();
 
@@ -148,8 +149,14 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> RandomGeneration([FromBody, FromForm] RandomGenerationInput input) {
         var userName = User.FindFirstValue("name") ?? string.Empty;
-        var examPaperName = input.ExamPaperName ?? $"随机生成-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-        var (examPaper, message) = await _examPaperService.RandomGenerationAsync(examPaperName, input.DifficultyLevel ?? DifficultyLevel.None);
+
+        var examPaper = new ExamPaper {
+            ExamPaperType = ExamPaperType.Random,
+            ExamPaperName = input.ExamPaperName ?? $"随机生成-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+            DifficultyLevel = input.DifficultyLevel ?? DifficultyLevel.None,
+        };
+
+        var (_, message) = await _examPaperService.RandomGenerationAsync(examPaper);
         if (examPaper is null) {
             return ValidationProblem(message);
         }
