@@ -32,6 +32,7 @@ public class UserDto {
     public string? NickName { get; set; }
     public string? Avatar { get; set; }
     public string? Email { get; set; }
+    public bool LockoutEnabled { get; set; }
     public DateTime? CreateTime { get; set; }
     public IEnumerable<string> Roles { get; set; } = [];
 }
@@ -40,6 +41,10 @@ public class UserUpdate {
     [MaxLength(256)]
     public string? NickName { get; set; }
     public List<string>? Roles { get; set; }
+    /// <summary>
+    /// 是否锁定用户
+    /// </summary>
+    public bool? LockoutEnabled { get; set; }
 }
 
 public class UserInput {

@@ -29,6 +29,9 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
+    [GeneratedRegex("^https?://")]
+    private static partial Regex HttpSchemeRegex();
+
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] UserFilter filter) {
@@ -50,7 +53,15 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                                     join r in _dbContext.Roles on ur.RoleId equals r.Id
                                     select new { ur.UserId, r } on u.Id equals urr.UserId into grouping
                         from urr in grouping.DefaultIfEmpty()
-                        group new { u, urr } by new { UserId = u.Id, u.UserName, u.Email, u.NickName, u.Avatar, u.CreateTime } into g
+                        group new { u, urr } by new {
+                            UserId = u.Id,
+                            u.UserName,
+                            u.Email,
+                            u.NickName,
+                            u.Avatar,
+                            u.CreateTime,
+                            u.LockoutEnabled,
+                        } into g
                         select new UserDto {
                             UserId = g.Key.UserId,
                             UserName = g.Key.UserName,
@@ -58,7 +69,8 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                             Avatar = g.Key.Avatar,
                             CreateTime = g.Key.CreateTime,
                             Email = g.Key.Email,
-                            Roles = g.OrderBy(v => v.urr.r.Id).Select(v => v.urr.r.Name)!
+                            Roles = g.OrderBy(v => v.urr.r.Id).Select(v => v.urr.r.Name)!,
+                            LockoutEnabled = g.Key.LockoutEnabled,
                         };
 
         var result = await queryable.AsNoTracking().OrderByDescending(v => v.CreateTime).ToArrayAsync();
@@ -107,6 +119,12 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
             await _dbContext.UserRoles.Where(v => v.UserId == userId).ExecuteDeleteAsync();
             await userManager.AddToRolesAsync(item, dto.Roles.Distinct());
         }
+        if (dto.LockoutEnabled.HasValue) {
+            await userManager.SetLockoutEnabledAsync(item, dto.LockoutEnabled.Value);
+            if (dto.LockoutEnabled.Value) {
+                await userManager.SetLockoutEndDateAsync(item, DateTimeOffset.UtcNow.AddYears(10));
+            }
+        }
         _mapper.Map(dto, item);
         await userManager.UpdateAsync(item);
         await transaction.CommitAsync();
@@ -141,7 +159,4 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
         poco.Roles = roles;
         return CreatedAtRoute("GetUserById", new { userId = user.Id }, poco);
     }
-
-    [GeneratedRegex("^https?://")]
-    private static partial Regex HttpSchemeRegex();
 }

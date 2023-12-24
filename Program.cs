@@ -35,14 +35,37 @@ builder.Services.AddMapster();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
+// builder.Services.AddIdentity<AppUser, AppRole>(options => {
+//     options.ClaimsIdentity.RoleClaimType = "role";
+//     options.ClaimsIdentity.UserNameClaimType = "name";
+//     options.ClaimsIdentity.UserIdClaimType = "sub";
+
+//     options.Password.RequireUppercase = false;
+//     options.Password.RequireNonAlphanumeric = false;
+//     options.Password.RequireDigit = false;
+//     options.Password.RequireLowercase = false;
+
+//     // 其他配置...
+//     options.Lockout.AllowedForNewUsers = true; // 允许新用户锁定
+//     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); // 锁定时间
+//     options.Lockout.MaxFailedAccessAttempts = 3; // 允许的最大登录失败尝试次数
+// })
+//     .AddEntityFrameworkStores<QuestionDbContext>()
+//     .AddDefaultTokenProviders();
+
 builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
     options.ClaimsIdentity.RoleClaimType = "role";
     options.ClaimsIdentity.UserNameClaimType = "name";
     options.ClaimsIdentity.UserIdClaimType = "sub";
+
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
+
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 3;
 })
     .AddRoles<AppRole>()
     .AddEntityFrameworkStores<QuestionDbContext>();
