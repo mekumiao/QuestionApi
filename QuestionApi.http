@@ -440,3 +440,10 @@ Content-Type: multipart/form-data
 
 < ./试卷导入模板.xlsx
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+# 统计api
+GET {{HostAddress}}/Statistics/summary HTTP/1.1
+Authorization: Bearer {{accessToken}}
+Accept: application/json

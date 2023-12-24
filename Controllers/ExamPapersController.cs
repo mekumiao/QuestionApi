@@ -38,7 +38,9 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] ExamPaperFilter filter) {
-        var queryable = _dbContext.ExamPapers.AsNoTracking();
+        var queryable = _dbContext.ExamPapers
+            .AsNoTracking()
+            .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect);
         queryable = filter.Build(queryable);
         var result = await queryable.CountAsync();
         return Ok(result);
