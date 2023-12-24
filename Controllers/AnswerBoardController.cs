@@ -149,9 +149,9 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             DifficultyLevel = input.DifficultyLevel ?? DifficultyLevel.None,
         };
 
-        var (_, result) = await examPaperService.RandomGenerationAsync(examPaper);
-        if (result is not null) {
-            return ValidationProblem(result);
+        var (_, message) = await examPaperService.RandomGenerationAsync(examPaper);
+        if (message is not null) {
+            return ValidationProblem(message);
         }
 
         var boardInput = new AnswerBoardInput { ExamPaperId = examPaper.ExamPaperId };

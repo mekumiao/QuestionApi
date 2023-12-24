@@ -161,7 +161,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         };
 
         var (_, message) = await _examPaperService.RandomGenerationAsync(examPaper);
-        if (examPaper is null) {
+        if (message is not null) {
             return ValidationProblem(message);
         }
         var result = _mapper.Map<ExamPaperDto>(examPaper);

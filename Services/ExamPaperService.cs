@@ -43,6 +43,10 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
         singleQuestions.AddRange(truefalseQuestions);
         singleQuestions.AddRange(fillblankQuestions);
 
+        if (singleQuestions.Count == 0) {
+            return (initExamPaper, "没有找到任何可用的题目");
+        }
+
         int order = 1;
         var questions = singleQuestions.Select(v => new ExamPaperQuestion { QuestionId = v, Order = order++ });
         initExamPaper.ExamPaperQuestions.AddRange(questions);
