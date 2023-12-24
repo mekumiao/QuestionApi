@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
 using MapsterMapper;
@@ -109,5 +110,12 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
         catch (DbUpdateConcurrencyException) {
             return NotFound();
         }
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] questionIds) {
+        await _dbContext.Questions.Where(v => questionIds.Contains(v.QuestionId)).ExecuteDeleteAsync();
+        return NoContent();
     }
 }
