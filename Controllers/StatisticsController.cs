@@ -43,13 +43,23 @@ public class StatisticsController(ILogger<StatisticsController> logger, Question
         #region 计算答题率
         var totalQuestions = await _dbContext.AnswerHistories.Where(v => v.IsSubmission == true).SumAsync(v => v.TotalQuestions);
         summary.AnswerRate = await _dbContext.AnswerHistories.Where(v => v.IsSubmission == true).SumAsync(v => v.TotalNumberAnswers);
-        summary.AnswerRate /= totalQuestions;
+        if (totalQuestions > 0) {
+            summary.AnswerRate /= totalQuestions;
+        }
+        else {
+            summary.AnswerRate /= 0;
+        }
         #endregion
 
         #region 计算错题率
         var answerCount = await _dbContext.StudentAnswers.Where(v => v.IsCorrect != null).CountAsync();
         summary.MistakeRate = await _dbContext.StudentAnswers.Where(v => v.IsCorrect == false).CountAsync();
-        summary.MistakeRate /= answerCount;
+        if (answerCount > 0) {
+            summary.MistakeRate /= answerCount;
+        }
+        else {
+            summary.MistakeRate = 0;
+        }
         #endregion
 
         return Ok(summary);
