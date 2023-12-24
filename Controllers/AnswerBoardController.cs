@@ -182,6 +182,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
                 .Include(v => v.StudentAnswers)
                 .ThenInclude(v => v.Question)
                 .Where(v => v.AnswerHistoryId == answerBoardId)
+                .Where(v => v.IsSubmission == true)
                 .SelectMany(v => v.StudentAnswers.Select(n => new {
                     n.QuestionId,
                     n.Question.DifficultyLevel,
