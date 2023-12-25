@@ -256,4 +256,22 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         var result = await queryable.ToListAsync();
         return Ok(_mapper.Map<ExamPaperDto[]>(result));
     }
+
+    /// <summary>
+    /// 获取当前用户可访问的试卷总数
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("me/exam-paper/count")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMeExamPapersCount([FromQuery] ExamPaperFilter filter) {
+        var queryable = _dbContext.ExamPapers
+                    .AsNoTracking()
+                    .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect)
+                    .AsQueryable();
+
+        queryable = filter.Build(queryable);
+
+        var result = await queryable.CountAsync();
+        return Ok(result);
+    }
 }
