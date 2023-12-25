@@ -150,11 +150,13 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status201Created)]
     public async Task<IActionResult> RandomlyCreateAnswerBoard([FromBody, FromForm] RandomGenerationInput input,
                                                                [FromServices] ExamPaperService examPaperService) {
-        var userName = User.FindFirstValue("name") ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(input.ExamPaperName)) {
+            input.ExamPaperName = $"随机练习-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        }
 
         var examPaper = new ExamPaper {
             ExamPaperType = ExamPaperType.RandomPractice,
-            ExamPaperName = input.ExamPaperName ?? $"随机练习-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+            ExamPaperName = input.ExamPaperName,
             DifficultyLevel = input.DifficultyLevel ?? DifficultyLevel.None,
         };
 

@@ -152,11 +152,13 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     [HttpPost("random")]
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> RandomGeneration([FromBody, FromForm] RandomGenerationInput input) {
-        var userName = User.FindFirstValue("name") ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(input.ExamPaperName)) {
+            input.ExamPaperName = $"随机练习-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        }
 
         var examPaper = new ExamPaper {
             ExamPaperType = ExamPaperType.Random,
-            ExamPaperName = input.ExamPaperName ?? $"随机生成-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+            ExamPaperName = input.ExamPaperName,
             DifficultyLevel = input.DifficultyLevel ?? DifficultyLevel.None,
         };
 
