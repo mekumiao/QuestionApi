@@ -180,8 +180,14 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         var examPaper = new ExamPaper {
             ExamPaperType = ExamPaperType.RedoIncorrect,
-            ExamPaperName = $"错题重做-{userName}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
         };
+        var history = await _dbContext.AnswerHistories
+            .AsNoTracking()
+            .Include(v => v.ExamPaper)
+            .SingleOrDefaultAsync(v => v.AnswerHistoryId == answerBoardId);
+        if (history is null) {
+            return NotFound();
+        }
 
         using (var scope = HttpContext.RequestServices.CreateAsyncScope()) {
             using var dbContext = scope.ServiceProvider.GetRequiredService<QuestionDbContext>();
@@ -206,6 +212,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
             ids = ids.DistinctBy(v => v.QuestionId).ToArray();
             examPaper.DifficultyLevel = (DifficultyLevel)ids.Average(v => (int)v.DifficultyLevel);
+            examPaper.ExamPaperName = history.ExamPaper.ExamPaperName;
 
             var questions = ids.Select(v => new ExamPaperQuestion {
                 QuestionId = v.QuestionId,
