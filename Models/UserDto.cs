@@ -45,6 +45,8 @@ public class UserUpdate {
     /// 是否锁定用户
     /// </summary>
     public bool? LockoutEnabled { get; set; }
+    [StringLength(256, MinimumLength = 6)]
+    public string? Password { get; set; }
 }
 
 public class UserInput {

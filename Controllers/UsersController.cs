@@ -129,6 +129,10 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
             await _dbContext.Students.Where(v => v.UserId == userId)
                 .ExecuteUpdateAsync(v => v.SetProperty(b => b.StudentName, dto.NickName));
         }
+        if (string.IsNullOrWhiteSpace(dto.Password) is false) {
+            await userManager.RemovePasswordAsync(item);
+            await userManager.AddPasswordAsync(item, dto.Password);
+        }
         _mapper.Map(dto, item);
         await userManager.UpdateAsync(item);
         await transaction.CommitAsync();
