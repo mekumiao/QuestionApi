@@ -328,7 +328,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         }
         // 加10秒的网络延迟补偿
         else if (history.TimeTakenSeconds > history.DurationSeconds + 10) {
-            history.IsTimeout = false;
+            history.IsTimeout = true;
         }
     }
 }
