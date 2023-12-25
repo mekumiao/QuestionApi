@@ -37,7 +37,7 @@ public class StatisticsController(ILogger<StatisticsController> logger, Question
             TotalQuestions = await _dbContext.Questions.CountAsync(),
             TotalExamSessions = await _dbContext.Examinations.CountAsync(),
             TotalExamParticipations = await _dbContext.AnswerHistories.Where(v => v.ExaminationId != null).CountAsync(),
-            ExamPaperCount = await _dbContext.ExamPapers.Where(v => v.ExamPaperType >= ExamPaperType.Random && v.ExamPaperType < ExamPaperType.Create).CountAsync()
+            ExamPaperCount = await _dbContext.ExamPapers.Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect).CountAsync()
         };
 
         #region 计算答题率
@@ -47,7 +47,7 @@ public class StatisticsController(ILogger<StatisticsController> logger, Question
             summary.AnswerRate /= totalQuestions;
         }
         else {
-            summary.AnswerRate /= 0;
+            summary.AnswerRate = 0;
         }
         #endregion
 
