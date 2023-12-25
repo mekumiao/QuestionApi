@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Mime;
 
 using EntityFramework.Exceptions.Common;
@@ -116,6 +117,11 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
         }
         catch (DbUpdateConcurrencyException) {
             return NotFound();
+        }
+        catch (DbUpdateException ex) {
+            Debug.Assert(false);
+            _logger.LogError(ex, "删除考试:{examinationId}时失败", examinationId);
+            throw;
         }
     }
 }

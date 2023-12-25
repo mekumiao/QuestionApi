@@ -80,6 +80,7 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .HasOne(v => v.Examination)
             .WithMany(v => v.AnswerHistories)
             .HasForeignKey(v => v.ExaminationId)
+            .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
         builder.Entity<Examination>()
