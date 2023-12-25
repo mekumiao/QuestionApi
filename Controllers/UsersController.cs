@@ -125,6 +125,10 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                 await userManager.SetLockoutEndDateAsync(item, DateTimeOffset.UtcNow.AddYears(10));
             }
         }
+        if (string.IsNullOrWhiteSpace(dto.NickName) is false) {
+            await _dbContext.Students.Where(v => v.UserId == userId)
+                .ExecuteUpdateAsync(v => v.SetProperty(b => b.StudentName, dto.NickName));
+        }
         _mapper.Map(dto, item);
         await userManager.UpdateAsync(item);
         await transaction.CommitAsync();
