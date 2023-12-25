@@ -17,11 +17,11 @@ public class AnswerHistory {
     /// <summary>
     /// 开始时间
     /// </summary>
-    public DateTime StartTime { get; set; }
+    public DateTime? StartTime { get; set; }
     /// <summary>
     /// 交卷时间
     /// </summary>
-    public DateTime SubmissionTime { get; set; }
+    public DateTime? SubmissionTime { get; set; }
     /// <summary>
     /// 限制的时长秒
     /// </summary>

@@ -30,11 +30,11 @@ public class AnswerHistoryDto {
     /// <summary>
     /// 开始时间
     /// </summary>
-    public DateTime StartTime { get; set; }
+    public DateTime? StartTime { get; set; }
     /// <summary>
     /// 交卷时间
     /// </summary>
-    public DateTime SubmissionTime { get; set; }
+    public DateTime? SubmissionTime { get; set; }
     public bool IsSubmission { get; set; }
     public int TotalIncorrectAnswers { get; set; }
     public int DurationSeconds { get; set; }

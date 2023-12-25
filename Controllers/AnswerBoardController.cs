@@ -49,8 +49,8 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         if (history.Student.UserId != userId) {
             return ValidationProblem($"答题板ID:{answerBoardId}不属于当前用户");
         }
-        if (history.IsSubmission is false && history.StartTime != default && history.DurationSeconds > 0) {
-            history.DurationSeconds -= (int)(DateTime.UtcNow - history.StartTime).TotalSeconds;
+        if (history.IsSubmission is false && history.StartTime.HasValue && history.DurationSeconds > 0) {
+            history.DurationSeconds -= (int)(DateTime.UtcNow - history.StartTime.Value).TotalSeconds;
             if (history.DurationSeconds < 0) {
                 history.DurationSeconds = 0;
             }
@@ -312,23 +312,23 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     }
 
     private static void SetTimeTakenSeconds(AnswerHistory history) {
-        history.TimeTakenSeconds = history.StartTime == default || history.SubmissionTime == default
+        history.TimeTakenSeconds = !history.StartTime.HasValue || !history.SubmissionTime.HasValue
             ? -1
-            : (int)(history.SubmissionTime - history.StartTime).TotalSeconds;
+            : (int)(history.SubmissionTime.Value - history.StartTime.Value).TotalSeconds;
     }
 
     private static void SetTimeout(AnswerHistory history) {
-        // 异常的答题时间
         if (history.TimeTakenSeconds < 0) {
+            // 异常的答题时间
             history.IsTimeout = true;
         }
-        // 未限制答题时间
         else if (history.DurationSeconds <= 0) {
+            // 未限制答题时间
             history.IsTimeout = false;
         }
-        // 加10秒的网络延迟补偿
-        else if (history.TimeTakenSeconds > history.DurationSeconds + 10) {
-            history.IsTimeout = true;
+        else {
+            // 加10秒的网络延迟补偿
+            history.IsTimeout = history.TimeTakenSeconds > history.DurationSeconds + 10;
         }
     }
 }
