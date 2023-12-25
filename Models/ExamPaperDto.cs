@@ -36,7 +36,7 @@ public class ExamPaperDto {
 }
 
 public class ExamPaperInput {
-    [MaxLength(500)]
+    [MaxLength(256)]
     public string ExamPaperName { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }

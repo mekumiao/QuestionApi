@@ -9,7 +9,7 @@ namespace QuestionApi.Database;
 public class ExamPaper {
     [Key]
     public int ExamPaperId { get; set; }
-    [MaxLength(500)]
+    [MaxLength(256)]
     public string ExamPaperName { get; set; } = string.Empty;
     public int TotalQuestions { get; set; }
     public ExamPaperType ExamPaperType { get; set; }

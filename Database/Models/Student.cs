@@ -7,8 +7,8 @@ namespace QuestionApi.Database;
 /// </summary>
 public class Student {
     public int StudentId { get; set; }
-    [MaxLength(500)]
-    public string Name { get; set; } = string.Empty;
+    [MaxLength(256)]
+    public string StudentName { get; set; } = string.Empty;
     public int? UserId { get; set; }
     public AppUser? User { get; set; }
     public List<StudentAnswer> StudentAnswers { get; } = [];

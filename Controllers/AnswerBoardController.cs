@@ -78,7 +78,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         user.Student ??= new Student {
             UserId = userId,
-            Name = user.NickName ?? user.UserName ?? string.Empty,
+            StudentName = user.NickName ?? user.UserName ?? string.Empty,
         };
 
         var examPaper = await _dbContext.ExamPapers

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuestionApi.Database;
@@ -11,9 +12,11 @@ using QuestionApi.Database;
 namespace QuestionApi.Migrations
 {
     [DbContext(typeof(QuestionDbContext))]
-    partial class QuestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231225051138_UpdateFieldNameToStudentNameForStudent")]
+    partial class UpdateFieldNameToStudentNameForStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,7 +183,7 @@ namespace QuestionApi.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("AnswerHistories", (string)null);
+                    b.ToTable("AnswerHistories");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.AppRole", b =>
@@ -314,7 +317,7 @@ namespace QuestionApi.Migrations
 
                     b.HasKey("ExamPaperId");
 
-                    b.ToTable("ExamPapers", (string)null);
+                    b.ToTable("ExamPapers");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.ExamPaperQuestion", b =>
@@ -332,7 +335,7 @@ namespace QuestionApi.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("ExamPaperQuestions", (string)null);
+                    b.ToTable("ExamPaperQuestions");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Examination", b =>
@@ -367,7 +370,7 @@ namespace QuestionApi.Migrations
 
                     b.HasIndex("ExamPaperId");
 
-                    b.ToTable("Examinations", (string)null);
+                    b.ToTable("Examinations");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Option", b =>
@@ -397,7 +400,7 @@ namespace QuestionApi.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Options", (string)null);
+                    b.ToTable("Options");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Question", b =>
@@ -424,7 +427,7 @@ namespace QuestionApi.Migrations
 
                     b.HasKey("QuestionId");
 
-                    b.ToTable("Questions", (string)null);
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.Student", b =>
@@ -449,7 +452,7 @@ namespace QuestionApi.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.StudentAnswer", b =>
@@ -489,7 +492,7 @@ namespace QuestionApi.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentAnswers", (string)null);
+                    b.ToTable("StudentAnswers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
