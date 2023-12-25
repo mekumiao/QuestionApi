@@ -5,12 +5,17 @@ using QuestionApi.Database;
 namespace QuestionApi.Models;
 
 public class StudentFilter {
+    /// <summary>
+    /// 学生名称或者用户ID
+    /// </summary>
     [MaxLength(50)]
-    public string? StudentName { get; set; }
+    public string? StudentNameOrUserId { get; set; }
 
     public IQueryable<Student> Build(IQueryable<Student> queryable) {
-        if (!string.IsNullOrWhiteSpace(StudentName)) {
-            queryable = queryable.Where(v => v.StudentName.Contains(StudentName));
+        if (!string.IsNullOrWhiteSpace(StudentNameOrUserId)) {
+            queryable = int.TryParse(StudentNameOrUserId, out var userId) && userId > 0
+                ? queryable.Where(v => v.StudentName.Contains(StudentNameOrUserId) || v.UserId == userId)
+                : queryable.Where(v => v.StudentName.Contains(StudentNameOrUserId));
         }
         return queryable;
     }
