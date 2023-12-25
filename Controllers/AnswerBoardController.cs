@@ -120,13 +120,21 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
 
         _dbContext.AnswerHistories.Add(history);
 
+        var studentQueryable = _dbContext.Students.Where(v => v.StudentId == user.Student.StudentId);
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try {
             await _dbContext.SaveChangesAsync();
+            // 判断是否是考试，增加学生考试或者练习的次数
+            _ = history.ExaminationId == null ?
+            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalPracticeSessions, b => b.TotalPracticeSessions + 1)) :
+            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalExamParticipations, b => b.TotalExamParticipations + 1));
         }
         catch (ReferenceConstraintException) {
             Debug.Assert(false);
             return ValidationProblem($"考试ID:{dto.ExamPaperId}不存在");
         }
+        await transaction.CommitAsync();
+
         var result = _mapper.Map<AnswerBoard>(history);
         return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = history.AnswerHistoryId }, result);
     }
@@ -250,6 +258,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             return ValidationProblem("您已经交卷");
         }
 
+        // 赋值学生提交的答案
         foreach (var input in inputs) {
             var record = history.StudentAnswers.Find(v => v.QuestionId == input.QuestionId);
             var answer = input.AnswerText?.Trim();
@@ -277,8 +286,13 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         var total_incorrect_answers = Correction(history.StudentAnswers);
         history.TotalIncorrectAnswers = total_incorrect_answers;
 
+        var studentQueryable = _dbContext.Students.Where(v => v.StudentId == history.StudentId);
         try {
             await _dbContext.SaveChangesAsync();
+            // 修改学生的：总题目数、作答数、错题数
+            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalQuestions, b => b.TotalQuestions + history.TotalQuestions));
+            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalNumberAnswers, b => b.TotalNumberAnswers + history.TotalNumberAnswers));
+            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalIncorrectAnswers, b => b.TotalIncorrectAnswers + history.TotalIncorrectAnswers));
         }
         catch (ReferenceConstraintException ex) {
             Debug.Assert(false);

@@ -354,10 +354,10 @@ DELETE {{HostAddress}}/examination/16 HTTP/1.1
 Authorization: Bearer {{accessToken}}
 Accept: application/json
 
-###
+### 学生API
 
-# 获取交卷
-GET {{HostAddress}}/students/me/submit-examination/15/ HTTP/1.1
+# 获取列表
+GET {{HostAddress}}/students/ HTTP/1.1
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 

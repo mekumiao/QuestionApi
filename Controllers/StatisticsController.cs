@@ -33,8 +33,8 @@ public class StatisticsController(ILogger<StatisticsController> logger, Question
     [ProducesResponseType(typeof(SummaryDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Summary() {
         var summary = new SummaryDto {
-            UserCount = await _dbContext.Users.CountAsync(),
-            QuestionCount = await _dbContext.Questions.CountAsync(),
+            TotalUsers = await _dbContext.Users.CountAsync(),
+            TotalQuestions = await _dbContext.Questions.CountAsync(),
             TotalExamSessions = await _dbContext.Examinations.CountAsync(),
             TotalExamParticipations = await _dbContext.AnswerHistories.Where(v => v.ExaminationId != null).CountAsync(),
             ExamPaperCount = await _dbContext.ExamPapers.Where(v => v.ExamPaperType >= ExamPaperType.Random && v.ExamPaperType < ExamPaperType.Create).CountAsync()

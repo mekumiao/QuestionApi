@@ -21,7 +21,10 @@ public class MappingRegister : IRegister {
 
         config.NewConfig<ExamPaperQuestion, ExamPaperQuestionDto>().Map(dest => dest, src => src.Question);
 
-        config.NewConfig<Student, StudentDto>().Map(dest => dest, src => src.User);
+        config.NewConfig<Student, StudentDto>()
+            .Map(dest => dest, src => src.User)
+            .Map(dest => dest.AnswerRate, src => (double)src.TotalNumberAnswers / src.TotalQuestions, should => should.TotalQuestions > 0)
+            .Map(dest => dest.IncorrectRate, src => (double)src.TotalIncorrectAnswers / src.TotalNumberAnswers, should => should.TotalNumberAnswers > 0);
         config.NewConfig<StudentUpdate, Student>();
 
         config.NewConfig<AppUser, UserDto>().Map(dest => dest.UserId, src => src.Id);

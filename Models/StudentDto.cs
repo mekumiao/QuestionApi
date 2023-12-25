@@ -27,6 +27,34 @@ public class StudentDto {
     public string? UserName { get; set; } = string.Empty;
     public string? Email { get; set; } = string.Empty;
     public int? UserId { get; set; }
+    /// <summary>
+    /// 总题目数
+    /// </summary>
+    public int TotalQuestions { get; set; }
+    /// <summary>
+    /// 作答总数
+    /// </summary>
+    public int TotalNumberAnswers { get; set; }
+    /// <summary>
+    /// 答题率
+    /// </summary>
+    public double AnswerRate { get; set; }
+    /// <summary>
+    /// 错题总数
+    /// </summary>
+    public int TotalIncorrectAnswers { get; set; }
+    /// <summary>
+    /// 错题率
+    /// </summary>
+    public double IncorrectRate { get; set; }
+    /// <summary>
+    /// 参加考试次数
+    /// </summary>
+    public int TotalExamParticipations { get; set; }
+    /// <summary>
+    /// 练习次数
+    /// </summary>
+    public int TotalPracticeSessions { get; set; }
 }
 
 public class StudentUpdate {

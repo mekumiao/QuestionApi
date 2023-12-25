@@ -12,11 +12,11 @@ public class SummaryDto {
     /// <summary>
     /// 用户总数
     /// </summary>
-    public int UserCount { get; set; }
+    public int TotalUsers { get; set; }
     /// <summary>
     /// 题目总数
     /// </summary>
-    public int QuestionCount { get; set; }
+    public int TotalQuestions { get; set; }
     /// <summary>
     /// 发布的考试总场数
     /// </summary>
