@@ -46,6 +46,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         var queryable = _dbContext.Students
             .AsNoTracking()
             .Include(v => v.User)
+            .OrderByDescending(v => v.StudentId)
             .AsQueryable();
 
         queryable = paging.Build(queryable);
@@ -207,5 +208,32 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             .Where(v => answerHistoryIds.Contains(v.AnswerHistoryId))
             .ExecuteDeleteAsync();
         return NoContent();
+    }
+
+    [HttpPut("{studentId:int}/reset-summary")]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(StudentDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ResetSummaryData([FromRoute] int studentId) {
+        var student = await _dbContext.Students.FindAsync(studentId);
+        if (student is null) {
+            return NotFound();
+        }
+        student.TotalQuestions = 0;
+        student.TotalNumberAnswers = 0;
+        student.TotalIncorrectAnswers = 0;
+        student.TotalExamParticipations = 0;
+        student.TotalPracticeSessions = 0;
+
+        try {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException) {
+            return NotFound();
+        }
+
+        await _dbContext.Entry(student).Reference(v => v.User).LoadAsync();
+        var result = _mapper.Map<StudentDto>(student);
+        return Ok(result);
     }
 }
