@@ -35,8 +35,8 @@ public class StatisticsController(ILogger<StatisticsController> logger, Question
         var summary = new SummaryDto {
             UserCount = await _dbContext.Users.CountAsync(),
             QuestionCount = await _dbContext.Questions.CountAsync(),
-            ExaminationCount = await _dbContext.Examinations.CountAsync(),
-            ExaminationCountNumber = await _dbContext.AnswerHistories.Where(v => v.ExaminationId != null).CountAsync(),
+            TotalExamSessions = await _dbContext.Examinations.CountAsync(),
+            TotalExamParticipations = await _dbContext.AnswerHistories.Where(v => v.ExaminationId != null).CountAsync(),
             ExamPaperCount = await _dbContext.ExamPapers.Where(v => v.ExamPaperType >= ExamPaperType.Random && v.ExamPaperType < ExamPaperType.Create).CountAsync()
         };
 
@@ -53,12 +53,12 @@ public class StatisticsController(ILogger<StatisticsController> logger, Question
 
         #region 计算错题率
         var answerCount = await _dbContext.StudentAnswers.Where(v => v.IsCorrect != null).CountAsync();
-        summary.MistakeRate = await _dbContext.StudentAnswers.Where(v => v.IsCorrect == false).CountAsync();
+        summary.IncorrectRate = await _dbContext.StudentAnswers.Where(v => v.IsCorrect == false).CountAsync();
         if (answerCount > 0) {
-            summary.MistakeRate /= answerCount;
+            summary.IncorrectRate /= answerCount;
         }
         else {
-            summary.MistakeRate = 0;
+            summary.IncorrectRate = 0;
         }
         #endregion
 

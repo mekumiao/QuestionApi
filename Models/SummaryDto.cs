@@ -4,7 +4,7 @@ public class SummaryDto {
     /// <summary>
     /// 错题率
     /// </summary>
-    public double MistakeRate { get; set; }
+    public double IncorrectRate { get; set; }
     /// <summary>
     /// 答题率
     /// </summary>
@@ -18,13 +18,13 @@ public class SummaryDto {
     /// </summary>
     public int QuestionCount { get; set; }
     /// <summary>
-    /// 考试总数
+    /// 发布的考试总场数
     /// </summary>
-    public int ExaminationCount { get; set; }
+    public int TotalExamSessions { get; set; }
     /// <summary>
-    /// 考试次数
+    /// 所有考试的总参与人数
     /// </summary>
-    public int ExaminationCountNumber { get; set; }
+    public int TotalExamParticipations { get; set; }
     /// <summary>
     /// 试卷总数
     /// </summary>
