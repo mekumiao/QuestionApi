@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Net.Mime;
 
 using MapsterMapper;
@@ -71,5 +73,34 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
         }
         var result = _mapper.Map<AnswerHistoryDto>(history);
         return Ok(result);
+    }
+
+    [HttpDelete("{answerHistoryId:int}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteAnswerHistoryItem([FromRoute] int answerHistoryId) {
+        var history = await _dbContext.AnswerHistories.Include(v => v.Examination).SingleOrDefaultAsync(v => v.AnswerHistoryId == answerHistoryId);
+        if (history is null) {
+            return NotFound();
+        }
+        _dbContext.AnswerHistories.Remove(history);
+        try {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) {
+            Debug.Assert(false);
+            _logger.LogError(ex, "方法{name}: 删除历史记录{id}时移除", nameof(DeleteAnswerHistoryItem), answerHistoryId);
+            throw;
+        }
+        return NoContent();
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteAnswerHistoryItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] answerHistoryIds) {
+        var rows = await _dbContext.AnswerHistories
+            .Where(v => answerHistoryIds.Contains(v.AnswerHistoryId))
+            .ExecuteDeleteAsync();
+        return NoContent();
     }
 }
