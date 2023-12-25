@@ -38,7 +38,7 @@ public class UserDto {
 }
 
 public class UserUpdate {
-    [MaxLength(256), Required]
+    [MaxLength(256)]
     public string? NickName { get; set; }
     public List<string>? Roles { get; set; }
     /// <summary>
@@ -48,7 +48,7 @@ public class UserUpdate {
 }
 
 public class UserInput {
-    [MaxLength(256), Required]
+    [MaxLength(256)]
     public string? NickName { get; set; }
     [EmailAddress, MaxLength(256)]
     public required string Email { get; set; } = string.Empty;

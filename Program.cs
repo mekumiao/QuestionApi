@@ -63,9 +63,9 @@ builder.Services.AddIdentityApiEndpoints<AppUser>(options => {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
 
-    options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 3;
+    options.Lockout.AllowedForNewUsers = false; // 新建用户默认不锁定
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); // 锁定时间
+    options.Lockout.MaxFailedAccessAttempts = 5; // 登录失败5次后锁定
 })
     .AddRoles<AppRole>()
     .AddEntityFrameworkStores<QuestionDbContext>();
