@@ -46,7 +46,8 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
         if (history is null) {
             return NotFound();
         }
-        if (history.Student.UserId != userId) {
+        // 不是管理员的情况下才做限制
+        if (User.IsInRole("admin") is false && history.Student.UserId != userId) {
             return ValidationProblem($"答题板ID:{answerBoardId}不属于当前用户");
         }
         if (history.IsSubmission is false && history.StartTime.HasValue && history.DurationSeconds > 0) {
