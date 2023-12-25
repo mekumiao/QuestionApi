@@ -236,4 +236,24 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         var result = _mapper.Map<StudentDto>(student);
         return Ok(result);
     }
+
+    /// <summary>
+    /// 获取当前用户可访问的试卷
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("me/exam-paper")]
+    [ProducesResponseType(typeof(ExamPaperDto[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMeExamPapers([FromQuery] ExamPaperFilter filter, [FromQuery] Paging paging) {
+        var queryable = _dbContext.ExamPapers
+                    .AsNoTracking()
+                    .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect)
+                    .OrderByDescending(v => v.ExamPaperId)
+                    .AsQueryable();
+
+        queryable = paging.Build(queryable);
+        queryable = filter.Build(queryable);
+
+        var result = await queryable.ToListAsync();
+        return Ok(_mapper.Map<ExamPaperDto[]>(result));
+    }
 }

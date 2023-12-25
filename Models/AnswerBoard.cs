@@ -11,11 +11,22 @@ public class AnswerBoard {
     public int AnswerBoardId { get; set; }
     public string ExamPaperName { get; set; } = string.Empty;
     public DifficultyLevel DifficultyLevel { get; set; }
+    /// <summary>
+    /// 错题总数
+    /// </summary>
     public int TotalIncorrectAnswers { get; set; }
     public int DurationSeconds { get; set; }
     public int TimeTakenSeconds { get; set; }
     public bool IsTimeout { get; set; }
     public bool IsSubmission { get; set; }
+    /// <summary>
+    /// 题目总数
+    /// </summary>
+    public int TotalQuestions { get; set; }
+    /// <summary>
+    /// 作答总数
+    /// </summary>
+    public int TotalNumberAnswers { get; set; }
     public ICollection<AnswerBoardQuestion> Questions { get; set; } = [];
 }
 

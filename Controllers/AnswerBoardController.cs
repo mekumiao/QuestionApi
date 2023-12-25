@@ -316,7 +316,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     }
 
     /// <summary>
-    /// 批改学生答案，并返回错题总数
+    /// 批改学生答案，并返回错题总数(不包含未作答的)
     /// </summary>
     /// <param name="studentAnswers"></param>
     /// <returns></returns>
@@ -332,7 +332,7 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
                 ? left.Length == right.Length && right.Join(left, v => v, n => n, (v, n) => v).Count() == right.Length
                 : left == right;
         }
-        return studentAnswers.Count(v => v.IsCorrect is false or null);
+        return studentAnswers.Count(v => v.IsCorrect is false);
     }
 
     private static void SetTimeTakenSeconds(AnswerHistory history) {
