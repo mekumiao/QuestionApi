@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using QuestionApi.Database;
 
 namespace QuestionApi.Models;
@@ -5,6 +7,12 @@ namespace QuestionApi.Models;
 public class AnswerHistoryFilter {
     public int? StudentId { get; set; }
     public int? ExamPaperId { get; set; }
+    [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
+    public DifficultyLevel? DifficultyLevel { get; set; }
+    [MaxLength(256)]
+    public string? ExamPaperName { get; set; }
+    [EnumDataType(typeof(ExaminationType), ErrorMessage = "无效的枚举值")]
+    public ExaminationType? ExaminationType { get; set; }
 
     public IQueryable<AnswerHistory> Build(IQueryable<AnswerHistory> queryable) {
         if (StudentId.HasValue) {
@@ -12,6 +20,15 @@ public class AnswerHistoryFilter {
         }
         if (ExamPaperId.HasValue) {
             queryable = queryable.Where(v => v.ExamPaperId == ExamPaperId);
+        }
+        if (DifficultyLevel is not null and > Database.DifficultyLevel.None) {
+            queryable = queryable.Where(v => v.DifficultyLevel == DifficultyLevel);
+        }
+        if (string.IsNullOrWhiteSpace(ExamPaperName) is false) {
+            queryable = queryable.Where(v => v.ExamPaper.ExamPaperName.Contains(ExamPaperName));
+        }
+        if (ExaminationType is not null and > Database.ExaminationType.None) {
+            queryable = queryable.Where(v => v.Examination != null && v.Examination.ExaminationType == ExaminationType);
         }
         return queryable;
     }

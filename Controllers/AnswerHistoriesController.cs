@@ -29,7 +29,11 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] AnswerHistoryFilter filter) {
-        var queryable = _dbContext.AnswerHistories.AsNoTracking();
+        var queryable = _dbContext.AnswerHistories
+            .AsNoTracking()
+            .Include(v => v.Examination)
+            .Include(v => v.ExamPaper)
+            .AsQueryable();
         queryable = filter.Build(queryable);
         var result = await queryable.CountAsync();
         return Ok(result);

@@ -30,7 +30,8 @@ public class MappingRegister : IRegister {
         config.NewConfig<AppUser, UserDto>().Map(dest => dest.UserId, src => src.Id);
         config.NewConfig<AnswerHistory, AnswerHistoryDto>()
             .Map(dest => dest, src => src.Examination, should => should.Examination != null)
-            .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName);
+            .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName)
+            .Map(dest => dest.StudentName, src => src.Student.StudentName);
         // .Map(dest => dest.DifficultyLevel, src => src.ExamPaper.DifficultyLevel);
 
         config.NewConfig<AnswerHistory, AnswerBoard>()
