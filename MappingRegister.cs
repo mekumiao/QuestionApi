@@ -27,7 +27,9 @@ public class MappingRegister : IRegister {
             .Map(dest => dest.IncorrectRate, src => (double)src.TotalIncorrectAnswers / src.TotalNumberAnswers, should => should.TotalNumberAnswers > 0);
         config.NewConfig<StudentUpdate, Student>();
 
-        config.NewConfig<AppUser, UserDto>().Map(dest => dest.UserId, src => src.Id);
+        config.NewConfig<AppUser, UserDto>()
+            .Map(dest => dest.UserId, src => src.Id)
+            .Map(dest => dest.NickName, src => src.NickName ?? src.UserName);
         config.NewConfig<AnswerHistory, AnswerHistoryDto>()
             .Map(dest => dest, src => src.Examination, should => should.Examination != null)
             .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName)
