@@ -99,4 +99,28 @@ builder.Services.AddAuthorization(options => {
 });
 
 builder.Services.AddAuthentication(AuthorizationCodeAuthenticationDefaults.AuthenticationScheme).AddAuthorizationCode();
+
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+
+
+// var jwtAppSettingOptions = builder.Configuration.GetSection("JwtIssuerOptions");
+
+// builder.Services.AddAuthentication(options => {
+//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+// })
+//     .AddJwtBearer(cfg => {
+//         cfg.RequireHttpsMetadata = false;
+//         cfg.SaveToken = true;
+//         cfg.TokenValidationParameters = new TokenValidationParameters {
+//             ValidIssuer = jwtAppSettingOptions["JwtIssuer"],
+//             ValidAudience = jwtAppSettingOptions["JwtIssuer"],
+//             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtAppSettingOptions["JwtKey"]!)),
+//             ClockSkew = TimeSpan.Zero // remove delay of token when expire
+//         };
+//     });
+
 ```
