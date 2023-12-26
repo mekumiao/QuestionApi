@@ -26,6 +26,7 @@ namespace QuestionApi.Controllers;
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 public class AccountController(ILogger<AccountController> logger,
@@ -112,7 +113,6 @@ public class AccountController(ILogger<AccountController> logger,
     // }
 
     [HttpGet("info")]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInfo() {
@@ -125,5 +125,35 @@ public class AccountController(ILogger<AccountController> logger,
         var result = _mapper.Map<UserDto>(user);
         result.Roles = roles;
         return Ok(result);
+    }
+
+    [HttpPut("info")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateInfo([FromBody, FromForm] InfoUpdate input) {
+        var userId = User.FindFirstValue("sub")!;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null) {
+            return NotFound();
+        }
+        _mapper.Map(input, user);
+        await _userManager.UpdateAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var result = _mapper.Map<UserDto>(user);
+        result.Roles = roles;
+        return Ok(result);
+    }
+
+    [HttpPut("change-password")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangePassword([FromBody, FromForm] ChangePasswordInput input) {
+        var userId = User.FindFirstValue("sub")!;
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null) {
+            return NotFound();
+        }
+        var result = await _userManager.ChangePasswordAsync(user, input.OldPassword, input.NewPassword);
+        return result.Succeeded ? NoContent() : ValidationProblem(result.ToString());
     }
 }
