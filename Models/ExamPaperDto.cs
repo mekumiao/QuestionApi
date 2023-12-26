@@ -49,13 +49,20 @@ public class ExamPaperQuestionInput {
     public int Order { get; set; }
 }
 
+public class ExamPaperQuestionUpdate {
+    public int QuestionId { get; set; }
+    [MaxLength(256)]
+    public string? CorrectAnswer { get; set; }
+    public int Order { get; set; }
+}
+
 public class ExamPaperUpdate {
     [MaxLength(256)]
     public string? ExamPaperName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
     [MaxLength(100), MinLength(1)]
-    public List<ExamPaperQuestionInput> Questions { get; set; } = [];
+    public List<ExamPaperQuestionUpdate> Questions { get; set; } = [];
 }
 
 public class ExamPaperQuestionDto {

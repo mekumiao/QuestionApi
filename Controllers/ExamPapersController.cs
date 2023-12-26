@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Net.Mime;
 using System.Security.Claims;
 
@@ -123,13 +124,28 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
 
         _mapper.Map(dto, item);
 
-        if (dto.Questions is not null) {
+        if (dto.Questions is not null and { Count: > 0 }) {
             item.ExamPaperQuestions.Clear();
             item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.Questions));
             item.TotalQuestions = item.ExamPaperQuestions.Count;
         }
 
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
         await _dbContext.SaveChangesAsync();
+
+        if (dto.Questions is not null and { Count: > 0 }) {
+            foreach (var qitem in dto.Questions) {
+                if (string.IsNullOrWhiteSpace(qitem.CorrectAnswer) is false) {
+                    var eqitem = item.ExamPaperQuestions.Find(v => v.QuestionId == qitem.QuestionId);
+                    if (eqitem is not null) {
+                        eqitem.Question.CorrectAnswer = qitem.CorrectAnswer;
+                    }
+                }
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        await transaction.CommitAsync();
 
         var result = _mapper.Map<ExamPaperDto>(item);
         return Ok(result);
