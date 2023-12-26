@@ -47,22 +47,28 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ExamPaperDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<ExamPaperDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] ExamPaperFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.ExamPapers
             .AsNoTracking()
+            .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect)
             .Include(v => v.ExamPaperQuestions.OrderByDescending(t => t.Order))
             .ThenInclude(v => v.Question)
             .ThenInclude(v => v.Options.OrderBy(t => t.OptionCode))
-            .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect)
             .OrderByDescending(v => v.ExamPaperId)
             .AsQueryable();
-
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
+        var totalQueryable = _dbContext.ExamPapers
+            .AsNoTracking()
+            .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect);
+        totalQueryable = filter.Build(queryable);
+        var total = await totalQueryable.CountAsync();
+
         var result = await queryable.ToListAsync();
-        return Ok(_mapper.Map<ExamPaperDto[]>(result));
+        var resultItems = _mapper.Map<ExamPaperDto[]>(result);
+        return Ok(new PagingResult<ExamPaperDto>(paging, total, resultItems));
     }
 
     [HttpGet("{paperId:int}", Name = "GetExamPaperById")]

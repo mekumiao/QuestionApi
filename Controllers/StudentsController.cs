@@ -41,19 +41,23 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
 
     [HttpGet]
     [Authorize(Roles = "admin")]
-    [ProducesResponseType(typeof(StudentDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<StudentDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] StudentFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Students
             .AsNoTracking()
             .Include(v => v.User)
             .OrderByDescending(v => v.StudentId)
             .AsQueryable();
-
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
+        var totalQueryable = _dbContext.Students.AsNoTracking();
+        totalQueryable = filter.Build(queryable);
+
         var result = await queryable.ToArrayAsync();
-        return Ok(_mapper.Map<StudentDto[]>(result));
+        var total = await totalQueryable.CountAsync();
+        var resultItems = _mapper.Map<StudentDto[]>(result);
+        return Ok(new PagingResult<StudentDto>(paging, total, resultItems));
     }
 
     [HttpGet("{studentId:int}", Name = "GetStudentById")]
@@ -108,9 +112,16 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     /// <returns></returns>
     [HttpGet("me/answer-history")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<AnswerHistoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAnswerHistoryListByCurrentUserId([FromQuery] Paging paging, [FromQuery] AnswerHistoryFilter filter) {
         var userId = Convert.ToInt32(User.FindFirstValue("sub"));
+
+        var totalQueryable = _dbContext.AnswerHistories
+                    .AsNoTracking()
+                    .Include(v => v.Student)
+                    .Where(v => v.Student.UserId == userId);
+        totalQueryable = filter.Build(totalQueryable);
+        var total = await totalQueryable.CountAsync();
 
         var queryable = _dbContext.AnswerHistories
             .AsNoTracking()
@@ -119,13 +130,12 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
             .Include(v => v.Examination)
             .OrderByDescending(v => v.AnswerHistoryId)
             .Where(v => v.Student.UserId == userId);
-
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
         var items = await queryable.ToArrayAsync();
-        var result = _mapper.Map<AnswerHistoryDto[]>(items);
-        return Ok(result);
+        var resultItems = _mapper.Map<AnswerHistoryDto[]>(items);
+        return Ok(new PagingResult<AnswerHistoryDto>(paging, total, resultItems));
     }
 
     /// <summary>
@@ -242,19 +252,20 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
     /// </summary>
     /// <returns></returns>
     [HttpGet("me/exam-paper")]
-    [ProducesResponseType(typeof(ExamPaperDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<ExamPaperDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMeExamPapers([FromQuery] ExamPaperFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.ExamPapers
                     .AsNoTracking()
                     .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect)
-                    .OrderByDescending(v => v.ExamPaperId)
                     .AsQueryable();
-
+        var totalQuestions = queryable;
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
-        var result = await queryable.ToListAsync();
-        return Ok(_mapper.Map<ExamPaperDto[]>(result));
+        var result = await queryable.OrderByDescending(v => v.ExamPaperId).ToListAsync();
+        var total = await totalQuestions.CountAsync();
+        var resultItems = _mapper.Map<ExamPaperDto[]>(result);
+        return Ok(new PagingResult<ExamPaperDto>(paging, total, resultItems));
     }
 
     /// <summary>

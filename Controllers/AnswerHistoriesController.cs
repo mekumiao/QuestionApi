@@ -42,7 +42,7 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(AnswerHistoryDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<AnswerHistoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] AnswerHistoryFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.AnswerHistories
             .AsNoTracking()
@@ -51,12 +51,14 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
             .Include(v => v.ExamPaper)
             .OrderByDescending(v => v.AnswerHistoryId)
             .AsQueryable();
-
+        var totalQueryable = queryable;
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
 
         var result = await queryable.ToArrayAsync();
-        return Ok(_mapper.Map<AnswerHistoryDto[]>(result));
+        var total = await totalQueryable.CountAsync();
+        var resultItems = _mapper.Map<AnswerHistoryDto[]>(result);
+        return Ok(new PagingResult<AnswerHistoryDto>(paging, total, resultItems));
     }
 
     [HttpGet("{answerHistoryId:int}")]

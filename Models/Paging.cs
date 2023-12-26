@@ -12,3 +12,22 @@ public class Paging {
         return queryable.Skip(Offset).Take(Limit);
     }
 }
+
+public class PagingResult<T> where T : class {
+    public int Offset { get; }
+    public int Limit { get; }
+    public int Total { get; set; }
+    public T[] Items { get; set; } = [];
+
+    public PagingResult(Paging paging) {
+        Offset = paging.Offset;
+        Limit = paging.Limit;
+    }
+
+    public PagingResult(Paging paging, int total, T[] items) {
+        Offset = paging.Offset;
+        Limit = paging.Limit;
+        Total = total;
+        Items = items;
+    }
+}

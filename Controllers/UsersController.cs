@@ -43,10 +43,14 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
 
     [HttpGet]
     [Authorize(Roles = "admin")]
-    [ProducesResponseType(typeof(UserDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<UserDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] UserFilter filter, [FromQuery] Paging paging) {
         var users = paging.Build(_dbContext.Set<AppUser>());
         users = filter.Build(users);
+
+        var totalQueryable = _dbContext.Set<AppUser>().AsNoTracking();
+        totalQueryable = filter.Build(totalQueryable);
+        var total = await totalQueryable.CountAsync();
 
         var queryable = from u in users
                         join urr in from ur in _dbContext.UserRoles
@@ -85,7 +89,7 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                 item.Avatar = avatarBuilder.Uri.AbsoluteUri;
             }
         }
-        return Ok(result);
+        return Ok(new PagingResult<UserDto>(paging, total, result));
     }
 
     [HttpGet("{userId:int}", Name = "GetUserById")]

@@ -44,7 +44,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ExaminationDto[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagingResult<ExaminationDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] ExaminationFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Examinations
             .AsNoTracking()
@@ -54,8 +54,14 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
             .AsQueryable();
         queryable = paging.Build(queryable);
         queryable = filter.Build(queryable);
+
+        var totalQueryable = _dbContext.Examinations.AsNoTracking();
+        totalQueryable = filter.Build(queryable);
+        var total = await totalQueryable.CountAsync();
+
         var result = await queryable.ToArrayAsync();
-        return Ok(_mapper.Map<ExaminationDto[]>(result));
+        var resultItems = _mapper.Map<ExaminationDto[]>(result);
+        return Ok(new PagingResult<ExaminationDto>(paging, total, resultItems));
     }
 
     [HttpGet("count")]
