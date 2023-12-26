@@ -69,7 +69,7 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                         select new UserDto {
                             UserId = g.Key.UserId,
                             UserName = g.Key.UserName,
-                            NickName = g.Key.NickName,
+                            NickName = g.Key.NickName ?? g.Key.UserName,
                             Avatar = g.Key.Avatar,
                             CreateTime = g.Key.CreateTime,
                             Email = g.Key.Email,
