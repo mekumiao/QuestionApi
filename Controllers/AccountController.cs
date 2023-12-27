@@ -137,6 +137,9 @@ public class AccountController(ILogger<AccountController> logger,
             return NotFound();
         }
         _mapper.Map(input, user);
+        if (user.AvatarFileId <= 0) {
+            user.AvatarFileId = null;
+        }
         await _userManager.UpdateAsync(user);
         var roles = await _userManager.GetRolesAsync(user);
         var result = _mapper.Map<UserDto>(user);

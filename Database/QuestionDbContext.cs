@@ -14,6 +14,7 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
     public DbSet<AnswerHistory> AnswerHistories { get; set; }
     public DbSet<Examination> Examinations { get; set; }
+    public DbSet<AppFile> AppFiles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         optionsBuilder.EnableSensitiveDataLogging();
@@ -44,6 +45,7 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .HasOne(v => v.User)
             .WithOne(v => v.Student)
             .HasForeignKey<Student>(v => v.UserId)
+            .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
         builder.Entity<StudentAnswer>()
@@ -88,5 +90,13 @@ public class QuestionDbContext(DbContextOptions options) : IdentityDbContext<App
             .WithMany(v => v.Examinations)
             .HasForeignKey(v => v.ExamPaperId)
             .IsRequired();
+
+        builder.Entity<AppFile>().HasKey(v => v.FileId);
+        builder.Entity<AppFile>()
+            .HasOne(v => v.UploadUser)
+            .WithMany(v => v.Files)
+            .HasForeignKey(v => v.UploadUserId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
     }
 }

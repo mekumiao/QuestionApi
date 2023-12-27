@@ -237,8 +237,8 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         return File(memoryStream, contentType, fileName);
     }
 
-    private static string GetContentType(string filePath) {
-        string contentType = TypeProvider.TryGetContentType(filePath, out string? foundContentType)
+    public static string GetContentType(string? filePath) {
+        string contentType = string.IsNullOrWhiteSpace(filePath) is false && TypeProvider.TryGetContentType(filePath, out string? foundContentType)
                 ? foundContentType
                 : "application/octet-stream"; // 如果无法确定文件类型，默认使用二进制流
         return contentType;

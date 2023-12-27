@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuestionApi.Database;
@@ -11,9 +12,11 @@ using QuestionApi.Database;
 namespace QuestionApi.Migrations
 {
     [DbContext(typeof(QuestionDbContext))]
-    partial class QuestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231227074330_AddAppFiles")]
+    partial class AddAppFiles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,15 +188,14 @@ namespace QuestionApi.Migrations
 
             modelBuilder.Entity("QuestionApi.Database.AppFile", b =>
                 {
-                    b.Property<int>("FileId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FileId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("Content")
-                        .IsRequired()
-                        .HasColumnType("bytea");
+                    b.Property<int>("ContentId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ExtensionName")
                         .HasMaxLength(256)
@@ -216,11 +218,31 @@ namespace QuestionApi.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.HasKey("FileId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContentId")
+                        .IsUnique();
 
                     b.HasIndex("UploadUserId");
 
                     b.ToTable("AppFiles");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.AppFileContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppFileContents");
                 });
 
             modelBuilder.Entity("QuestionApi.Database.AppRole", b =>
@@ -628,10 +650,18 @@ namespace QuestionApi.Migrations
 
             modelBuilder.Entity("QuestionApi.Database.AppFile", b =>
                 {
+                    b.HasOne("QuestionApi.Database.AppFileContent", "Content")
+                        .WithOne("AppFile")
+                        .HasForeignKey("QuestionApi.Database.AppFile", "ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("QuestionApi.Database.AppUser", "UploadUser")
                         .WithMany("Files")
                         .HasForeignKey("UploadUserId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Content");
 
                     b.Navigation("UploadUser");
                 });
@@ -681,8 +711,7 @@ namespace QuestionApi.Migrations
                 {
                     b.HasOne("QuestionApi.Database.AppUser", "User")
                         .WithOne("Student")
-                        .HasForeignKey("QuestionApi.Database.Student", "UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("QuestionApi.Database.Student", "UserId");
 
                     b.Navigation("User");
                 });
@@ -717,6 +746,12 @@ namespace QuestionApi.Migrations
             modelBuilder.Entity("QuestionApi.Database.AnswerHistory", b =>
                 {
                     b.Navigation("StudentAnswers");
+                });
+
+            modelBuilder.Entity("QuestionApi.Database.AppFileContent", b =>
+                {
+                    b.Navigation("AppFile")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("QuestionApi.Database.AppUser", b =>

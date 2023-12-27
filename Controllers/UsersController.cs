@@ -65,6 +65,7 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                             u.Avatar,
                             u.CreateTime,
                             u.LockoutEnabled,
+                            u.AvatarFileId,
                         } into g
                         select new UserDto {
                             UserId = g.Key.UserId,
@@ -75,6 +76,7 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
                             Email = g.Key.Email,
                             Roles = g.OrderBy(v => v.urr.r.Id).Select(v => v.urr.r.Name)!,
                             LockoutEnabled = g.Key.LockoutEnabled,
+                            AvatarFileId = g.Key.AvatarFileId,
                         };
 
         var result = await queryable.AsNoTracking().OrderByDescending(v => v.CreateTime).ToArrayAsync();
