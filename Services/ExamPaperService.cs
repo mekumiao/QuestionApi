@@ -412,7 +412,7 @@ public class ExamPaperExcelGenerator {
                 worksheet.Cells[row, 4].Value = (int)item.Question.DifficultyLevel;
                 worksheet.Cells[row, 5].Value = item.Question.CorrectAnswer;
                 int i = 1;
-                foreach (var option in item.Question.Options) {
+                foreach (var option in item.Question.Options.OrderBy(v => v.OptionCode)) {
                     worksheet.Cells[row, 5 + i].Value = option.OptionText;
                     i++;
                 }
