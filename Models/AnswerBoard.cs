@@ -61,7 +61,7 @@ public class AnswerBoardQuestionOption {
 }
 
 public class AnswerBoardInput {
-    public int ExamPaperId { get; set; }
+    public int? ExamPaperId { get; set; }
     public int? ExaminationId { get; set; }
 }
 

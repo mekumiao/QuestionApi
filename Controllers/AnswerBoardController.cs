@@ -26,10 +26,14 @@ namespace QuestionApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class AnswerBoardController(ILogger<AnswerBoardController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+public class AnswerBoardController(ILogger<AnswerBoardController> logger,
+                                   QuestionDbContext dbContext,
+                                   IMapper mapper,
+                                   AnswerBoardService answerBoardService) : ControllerBase {
     private readonly ILogger<AnswerBoardController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
+    private readonly AnswerBoardService _answerBoardService = answerBoardService;
 
     [HttpGet("{answerBoardId:int}", Name = "GetAnswerBoardById")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,91 +74,117 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
     [ProducesResponseType(typeof(AnswerBoard), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateAnswerBoard([FromBody, FromForm] AnswerBoardInput dto) {
         var userId = Convert.ToInt32(User.FindFirstValue("sub"));
-        var user = await _dbContext.Set<AppUser>()
-            .Include(v => v.Student)
-            .SingleOrDefaultAsync(v => v.Id == userId);
-        if (user is null) {
-            return ValidationProblem("当前登录用户信息不存在或已被删除");
+        if (dto.ExaminationId is not null and > 0) {
+            var (result, message) = await _answerBoardService.CreateAnswerBoardByExaminationId(userId, dto.ExaminationId.Value);
+            return message is not null
+                ? ValidationProblem(message)
+                : CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = result!.AnswerBoardId }, result);
         }
-
-        user.Student ??= new Student {
-            UserId = userId,
-            StudentName = user.NickName ?? user.UserName ?? string.Empty,
-        };
-
-        var examPaper = await _dbContext.ExamPapers
-            .Include(v => v.ExamPaperQuestions)
-            .ThenInclude(v => v.Question)
-            .ThenInclude(v => v.Options)
-            .SingleOrDefaultAsync(v => v.ExamPaperId == dto.ExamPaperId);
-        if (examPaper is null) {
-            return ValidationProblem($"试卷ID:{dto.ExamPaperId}不存在或已经被删除");
+        else if (dto.ExamPaperId is not null and > 0) {
+            var (result, message) = await _answerBoardService.CreateAnswerBoardByExamPaperId(userId, dto.ExamPaperId.Value);
+            return message is not null
+                ? ValidationProblem(message)
+                : CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = result!.AnswerBoardId }, result);
         }
-        if (examPaper.Questions.Count == default) {
-            return ValidationProblem($"试卷ID:{dto.ExamPaperId}没有设置题目");
+        else {
+            return NotFound();
         }
+        // var user = await _dbContext.Set<AppUser>()
+        //     .Include(v => v.Student)
+        //     .SingleOrDefaultAsync(v => v.Id == userId);
+        // if (user is null) {
+        //     return ValidationProblem("当前登录用户信息不存在或已被删除");
+        // }
 
-        var history = new AnswerHistory {
-            Student = user.Student,
-            ExamPaper = examPaper,
-            StartTime = DateTime.UtcNow,
-            DifficultyLevel = examPaper.DifficultyLevel,
-        };
-        var answers = _mapper.Map<StudentAnswer[]>(examPaper.ExamPaperQuestions);
-        foreach (var item in answers) {
-            item.Student = user.Student;
-            // ExamPaperQuestion到StudentAnswer会将Question赋值过来，所以需要置空，让EF不创建Question
-            item.Question = null!;
-        }
-        history.StudentAnswers.AddRange(answers);
-        history.TotalQuestions = history.StudentAnswers.Count;
+        // var examPaper = await _dbContext.ExamPapers
+        //     .Include(v => v.ExamPaperQuestions)
+        //     .ThenInclude(v => v.Question)
+        //     .ThenInclude(v => v.Options)
+        //     .SingleOrDefaultAsync(v => v.ExamPaperId == dto.ExamPaperId);
+        // if (examPaper is null) {
+        //     return ValidationProblem($"试卷ID:{dto.ExamPaperId}不存在或已经被删除");
+        // }
+        // if (examPaper.Questions.Count == default) {
+        //     return ValidationProblem($"试卷ID:{dto.ExamPaperId}没有设置题目");
+        // }
 
-        if (dto.ExaminationId.HasValue) {
-            var examination = await _dbContext.Examinations.FindAsync(dto.ExaminationId.Value);
-            if (examination is null) {
-                return NotFound($"考试ID:{dto.ExaminationId}不存在或已被删除");
-            }
-            history.Examination = examination;
-            history.DurationSeconds = examination.DurationSeconds;
-            history.DifficultyLevel = examination.DifficultyLevel;
+        // if (dto.ExaminationId.HasValue && user.Student is not null) {
+        //     // 仅能创建一条考试记录
+        //     var existsHistory = await _dbContext.AnswerHistories
+        //         .AsNoTracking()
+        //         .Where(v => v.StudentId == user.Student.StudentId && v.ExaminationId == dto.ExaminationId)
+        //         .FirstOrDefaultAsync();
+        //     if (existsHistory is not null) {
+        //         var resultDto = _mapper.Map<AnswerBoard>(existsHistory);
+        //         return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = existsHistory.AnswerHistoryId }, resultDto);
+        //     }
+        // }
 
-        }
+        // user.Student ??= new Student {
+        //     UserId = userId,
+        //     StudentName = user.NickName ?? user.UserName ?? string.Empty,
+        // };
 
-        _dbContext.AnswerHistories.Add(history);
+        // var history = new AnswerHistory {
+        //     Student = user.Student,
+        //     ExamPaper = examPaper,
+        //     StartTime = DateTime.UtcNow,
+        //     DifficultyLevel = examPaper.DifficultyLevel,
+        // };
+        // var answers = _mapper.Map<StudentAnswer[]>(examPaper.ExamPaperQuestions);
+        // foreach (var item in answers) {
+        //     item.Student = user.Student;
+        //     // ExamPaperQuestion到StudentAnswer会将Question赋值过来，所以需要置空，让EF不创建Question
+        //     item.Question = null!;
+        // }
+        // history.StudentAnswers.AddRange(answers);
+        // history.TotalQuestions = history.StudentAnswers.Count;
 
-        // 学生重复参加考试仅计数一次（没有找到学生的任何考试记录时才将考试次数累加1）
-        async Task<bool> IsExistsExamination() {
-            return dto.ExaminationId.HasValue && await _dbContext.AnswerHistories
-                   .Where(v => v.ExaminationId == dto.ExaminationId.Value)
-                   .Where(v => v.StudentId == user.Student.StudentId)
-                   .CountAsync() == 1; //仅有当前添加的一条
-        }
+        // if (dto.ExaminationId.HasValue) {
+        //     var examination = await _dbContext.Examinations.FindAsync(dto.ExaminationId.Value);
+        //     if (examination is null) {
+        //         return NotFound($"考试ID:{dto.ExaminationId}不存在或已被删除");
+        //     }
+        //     history.Examination = examination;
+        //     history.DurationSeconds = examination.DurationSeconds;
+        //     history.DifficultyLevel = examination.DifficultyLevel;
+        // }
 
-        var studentQueryable = _dbContext.Students.Where(v => v.StudentId == user.Student.StudentId);
-        using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        try {
-            await _dbContext.SaveChangesAsync();
-            // 判断是否是考试，增加学生考试或者练习的次数
-            _ = history.ExaminationId == null ?
-            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalPracticeSessions, b => b.TotalPracticeSessions + 1)) :
-            await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalExamParticipations, b => b.TotalExamParticipations + 1));
+        // _dbContext.AnswerHistories.Add(history);
 
-            // 增加参加考试人数
-            if (await IsExistsExamination()) {
-                await _dbContext.Examinations
-                    .Where(v => v.ExaminationId == dto.ExaminationId!.Value)
-                    .ExecuteUpdateAsync(v => v.SetProperty(b => b.ExamParticipantCount, b => b.ExamParticipantCount + 1));
-            }
-        }
-        catch (ReferenceConstraintException) {
-            Debug.Assert(false);
-            return ValidationProblem($"考试ID:{dto.ExamPaperId}不存在");
-        }
+        // // 学生重复参加考试仅计数一次（没有找到学生的任何考试记录时才将考试次数累加1）
+        // async Task<bool> IsExistsExamination() {
+        //     return dto.ExaminationId.HasValue && await _dbContext.AnswerHistories
+        //            .Where(v => v.ExaminationId == dto.ExaminationId.Value)
+        //            .Where(v => v.StudentId == user.Student.StudentId)
+        //            .CountAsync() == 1; //仅有当前添加的一条
+        // }
 
-        await transaction.CommitAsync();
+        // var studentQueryable = _dbContext.Students.Where(v => v.StudentId == user.Student.StudentId);
+        // using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        // try {
+        //     await _dbContext.SaveChangesAsync();
+        //     // 判断是否是考试，增加学生考试或者练习的次数
+        //     _ = history.ExaminationId == null ?
+        //     await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalPracticeSessions, b => b.TotalPracticeSessions + 1)) :
+        //     await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalExamParticipations, b => b.TotalExamParticipations + 1));
 
-        var result = _mapper.Map<AnswerBoard>(history);
-        return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = history.AnswerHistoryId }, result);
+        //     // 增加参加考试人数
+        //     if (await IsExistsExamination()) {
+        //         await _dbContext.Examinations
+        //             .Where(v => v.ExaminationId == dto.ExaminationId!.Value)
+        //             .ExecuteUpdateAsync(v => v.SetProperty(b => b.ExamParticipantCount, b => b.ExamParticipantCount + 1));
+        //     }
+        // }
+        // catch (ReferenceConstraintException) {
+        //     Debug.Assert(false);
+        //     return ValidationProblem($"考试ID:{dto.ExamPaperId}不存在");
+        // }
+
+        // await transaction.CommitAsync();
+
+        // var result = _mapper.Map<AnswerBoard>(history);
+        // return CreatedAtRoute("GetAnswerBoardById", new { answerBoardId = history.AnswerHistoryId }, result);
     }
 
     /// <summary>

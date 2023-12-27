@@ -76,7 +76,10 @@ builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, (
     }
 });
 
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AppUserClaimsPrincipalFactory>();
+
 builder.Services.AddScoped<ExamPaperService>();
+builder.Services.AddScoped<AnswerBoardService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -100,6 +103,9 @@ TypeAdapterConfig.GlobalSettings.Compile();
 builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
 
 var app = builder.Build();
+
+// using var scope = app.Services.CreateScope();
+// var factory = scope.ServiceProvider.GetRequiredService<IUserClaimsPrincipalFactory<AppUser>>();
 
 // Configure the HTTP request pipeline.
 

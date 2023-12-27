@@ -19,6 +19,7 @@ public class Examination {
     /// 参加考试的人数
     /// </summary>
     public int ExamParticipantCount { get; set; }
+    public bool IsPublish { get; set; }
     public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 

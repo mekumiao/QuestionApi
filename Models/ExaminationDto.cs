@@ -36,8 +36,38 @@ public class ExaminationDto {
     public int DurationSeconds { get; set; }
     public int ExamParticipantCount { get; set; }
     public int Order { get; set; }
+    public bool IsPublish { get; set; }
 }
 
+public class ExaminationPublishDto {
+    public int ExaminationId { get; set; }
+    public string ExaminationName { get; set; } = string.Empty;
+    public ExaminationType ExaminationType { get; set; }
+    public DifficultyLevel DifficultyLevel { get; set; }
+    public int ExamPaperId { get; set; }
+    public string ExamPaperName { get; set; } = string.Empty;
+    public int DurationSeconds { get; set; }
+    public int ExamParticipantCount { get; set; }
+    public int Order { get; set; }
+    public bool IsSubmission { get; set; }
+    /// <summary>
+    /// 剩余时间
+    /// </summary>
+    public int RemainingSeconds { get; set; }
+    /// <summary>
+    /// 消耗时间
+    /// </summary>
+    public int TimeTakenSeconds { get; set; }
+    public AnswerState AnswerState { get; set; }
+}
+
+public enum AnswerState {
+    None,
+    Unanswered,
+    Answering,
+    Finished,
+    Timeout,
+}
 
 public class ExaminationInput {
     [MaxLength(256)]
@@ -49,6 +79,7 @@ public class ExaminationInput {
     public int ExamPaperId { get; set; }
     public int DurationSeconds { get; set; }
     public int Order { get; set; }
+    public bool IsPublish { get; set; }
 }
 
 public class ExaminationUpdate {
@@ -59,5 +90,6 @@ public class ExaminationUpdate {
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
     public int? DurationSeconds { get; set; }
-    public int Order { get; set; }
+    public int? Order { get; set; }
+    public bool? IsPublish { get; set; }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net.Mime;
+using System.Security.Claims;
 
 using EntityFramework.Exceptions.Common;
 
@@ -35,6 +36,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     /// <param name="examinationId"></param>
     /// <returns></returns>
     [HttpGet("{examinationId:int}", Name = "GetExaminationById")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ExaminationDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetExaminationById([FromRoute] int examinationId) {
@@ -44,6 +46,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     }
 
     [HttpGet]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(PagingResult<ExaminationDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetList([FromQuery] ExaminationFilter filter, [FromQuery] Paging paging) {
         var queryable = _dbContext.Examinations
@@ -65,6 +68,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
     }
 
     [HttpGet("count")]
+    [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCount([FromQuery] ExaminationFilter filter) {
         var queryable = _dbContext.Examinations.AsNoTracking();
@@ -129,5 +133,71 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
             _logger.LogError(ex, "删除考试:{examinationId}时失败", examinationId);
             throw;
         }
+    }
+
+    /// <summary>
+    /// 获取已发布的考试列表
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="paging"></param>
+    /// <returns></returns>
+    [HttpGet("publish")]
+    [ProducesResponseType(typeof(PagingResult<ExaminationPublishDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetPublishList([FromQuery] ExaminationFilter filter, [FromQuery] Paging paging) {
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
+        var student = await _dbContext.Students.AsNoTracking().SingleOrDefaultAsync(v => v.UserId == userId);
+
+        var queryable = _dbContext.Examinations
+            .AsNoTracking()
+            .Include(v => v.ExamPaper)
+            .Where(v => v.IsPublish)
+            .OrderByDescending(v => v.Order)
+            .ThenByDescending(v => v.ExaminationId)
+            .AsQueryable();
+        queryable = paging.Build(queryable);
+        queryable = filter.Build(queryable);
+
+        var totalQueryable = _dbContext.Examinations.AsNoTracking();
+        totalQueryable = filter.Build(queryable);
+        var total = await totalQueryable.CountAsync();
+
+        var result = await queryable.ToArrayAsync();
+        var resultItems = _mapper.Map<ExaminationPublishDto[]>(result);
+
+        if (student is not null) {
+            // 查询当前用户参加过的考试记录
+            var histories = await _dbContext.AnswerHistories
+                .AsNoTracking()
+                .Where(v => v.StudentId == student.StudentId && v.ExaminationId != null)
+                .ToArrayAsync();
+
+            foreach (var exam in resultItems) {
+                exam.AnswerState = AnswerState.Unanswered;
+                foreach (var history in histories) {
+                    if (exam.ExaminationId == history.ExaminationId) {
+                        _mapper.Map(history, exam);
+                        if (history.IsSubmission) {
+                            exam.AnswerState = AnswerState.Finished;
+                        }
+                        else if (history.StartTime.HasValue && history.DurationSeconds > 0) {
+                            // 设置剩余的考试时间
+                            exam.RemainingSeconds = history.DurationSeconds - (int)(DateTime.UtcNow - history.StartTime.Value).TotalSeconds;
+                            if (exam.RemainingSeconds < 0) {
+                                exam.RemainingSeconds = 0;
+                                exam.AnswerState = AnswerState.Timeout;
+                            }
+                            else {
+                                exam.AnswerState = AnswerState.Answering;
+                            }
+                        }
+                        else {
+                            exam.AnswerState = AnswerState.Answering;
+                        }
+                    }
+                }
+            }
+        }
+
+        return Ok(new PagingResult<ExaminationPublishDto>(paging, total, resultItems));
     }
 }
