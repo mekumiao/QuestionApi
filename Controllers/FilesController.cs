@@ -8,6 +8,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 using QuestionApi.Database;
 using QuestionApi.Models;
@@ -75,6 +76,7 @@ public class FilesController(ILogger<FilesController> logger, QuestionDbContext 
     }
 
     [HttpGet("{fileId:int}/content")]
+    [CacheControl]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
