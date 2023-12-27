@@ -117,9 +117,18 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             history.Examination = examination;
             history.DurationSeconds = examination.DurationSeconds;
             history.DifficultyLevel = examination.DifficultyLevel;
+
         }
 
         _dbContext.AnswerHistories.Add(history);
+
+        // 学生重复参加考试仅计数一次（没有找到学生的任何考试记录时才将考试次数累加1）
+        async Task<bool> IsExistsExamination() {
+            return dto.ExaminationId.HasValue && await _dbContext.AnswerHistories
+                   .Where(v => v.ExaminationId == dto.ExaminationId.Value)
+                   .Where(v => v.StudentId == user.Student.StudentId)
+                   .CountAsync() == 1; //仅有当前添加的一条
+        }
 
         var studentQueryable = _dbContext.Students.Where(v => v.StudentId == user.Student.StudentId);
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
@@ -129,11 +138,19 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger, Questi
             _ = history.ExaminationId == null ?
             await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalPracticeSessions, b => b.TotalPracticeSessions + 1)) :
             await studentQueryable.ExecuteUpdateAsync(v => v.SetProperty(b => b.TotalExamParticipations, b => b.TotalExamParticipations + 1));
+
+            // 增加参加考试人数
+            if (await IsExistsExamination()) {
+                await _dbContext.Examinations
+                    .Where(v => v.ExaminationId == dto.ExaminationId!.Value)
+                    .ExecuteUpdateAsync(v => v.SetProperty(b => b.ExamParticipantCount, b => b.ExamParticipantCount + 1));
+            }
         }
         catch (ReferenceConstraintException) {
             Debug.Assert(false);
             return ValidationProblem($"考试ID:{dto.ExamPaperId}不存在");
         }
+
         await transaction.CommitAsync();
 
         var result = _mapper.Map<AnswerBoard>(history);

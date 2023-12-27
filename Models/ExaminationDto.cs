@@ -34,6 +34,7 @@ public class ExaminationDto {
     public int ExamPaperId { get; set; }
     public string ExamPaperName { get; set; } = string.Empty;
     public int DurationSeconds { get; set; }
+    public int ExamParticipantCount { get; set; }
     public int Order { get; set; }
 }
 

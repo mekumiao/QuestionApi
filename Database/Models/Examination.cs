@@ -15,6 +15,10 @@ public class Examination {
     /// 持续时间
     /// </summary>
     public int DurationSeconds { get; set; }
+    /// <summary>
+    /// 参加考试的人数
+    /// </summary>
+    public int ExamParticipantCount { get; set; }
     public List<AnswerHistory> AnswerHistories { get; } = [];
 }
 
