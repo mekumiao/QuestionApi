@@ -9,6 +9,7 @@ public class UserFilter {
     public string? UserName { get; set; }
     [MaxLength(256)]
     public string? NickName { get; set; }
+    [MaxLength(256)]
     public string? Email { get; set; }
 
     public IQueryable<AppUser> Build(IQueryable<AppUser> queryable) {
@@ -39,8 +40,9 @@ public class UserDto {
 }
 
 public class UserUpdate {
-    [MaxLength(256)]
+    [MaxLength(256), MinLength(1)]
     public string? NickName { get; set; }
+    [MaxLength(10)]
     public List<string>? Roles { get; set; }
     /// <summary>
     /// 是否锁定用户
@@ -51,13 +53,14 @@ public class UserUpdate {
 }
 
 public class UserInput {
-    [MaxLength(256)]
+    [MaxLength(256), MinLength(1)]
     public string? NickName { get; set; }
     [EmailAddress, MaxLength(256)]
     public required string Email { get; set; } = string.Empty;
     [StringLength(256, MinimumLength = 6)]
     public required string Password { get; set; } = string.Empty;
-    [MaxLength(256)]
+    [MaxLength(256), MinLength(1)]
     public string? Avatar { get; set; }
+    [MaxLength(10)]
     public List<string> Roles { get; set; } = [];
 }

@@ -117,13 +117,15 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
     public async Task<IActionResult> Update([FromRoute] int userId,
                                             [FromBody, FromForm] UserUpdate dto,
                                             [FromServices] UserManager<AppUser> userManager) {
+        var currentId = Convert.ToInt32(User.FindFirstValue("sub"));
         var item = await userManager.FindByIdAsync(userId.ToString());
         if (item is null) {
             return NotFound();
         }
 
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        if (dto.Roles is not null) {
+        // 管理员不能修改自己的角色
+        if (dto.Roles is not null && userId != currentId) {
             await _dbContext.UserRoles.Where(v => v.UserId == userId).ExecuteDeleteAsync();
             await userManager.AddToRolesAsync(item, dto.Roles.Distinct());
         }
