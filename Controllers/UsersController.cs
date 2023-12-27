@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -172,5 +174,47 @@ public partial class UsersController(ILogger<UsersController> logger, QuestionDb
         var poco = _mapper.Map<UserDto>(user);
         poco.Roles = roles;
         return CreatedAtRoute("GetUserById", new { userId = user.Id }, poco);
+    }
+
+    [HttpDelete("{userId:int}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete([FromRoute] int userId, [FromServices] UserManager<AppUser> userManager) {
+        var currentId = User.FindFirstValue("sub");
+        var userIdStr = userId.ToString();
+        if (currentId == userIdStr) {
+            return ValidationProblem("您不能删除自己");
+        }
+        var user = await userManager.FindByIdAsync(userIdStr);
+        if (user is null) {
+            return NotFound();
+        }
+        var isAdmin = await userManager.IsInRoleAsync(user, "admin");
+        if (isAdmin) {
+            return ValidationProblem($"用户ID:{user.Id}是管理员，不能删除");
+        }
+        var result = await userManager.DeleteAsync(user);
+        return result.Succeeded ? NoContent() : (IActionResult)ValidationProblem(result.ToString());
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] questionIds,
+                                                 [FromServices] UserManager<AppUser> userManager) {
+        var currentId = Convert.ToInt32(User.FindFirstValue("sub"));
+        foreach (var item in questionIds) {
+            if (item == currentId) {
+                continue;
+            }
+            var user = await userManager.FindByIdAsync(item.ToString());
+            if (user is null) {
+                continue;
+            }
+            if (await userManager.IsInRoleAsync(user, "admin")) {
+                continue;
+            }
+            await userManager.DeleteAsync(user);
+        }
+        return NoContent();
     }
 }
