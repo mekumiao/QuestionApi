@@ -285,4 +285,25 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         var result = await queryable.CountAsync();
         return Ok(result);
     }
+
+    [HttpDelete("{studentId:int}")]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteItem([FromRoute] int studentId) {
+        var row = await _dbContext.Students
+             .Where(v => v.StudentId == studentId)
+             .ExecuteDeleteAsync();
+        return row > 0 ? NoContent() : NotFound();
+    }
+
+    [HttpDelete]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] studentIds) {
+        await _dbContext.Students
+            .Where(v => studentIds.Contains(v.StudentId))
+            .ExecuteDeleteAsync();
+        return NoContent();
+    }
 }
