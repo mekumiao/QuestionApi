@@ -93,3 +93,17 @@ public class ExaminationUpdate {
     public int? Order { get; set; }
     public bool? IsPublish { get; set; }
 }
+
+public class CertificateDto {
+    public int UserId { get; set; }
+    public string? Avatar { get; set; }
+    public int? AvatarFileId { get; set; }
+    public required string UserName { get; set; }
+    public required string NickName { get; set; }
+    public int StudentId { get; set; }
+    public int ExaminationId { get; set; }
+    public required string ExaminationName { get; set; }
+    public int TimeTakenSeconds { get; set; }
+    public int Score { get; set; }
+    public bool IsSuccess { get; set; }
+}

@@ -53,5 +53,13 @@ public class MappingRegister : IRegister {
 
         config.NewConfig<Examination, ExaminationDto>()
             .Map(dest => dest.ExamPaperName, src => src.ExamPaper.ExamPaperName);
+
+        config.NewConfig<AppUser, CertificateDto>()
+            .Map(dest => dest.UserId, src => src.Id);
+
+        config.NewConfig<AnswerHistory, CertificateDto>()
+            .Map(dest => dest.ExaminationName, src => src.Examination!.ExaminationName, should => should.Examination != null)
+            .Map(dest => dest.Score, src => (src.TotalNumberAnswers - src.TotalIncorrectAnswers) / (double)src.TotalQuestions * 5, should => should.TotalQuestions > 0 && should.IsSubmission)
+            .AfterMapping((src, dest) => dest.IsSuccess = dest.Score >= 3 && src.IsSubmission && src.IsTimeout == false);
     }
 }

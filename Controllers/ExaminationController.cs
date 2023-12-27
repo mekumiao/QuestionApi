@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net.Mime;
 using System.Security.Claims;
@@ -199,5 +200,30 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
         }
 
         return Ok(new PagingResult<ExaminationPublishDto>(paging, total, resultItems));
+    }
+
+    [HttpGet("{examinationId:int}/{userId:int}/certificate")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(CertificateDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCertificate([FromRoute, Range(1, int.MaxValue)] int examinationId, [FromRoute, Range(1, int.MaxValue)] int userId) {
+        var user = await _dbContext.Set<AppUser>()
+            .Include(v => v.Student)
+            .SingleOrDefaultAsync(v => v.Id == userId);
+        if (user is null or { Student: null }) {
+            return NotFound();
+        }
+        var history = await _dbContext.AnswerHistories
+            .AsNoTracking()
+            .Include(v => v.Examination)
+            .Where(v => v.ExaminationId == examinationId && v.StudentId == user.Student.StudentId)
+            .FirstOrDefaultAsync();
+        if (history is null) {
+            return NotFound();
+        }
+
+        var result = _mapper.Map<CertificateDto>(user);
+        _mapper.Map(history, result);
+        return Ok(result);
     }
 }
