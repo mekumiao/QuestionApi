@@ -27,6 +27,7 @@ public class AnswerBoard {
     /// 作答总数
     /// </summary>
     public int TotalNumberAnswers { get; set; }
+    public int? ExaminationId { get; set; }
     public ICollection<AnswerBoardQuestion> Questions { get; set; } = [];
 }
 
