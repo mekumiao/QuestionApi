@@ -27,10 +27,8 @@ builder.Services.AddControllers().AddJsonOptions(options => {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
 });
-builder.Services.AddDbContext<QuestionDbContext>(options =>
-    options.UseNpgsql("Host=mini.dev;Username=postgres;Database=questiondb",
-        v => v.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-);
+var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
+builder.Services.AddDbContext<QuestionDbContext>(options => options.UseNpgsql(connectionString, v => v.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 builder.Services.AddMapster();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
