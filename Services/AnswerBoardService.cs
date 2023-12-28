@@ -101,8 +101,12 @@ public class AnswerBoardService(ILogger<ExamPaperService> logger, QuestionDbCont
             // 检查已存在的考试记录
             var existsHistory = await _dbContext.AnswerHistories
                 .AsNoTracking()
+                .Include(v => v.Examination)
                 .FirstOrDefaultAsync(v => v.StudentId == user.Student.StudentId && v.ExaminationId == examinationId);
             if (existsHistory is not null) {
+                if (existsHistory.Examination!.IsPublish is false) {
+                    return (null, $"考试{examinationId}还未发布，不能答题");
+                }
                 var resultDto = _mapper.Map<AnswerBoard>(existsHistory);
                 return (resultDto, null);
             }
@@ -125,6 +129,9 @@ public class AnswerBoardService(ILogger<ExamPaperService> logger, QuestionDbCont
         }
         if (examination.ExamPaper.ExamPaperQuestions.Count == default) {
             return (null, $"考试ID:{examinationId}关联的试卷ID:{examination.ExamPaperId}没有设置题目");
+        }
+        if (examination.IsPublish is false) {
+            return (null, $"考试{examinationId}还未发布，不能答题");
         }
 
         user.Student ??= new Student {
