@@ -80,6 +80,7 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AppUserClaimsPr
 
 builder.Services.AddScoped<ExamPaperService>();
 builder.Services.AddScoped<AnswerBoardService>();
+builder.Services.AddScoped<QuestionService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

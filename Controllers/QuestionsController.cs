@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using QuestionApi.Database;
 using QuestionApi.Models;
+using QuestionApi.Services;
 
 namespace QuestionApi.Controllers;
 
@@ -22,10 +23,16 @@ namespace QuestionApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
-public class QuestionsController(ILogger<QuestionsController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+public class QuestionsController(ILogger<QuestionsController> logger,
+                                 QuestionDbContext dbContext,
+                                 IMapper mapper,
+                                 ExamPaperService examPaperService,
+                                 QuestionService questionService) : ControllerBase {
     private readonly ILogger<QuestionsController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
+    private readonly ExamPaperService _examPaperService = examPaperService;
+    private readonly QuestionService _questionService = questionService;
 
     [HttpGet("count")]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
@@ -121,5 +128,59 @@ public class QuestionsController(ILogger<QuestionsController> logger, QuestionDb
     public async Task<IActionResult> DeleteItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] questionIds) {
         await _dbContext.Questions.Where(v => questionIds.Contains(v.QuestionId)).ExecuteDeleteAsync();
         return NoContent();
+    }
+
+    /// <summary>
+    /// 导入题目
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("import")]
+    [ProducesResponseType(typeof(QuestionDto[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ImportFromExcel([FromForm, Required] ImportQuestionFromExcelInput input) {
+        if (input.File == null || input.File.Length == 0) {
+            return ValidationProblem("未选择文件或文件为空");
+        }
+        using var memoryStream = new MemoryStream();
+        await input.File.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+        var (questions, errors) = await _questionService.ImportFromExcelAsync(memoryStream);
+        if (errors.Count > 0) {
+            return ValidationProblem(new ValidationProblemDetails(errors));
+        }
+        var result = _mapper.Map<QuestionDto[]>(questions);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 导出题目
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [HttpPost("export")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ExportToExcel([FromBody, MaxLength(10), MinLength(1)] int[] input) {
+        var memoryStream = new MemoryStream();
+        var error = await _questionService.ExportToExcelAsync(memoryStream, input);
+        if (error is not null) {
+            return ValidationProblem(error);
+        }
+        var contentType = ExamPapersController.GetContentType("file.xlsx");
+        var fileName = $"导出题目-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.xlsx";
+        return File(memoryStream, contentType, fileName);
+    }
+
+    /// <summary>
+    /// 下载导入模板
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("export/template")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult ExportToExcelTemplate() {
+        var memoryStream = new MemoryStream();
+        _examPaperService.ExportToExcelTemplate(memoryStream);
+        var contentType = ExamPapersController.GetContentType("file.xlsx");
+        var fileName = $"题目导入模板-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.xlsx";
+        return File(memoryStream, contentType, fileName);
     }
 }

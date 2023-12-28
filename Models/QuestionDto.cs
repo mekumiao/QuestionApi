@@ -73,3 +73,8 @@ public class OptionUpdate {
     public char? OptionCode { get; set; }
     public string? OptionText { get; set; }
 }
+
+
+public class ImportQuestionFromExcelInput {
+    public required IFormFile File { get; set; }
+}

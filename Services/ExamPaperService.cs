@@ -101,7 +101,7 @@ public class ExamPaperService(ILogger<ExamPaperService> logger, QuestionDbContex
             .Where(v => examPaperIds.Contains(v.ExamPaperId))
             .OrderByDescending(v => v.ExamPaperId)
             .ToArrayAsync();
-        if (examPaperIds.Length == 0) {
+        if (examPapers.Length == 0) {
             return (null, "没有找到任何的试卷");
         }
         ExamPaperExcelGenerator.Generate(stream, examPapers);
@@ -401,6 +401,9 @@ public class ExamPaperExcelGenerator {
             if (package.Workbook.Worksheets.Any(v => v.Name == name)) {
                 name = $"{name}-{sheetIndex++}";
                 goto isExists;
+            }
+            if (string.IsNullOrWhiteSpace(name)) {
+                name = "Sheet1";
             }
             var worksheet = package.Workbook.Worksheets.Add(name);
             SetTitle(worksheet);

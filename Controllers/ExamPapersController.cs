@@ -214,7 +214,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost("import")]
-    [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ExamPaperDto[]), StatusCodes.Status200OK)]
     public async Task<IActionResult> ImportFromExcel([FromForm] ImportExamPaperFromExcelInput input) {
         if (input.File == null || input.File.Length == 0) {
             return ValidationProblem("未选择文件或文件为空");
