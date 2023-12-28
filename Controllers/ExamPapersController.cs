@@ -68,7 +68,7 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         var totalQueryable = _dbContext.ExamPapers
             .AsNoTracking()
             .Where(v => v.ExamPaperType > ExamPaperType.None && v.ExamPaperType < ExamPaperType.RedoIncorrect);
-        totalQueryable = filter.Build(queryable);
+        totalQueryable = filter.Build(totalQueryable);
         var total = await totalQueryable.CountAsync();
 
         var result = await queryable.ToListAsync();

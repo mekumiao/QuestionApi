@@ -52,7 +52,7 @@ public class StudentsController(ILogger<StudentsController> logger, QuestionDbCo
         queryable = filter.Build(queryable);
 
         var totalQueryable = _dbContext.Students.AsNoTracking();
-        totalQueryable = filter.Build(queryable);
+        totalQueryable = filter.Build(totalQueryable);
 
         var result = await queryable.ToArrayAsync();
         var total = await totalQueryable.CountAsync();

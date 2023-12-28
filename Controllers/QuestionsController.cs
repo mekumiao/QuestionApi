@@ -55,7 +55,7 @@ public class QuestionsController(ILogger<QuestionsController> logger,
         queryable = filter.Build(queryable);
 
         var totalQueryable = _dbContext.Questions.AsNoTracking();
-        totalQueryable = filter.Build(queryable);
+        totalQueryable = filter.Build(totalQueryable);
         var total = await totalQueryable.CountAsync();
 
         var result = await queryable.ToListAsync();

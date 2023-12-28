@@ -60,7 +60,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
         queryable = filter.Build(queryable);
 
         var totalQueryable = _dbContext.Examinations.AsNoTracking();
-        totalQueryable = filter.Build(queryable);
+        totalQueryable = filter.Build(totalQueryable);
         var total = await totalQueryable.CountAsync();
 
         var result = await queryable.ToArrayAsync();
@@ -159,7 +159,7 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
         queryable = filter.Build(queryable);
 
         var totalQueryable = _dbContext.Examinations.AsNoTracking();
-        totalQueryable = filter.Build(queryable);
+        totalQueryable = filter.Build(totalQueryable);
         var total = await totalQueryable.CountAsync();
 
         var result = await queryable.ToArrayAsync();
