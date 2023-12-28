@@ -135,8 +135,8 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
                      .AddParameters(nameof(ExamPaperQuestion.ExamPaperId), paperId)
                      .AdaptToType<ExamPaperQuestion[]>();
                 item.ExamPaperQuestions.AddRange(examPaperQuestions);
-                item.TotalQuestions = item.ExamPaperQuestions.Count;
             }
+            item.TotalQuestions = item.ExamPaperQuestions.Count;
         }
 
         // using var transaction = await _dbContext.Database.BeginTransactionAsync();
