@@ -3,6 +3,10 @@ using System.Diagnostics;
 using System.Net.Mime;
 using System.Security.Claims;
 
+using EntityFramework.Exceptions.Common;
+
+using Mapster;
+
 using MapsterMapper;
 
 using Microsoft.AspNetCore.Authorization;
@@ -126,26 +130,36 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
 
         if (dto.Questions is not null and { Count: > 0 }) {
             item.ExamPaperQuestions.Clear();
-            item.ExamPaperQuestions.AddRange(_mapper.Map<List<ExamPaperQuestion>>(dto.Questions));
+            var examPaperQuestions = _mapper.From(dto.Questions)
+                 .AddParameters(nameof(ExamPaperQuestion.ExamPaperId), paperId)
+                 .AdaptToType<ExamPaperQuestion[]>();
+            item.ExamPaperQuestions.AddRange(examPaperQuestions);
             item.TotalQuestions = item.ExamPaperQuestions.Count;
         }
 
-        using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        await _dbContext.SaveChangesAsync();
-
-        if (dto.Questions is not null and { Count: > 0 }) {
-            foreach (var qitem in dto.Questions) {
-                if (string.IsNullOrWhiteSpace(qitem.CorrectAnswer) is false) {
-                    var eqitem = item.ExamPaperQuestions.Find(v => v.QuestionId == qitem.QuestionId);
-                    if (eqitem is not null) {
-                        eqitem.Question.CorrectAnswer = qitem.CorrectAnswer;
-                    }
-                }
-            }
+        // using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try {
             await _dbContext.SaveChangesAsync();
         }
+        catch (DbUpdateException ex) {
+            Debug.Assert(false);
+            _logger.LogError(ex, "保存试卷{paperId}时发生异常", paperId);
+            throw;
+        }
 
-        await transaction.CommitAsync();
+        // if (dto.Questions is not null and { Count: > 0 }) {
+        //     foreach (var qitem in dto.Questions) {
+        //         if (string.IsNullOrWhiteSpace(qitem.CorrectAnswer) is false) {
+        //             var eqitem = item.ExamPaperQuestions.Find(v => v.QuestionId == qitem.QuestionId);
+        //             if (eqitem is not null) {
+        //                 eqitem.Question.CorrectAnswer = qitem.CorrectAnswer;
+        //             }
+        //         }
+        //     }
+        //     await _dbContext.SaveChangesAsync();
+        // }
+
+        // await transaction.CommitAsync();
 
         var result = _mapper.Map<ExamPaperDto>(item);
         return Ok(result);

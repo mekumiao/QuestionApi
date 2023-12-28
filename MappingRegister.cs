@@ -61,5 +61,8 @@ public class MappingRegister : IRegister {
             .Map(dest => dest.ExaminationName, src => src.Examination!.ExaminationName, should => should.Examination != null)
             .Map(dest => dest.Score, src => (src.TotalNumberAnswers - src.TotalIncorrectAnswers) / (double)src.TotalQuestions * 5, should => should.TotalQuestions > 0 && should.IsSubmission)
             .AfterMapping((src, dest) => dest.IsSuccess = dest.Score >= 3 && src.IsSubmission && src.IsTimeout == false);
+
+        config.NewConfig<ExamPaperUpdate, ExamPaperQuestion>()
+            .Map(dest => dest.ExamPaperId, src => MapContext.Current!.Parameters[nameof(ExamPaperQuestion.ExamPaperId)]);
     }
 }
