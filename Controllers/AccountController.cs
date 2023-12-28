@@ -131,8 +131,8 @@ public class AccountController(ILogger<AccountController> logger,
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateInfo([FromBody, FromForm] InfoUpdate input) {
-        var userId = User.FindFirstValue("sub")!;
-        var user = await _userManager.FindByIdAsync(userId);
+        var userId = Convert.ToInt32(User.FindFirstValue("sub"));
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null) {
             return NotFound();
         }
@@ -140,7 +140,13 @@ public class AccountController(ILogger<AccountController> logger,
         if (user.AvatarFileId <= 0) {
             user.AvatarFileId = null;
         }
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
         await _userManager.UpdateAsync(user);
+        if (string.IsNullOrWhiteSpace(input.NickName) is false) {
+            await _dbContext.Students.Where(v => v.UserId == userId)
+                .ExecuteUpdateAsync(v => v.SetProperty(b => b.StudentName, input.NickName));
+        }
+        await transaction.CommitAsync();
         var roles = await _userManager.GetRolesAsync(user);
         var result = _mapper.Map<UserDto>(user);
         result.Roles = roles;
