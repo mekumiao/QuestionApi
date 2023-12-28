@@ -183,6 +183,13 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
         }
     }
 
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] paperIds) {
+        await _dbContext.ExamPapers.Where(v => paperIds.Contains(v.ExamPaperId)).ExecuteDeleteAsync();
+        return NoContent();
+    }
+
     /// <summary>
     /// 随机生成试卷
     /// </summary>
