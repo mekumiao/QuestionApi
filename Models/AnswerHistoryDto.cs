@@ -6,6 +6,7 @@ namespace QuestionApi.Models;
 
 public class AnswerHistoryFilter {
     public int? StudentId { get; set; }
+    public int? ExaminationId { get; set; }
     public int? ExamPaperId { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
@@ -17,6 +18,9 @@ public class AnswerHistoryFilter {
     public IQueryable<AnswerHistory> Build(IQueryable<AnswerHistory> queryable) {
         if (StudentId.HasValue) {
             queryable = queryable.Where(v => v.StudentId == StudentId);
+        }
+        if (ExaminationId.HasValue) {
+            queryable = queryable.Where(v => v.ExaminationId == ExaminationId);
         }
         if (ExamPaperId.HasValue) {
             queryable = queryable.Where(v => v.ExamPaperId == ExamPaperId);
