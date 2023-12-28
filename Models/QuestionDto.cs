@@ -6,15 +6,17 @@ namespace QuestionApi.Models;
 
 public class QuestionFilter {
     [MaxLength(50)]
-    public string? QuestionText { get; set; }
+    public string? QuestionTextOrId { get; set; }
     [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public QuestionType? QuestionType { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
 
     public IQueryable<Question> Build(IQueryable<Question> queryable) {
-        if (!string.IsNullOrWhiteSpace(QuestionText)) {
-            queryable = queryable.Where(v => v.QuestionText.Contains(QuestionText));
+        if (!string.IsNullOrWhiteSpace(QuestionTextOrId)) {
+            queryable = int.TryParse(QuestionTextOrId, out var questionId)
+                ? queryable.Where(v => v.QuestionText.Contains(QuestionTextOrId) || v.QuestionId == questionId)
+                : queryable.Where(v => v.QuestionText.Contains(QuestionTextOrId));
         }
         if (QuestionType is not null and > 0) {
             queryable = queryable.Where(v => v.QuestionType == QuestionType);
