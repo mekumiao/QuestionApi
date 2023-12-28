@@ -93,16 +93,16 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
     [ProducesResponseType(typeof(ExamPaperDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody, FromForm] ExamPaperInput dto) {
         var item = _mapper.Map<ExamPaper>(dto);
-        if (dto.Questions.Count != 0) {
+        if (dto.Questions is not null and { Count: not 0 }) {
             item.ExamPaperQuestions.AddRange(_mapper.Map<ExamPaperQuestion[]>(dto.Questions));
             item.TotalQuestions = item.ExamPaperQuestions.Count;
-        }
 
-        var questionIds = dto.Questions.Select(v => v.QuestionId).ToArray();
-        await _dbContext.Questions
-            .Include(v => v.Options.OrderBy(t => t.OptionCode))
-            .Where(v => questionIds.Contains(v.QuestionId))
-            .LoadAsync();
+            var questionIds = dto.Questions.Select(v => v.QuestionId).ToArray();
+            await _dbContext.Questions
+                .Include(v => v.Options.OrderBy(t => t.OptionCode))
+                .Where(v => questionIds.Contains(v.QuestionId))
+                .LoadAsync();
+        }
 
         item.ExamPaperType = ExamPaperType.Create;
 
@@ -128,13 +128,15 @@ public class ExamPapersController(ILogger<ExamPapersController> logger,
 
         _mapper.Map(dto, item);
 
-        if (dto.Questions is not null and { Count: > 0 }) {
+        if (dto.Questions is not null) {
             item.ExamPaperQuestions.Clear();
-            var examPaperQuestions = _mapper.From(dto.Questions)
-                 .AddParameters(nameof(ExamPaperQuestion.ExamPaperId), paperId)
-                 .AdaptToType<ExamPaperQuestion[]>();
-            item.ExamPaperQuestions.AddRange(examPaperQuestions);
-            item.TotalQuestions = item.ExamPaperQuestions.Count;
+            if (dto.Questions.Count != 0) {
+                var examPaperQuestions = _mapper.From(dto.Questions)
+                     .AddParameters(nameof(ExamPaperQuestion.ExamPaperId), paperId)
+                     .AdaptToType<ExamPaperQuestion[]>();
+                item.ExamPaperQuestions.AddRange(examPaperQuestions);
+                item.TotalQuestions = item.ExamPaperQuestions.Count;
+            }
         }
 
         // using var transaction = await _dbContext.Database.BeginTransactionAsync();

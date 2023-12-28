@@ -37,11 +37,14 @@ public class ExamPaperDto {
 
 public class ExamPaperInput {
     [MaxLength(256)]
-    public string ExamPaperName { get; set; } = string.Empty;
+    public required string ExamPaperName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
-    [MaxLength(100), MinLength(1)]
-    public List<ExamPaperQuestionInput> Questions { get; set; } = [];
+    /// <summary>
+    /// 题目列表(允许传入空数组)
+    /// </summary>
+    [MaxLength(100)]
+    public List<ExamPaperQuestionInput>? Questions { get; set; }
 }
 
 public class ExamPaperQuestionInput {
@@ -61,8 +64,8 @@ public class ExamPaperUpdate {
     public string? ExamPaperName { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel? DifficultyLevel { get; set; }
-    [MaxLength(100), MinLength(1)]
-    public List<ExamPaperQuestionUpdate> Questions { get; set; } = [];
+    [MaxLength(100)]
+    public List<ExamPaperQuestionUpdate>? Questions { get; set; }
 }
 
 public class ExamPaperQuestionDto {
