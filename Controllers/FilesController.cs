@@ -36,15 +36,14 @@ public class FilesController(ILogger<FilesController> logger, QuestionDbContext 
         if (fileInput.File is null or { Length: 0 }) {
             return ValidationProblem("没有上传任何文件，或文件大小为0");
         }
+        else if (fileInput.File.Length > 2097152) {
+            ModelState.AddModelError(nameof(AppFileInput.File), "文件太大，最大支持2M的文件");
+            return ValidationProblem(ModelState);
+        }
         var userId = Convert.ToInt32(User.FindFirstValue("sub"));
         var userName = User.FindFirstValue("name");
         using var memoryStream = new MemoryStream();
         await fileInput.File.CopyToAsync(memoryStream);
-
-        if (memoryStream.Length > 2097152) {
-            ModelState.AddModelError("File", "The file is too large.");
-            return ValidationProblem(ModelState);
-        }
 
         var appFile = new AppFile() {
             Size = memoryStream.Length,
