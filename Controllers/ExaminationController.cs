@@ -226,4 +226,36 @@ public class ExaminationController(ILogger<ExaminationController> logger, Questi
         _mapper.Map(history, result);
         return Ok(result);
     }
+
+    [HttpPut("{examinationId:int}/publish")]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ExaminationDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Publish([FromRoute] int examinationId,
+                                             [FromBody, FromForm] ExaminationPublishInput input) {
+        var item = await _dbContext.Examinations.FindAsync(examinationId);
+        if (item is null) {
+            return NotFound();
+        }
+        item.IsPublish = input.IsPublish;
+        await _dbContext.SaveChangesAsync();
+        var result = _mapper.Map<ExaminationDto>(item);
+        return Ok(result);
+    }
+
+    [HttpPut("publish")]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ExaminationDto[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PublishItems([FromBody, FromForm] ExaminationPublishItemsInput input) {
+        await _dbContext.Examinations
+            .Where(v => input.ExaminationIds.Contains(v.ExaminationId))
+            .ExecuteUpdateAsync(v => v.SetProperty(b => b.IsPublish, input.IsPublish));
+        var examinations = await _dbContext.Examinations
+            .AsNoTracking()
+            .Where(v => input.ExaminationIds.Contains(v.ExaminationId))
+            .ToArrayAsync();
+        var result = _mapper.Map<ExaminationDto[]>(examinations);
+        return Ok(result);
+    }
 }

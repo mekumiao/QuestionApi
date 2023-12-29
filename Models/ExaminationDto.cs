@@ -107,3 +107,12 @@ public class CertificateDto {
     public int Score { get; set; }
     public bool IsSuccess { get; set; }
 }
+
+public class ExaminationPublishInput {
+    public required bool IsPublish { get; set; }
+}
+
+public class ExaminationPublishItemsInput : ExaminationPublishInput {
+    [MaxLength(20), MinLength(1)]
+    public required int[] ExaminationIds { get; set; }
+}
