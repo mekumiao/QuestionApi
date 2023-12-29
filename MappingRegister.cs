@@ -38,6 +38,7 @@ public class MappingRegister : IRegister {
 
         config.NewConfig<AnswerHistory, AnswerBoard>()
             .Fork(f => f.ForType<StudentAnswer, AnswerBoardQuestion>()
+            .Map(dest => dest.DifficultyLevel, src => src.Question.DifficultyLevel)
             .Map(dest => dest.QuestionText, src => src.Question.QuestionText)
             .Map(dest => dest.Options, src => src.Question.Options.OrderBy(v => v.OptionCode))
             .Map(dest => dest.CorrectAnswer, src => src.Question.CorrectAnswer, should => should.AnswerHistory.IsSubmission))
