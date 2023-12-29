@@ -38,17 +38,21 @@ public class QuestionDto {
 }
 
 public class QuestionInput {
-    public required string QuestionText { get; set; } = string.Empty;
+    [MaxLength(500)]
+    public required string QuestionText { get; set; }
+    [MaxLength(256)]
+    public required string CorrectAnswer { get; set; }
     [EnumDataType(typeof(QuestionType), ErrorMessage = "无效的枚举值")]
     public required QuestionType QuestionType { get; set; }
-    public required string CorrectAnswer { get; set; } = string.Empty;
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
     public List<OptionInput>? Options { get; set; }
 }
 
 public class QuestionUpdate {
+    [MaxLength(500)]
     public string? QuestionText { get; set; }
+    [MaxLength(256)]
     public string? CorrectAnswer { get; set; }
     [EnumDataType(typeof(DifficultyLevel), ErrorMessage = "无效的枚举值")]
     public DifficultyLevel DifficultyLevel { get; set; }
@@ -63,6 +67,7 @@ public class OptionDto {
 }
 
 public class OptionInput {
+    [MaxLength(500)]
     public string OptionText { get; set; } = string.Empty;
     public char OptionCode { get; set; }
 }
@@ -71,6 +76,7 @@ public class OptionUpdate {
 
     public int OptionId { get; set; }
     public char? OptionCode { get; set; }
+    [MaxLength(500)]
     public string? OptionText { get; set; }
 }
 

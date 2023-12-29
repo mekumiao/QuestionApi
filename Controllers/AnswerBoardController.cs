@@ -375,6 +375,11 @@ public class AnswerBoardController(ILogger<AnswerBoardController> logger,
                 // 跳过未作答的题目
                 continue;
             }
+            if (string.IsNullOrWhiteSpace(right)) {
+                // 标准答案为空时，作答判为对
+                item.IsCorrect = true;
+                continue;
+            }
             item.IsCorrect = item.Question.QuestionType == QuestionType.MultipleChoice
                 ? left.Length == right.Length && right.Join(left, v => v, n => n, (v, n) => v).Count() == right.Length
                 : left == right;

@@ -340,7 +340,9 @@ public partial class ExamPaperExcelParser {
 
     private static string? SetCorrectAnswer(ExamPaperQuestion question, string cellValue, int row, int col) {
         if (string.IsNullOrWhiteSpace(cellValue)) {
-            return $"第{row}行{col}列的值{cellValue}不能为空白";
+            // return $"第{row}行{col}列的值{cellValue}不能为空白";
+            // 允许不设置答案（不设置答案的题目，提交任何答案都将判对）
+            return null;
         }
         switch (question.Question.QuestionType) {
             case QuestionType.SingleChoice:
