@@ -86,23 +86,50 @@ public class AnswerHistoriesController(ILogger<AnswerHistoriesController> logger
             return NotFound();
         }
         _dbContext.AnswerHistories.Remove(history);
+
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try {
             await _dbContext.SaveChangesAsync();
+            if (history.Examination is not null) {
+                await _dbContext.Examinations
+                    .Where(v => v.ExaminationId == history.ExaminationId)
+                    .ExecuteUpdateAsync(v => v.SetProperty(b => b.ExamParticipantCount, b => b.ExamParticipantCount - 1));
+            }
         }
         catch (DbUpdateException ex) {
             Debug.Assert(false);
             _logger.LogError(ex, "方法{name}: 删除历史记录{id}时移除", nameof(DeleteAnswerHistoryItem), answerHistoryId);
             throw;
         }
+        await transaction.CommitAsync();
+
         return NoContent();
     }
 
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteAnswerHistoryItems([FromBody, FromForm, MaxLength(20), MinLength(1)] int[] answerHistoryIds) {
+        var histories = await _dbContext.AnswerHistories
+            .Where(v => answerHistoryIds.Contains(v.AnswerHistoryId))
+            .ToArrayAsync();
+
+        var examinations = histories
+            .Where(v => v.ExaminationId != null)
+            .GroupBy(v => v.ExaminationId)
+            .Select(v => new { ExaminationId = v.Key!.Value, Count = v.Count() })
+            .ToArray();
+
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        foreach (var item in examinations) {
+            await _dbContext.Examinations
+                .Where(v => v.ExaminationId == item.ExaminationId)
+                .ExecuteUpdateAsync(v => v.SetProperty(b => b.ExamParticipantCount, b => b.ExamParticipantCount - item.Count));
+        }
         var rows = await _dbContext.AnswerHistories
             .Where(v => answerHistoryIds.Contains(v.AnswerHistoryId))
             .ExecuteDeleteAsync();
+        await transaction.CommitAsync();
+
         return NoContent();
     }
 }
