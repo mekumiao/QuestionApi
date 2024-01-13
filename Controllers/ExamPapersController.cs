@@ -26,14 +26,11 @@ namespace QuestionApi.Controllers;
 /// <param name="logger"></param>
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
-[ApiController]
 [Authorize(Roles = "admin")]
-[Route("[controller]")]
-[Produces(MediaTypeNames.Application.Json)]
 public class ExamPapersController(ILogger<ExamPapersController> logger,
                               QuestionDbContext dbContext,
                               ExamPaperService examPaperService,
-                              IMapper mapper) : ControllerBase {
+                              IMapper mapper) : BaseController {
     private readonly ILogger<ExamPapersController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly ExamPaperService _examPaperService = examPaperService;

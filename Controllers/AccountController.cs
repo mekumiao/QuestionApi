@@ -25,17 +25,14 @@ namespace QuestionApi.Controllers;
 /// <param name="logger"></param>
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
-[ApiController]
 [Authorize]
-[Route("[controller]")]
-[Produces(MediaTypeNames.Application.Json)]
 public class AccountController(ILogger<AccountController> logger,
                                QuestionDbContext dbContext,
                                IMapper mapper,
                                IOptions<JwtBearerOptions> jwtOptions,
                                RoleManager<AppRole> roleManager,
                                SignInManager<AppUser> signInManager,
-                               UserManager<AppUser> userManager) : ControllerBase {
+                               UserManager<AppUser> userManager) : BaseController {
     private readonly ILogger<AccountController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;

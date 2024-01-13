@@ -21,11 +21,8 @@ namespace QuestionApi.Controllers;
 /// <param name="logger"></param>
 /// <param name="dbContext"></param>
 /// <param name="mapper"></param>
-[ApiController]
 [Authorize]
-[Route("[controller]")]
-[Produces(MediaTypeNames.Application.Json)]
-public class FilesController(ILogger<FilesController> logger, QuestionDbContext dbContext, IMapper mapper) : ControllerBase {
+public class FilesController(ILogger<FilesController> logger, QuestionDbContext dbContext, IMapper mapper) : BaseController {
     private readonly ILogger<FilesController> _logger = logger;
     private readonly QuestionDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
